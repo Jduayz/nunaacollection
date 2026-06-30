@@ -209,24 +209,42 @@ let products = [
   },
   {
     id: 19,
-    code: 'nn-019 + nn-020',
-    name: 'Spaghetti crop top + Shorts',
-    price: 640,
-    detail: 'Flowers collection • Set',
+    code: 'nn-019',
+    name: 'Spaghetti crop top',
+    price: 320,
+    detail: 'Flowers collection • Top',
     colors: getColors(colorSets.flowerPattern),
     image: 'assets/images/products/nn-019-020-flower-set.jpeg'
   },
   {
     id: 20,
-    code: 'nn-021 + nn-022',
-    name: 'Puff Sleeve + Skirt',
-    price: 640,
-    detail: 'Flowers collection • Set',
+    code: 'nn-020',
+    name: 'Shorts',
+    price: 320,
+    detail: 'Flowers collection • Shorts',
+    colors: getColors(colorSets.flowerPattern),
+    image: 'assets/images/products/nn-019-020-flower-set.jpeg'
+  },
+  {
+    id: 21,
+    code: 'nn-021',
+    name: 'Puff Sleeve',
+    price: 320,
+    detail: 'Flowers collection • Top',
     colors: getColors(colorSets.flowerPattern),
     image: 'assets/images/products/nn-021-022-flower-set.jpeg'
   },
   {
-    id: 21,
+    id: 22,
+    code: 'nn-022',
+    name: 'Skirt',
+    price: 320,
+    detail: 'Flowers collection • Skirt',
+    colors: getColors(colorSets.flowerPattern),
+    image: 'assets/images/products/nn-021-022-flower-set.jpeg'
+  },
+  {
+    id: 23,
     code: 'nn-023',
     name: 'Cupcake top linen fabric',
     price: 350,
@@ -235,7 +253,7 @@ let products = [
     image: 'assets/images/products/nn-023-cupcake-top-linen.jpeg'
   },
   {
-    id: 22,
+    id: 24,
     code: 'nn-024',
     name: 'Long sleeve candy collection',
     price: 350,
@@ -244,7 +262,7 @@ let products = [
     image: 'assets/images/products/nn-024-long-sleeve-candy.jpeg'
   },
   {
-    id: 23,
+    id: 25,
     code: 'nn-025',
     name: 'Long sleeve crop top cotton',
     price: 350,
@@ -253,7 +271,7 @@ let products = [
     image: 'assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg'
   },
   {
-    id: 24,
+    id: 26,
     code: 'nn-026',
     name: 'Long sleeve crop top linen',
     price: 420,
@@ -262,7 +280,7 @@ let products = [
     image: 'assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg'
   },
   {
-    id: 25,
+    id: 27,
     code: 'nn-027',
     name: 'Nunaa cotton coat',
     price: 420,
@@ -314,7 +332,8 @@ function isStockManaged(color) {
 }
 
 function getCartQuantity(code, colorName) {
-  return cart.filter(item => item.code === code && item.selectedColor.name === colorName).length;
+  const cartItem = cart.find(item => item.code === code && item.selectedColor.name === colorName);
+  return cartItem ? cartItem.quantity : 0;
 }
 
 function getRemainingStock(product, color) {
@@ -335,6 +354,33 @@ function formatStockText(product) {
   if (!isStockManaged(selectedColor)) return 'พร้อมสั่งซื้อ';
   const remaining = getRemainingStock(product, selectedColor);
   return remaining > 0 ? `เหลือ ${remaining} ชิ้น` : 'สินค้าหมด';
+}
+
+function findCartItem(code, colorName) {
+  return cart.find(item => item.code === code && item.selectedColor.name === colorName);
+}
+
+function getProductByCode(code) {
+  return products.find(product => product.code === code);
+}
+
+function refreshProductStockDisplays() {
+  products.forEach(product => {
+    const card = productGrid.querySelector(`[data-product-id="${product.id}"]`);
+    if (!card) return;
+
+    const stockStatus = card.querySelector('[data-stock-id]');
+    if (stockStatus) stockStatus.textContent = formatStockText(product);
+
+    card.querySelectorAll('.color-swatch').forEach(swatch => {
+      const color = product.colors[Number(swatch.dataset.colorIndex)];
+      swatch.disabled = !isColorAvailable(product, color);
+    });
+
+    const addButton = card.querySelector('.add-cart');
+    if (addButton) addButton.disabled = !getProductAvailability(product);
+    card.classList.toggle('sold-out', !getProductAvailability(product));
+  });
 }
 
 function normalizeProduct(row, index) {
@@ -375,7 +421,7 @@ async function loadProductsFromSheet() {
 
 function renderProducts() {
   productGrid.innerHTML = products.map(product => `
-    <article class="product-card${getProductAvailability(product) ? '' : ' sold-out'}">
+    <article class="product-card${getProductAvailability(product) ? '' : ' sold-out'}" data-product-id="${product.id}">
       <div class="product-image">
         <img src="${product.image}" alt="${product.name}" loading="lazy">
       </div>
@@ -419,14 +465,22 @@ function renderCart() {
     cartItems.innerHTML = cart.map(item => `
       <div class="cart-row">
         <span>${item.code} • ${item.name} • สี${item.selectedColor.name}</span>
-        <strong>${formatter.format(item.price)}</strong>
+        <div class="cart-row-actions">
+          <div class="quantity-control" aria-label="จำนวน ${item.name} สี${item.selectedColor.name}">
+            <button type="button" class="quantity-button" data-action="decrease" data-code="${item.code}" data-color="${item.selectedColor.name}" aria-label="ลดจำนวน">−</button>
+            <span>${item.quantity}</span>
+            <button type="button" class="quantity-button" data-action="increase" data-code="${item.code}" data-color="${item.selectedColor.name}" aria-label="เพิ่มจำนวน">+</button>
+          </div>
+          <strong>${formatter.format(item.price * item.quantity)}</strong>
+        </div>
       </div>
     `).join('');
   }
 
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   cartTotal.textContent = formatter.format(total);
-  cartCount.textContent = cart.length;
+  cartCount.textContent = itemCount;
   renderOrderSummary();
 }
 
@@ -436,9 +490,9 @@ function buildOrderSummary() {
   }
 
   const orderItems = cart.map((item, index) => (
-    `${index + 1}. ${item.code} • ${item.name} • สี${item.selectedColor.name} - ${formatter.format(item.price)}`
+    `${index + 1}. ${item.code} • ${item.name} • สี${item.selectedColor.name} x ${item.quantity} - ${formatter.format(item.price * item.quantity)}`
   )).join('\n');
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   return [
     'Nunaa.Collection Order',
@@ -464,7 +518,7 @@ function buildOrderPayload() {
     name: item.name,
     colorName: item.selectedColor.name,
     price: item.price,
-    quantity: 1
+    quantity: item.quantity
   }));
 
   return {
@@ -478,7 +532,7 @@ function buildOrderPayload() {
       note: customerNote.value.trim()
     },
     items,
-    total: cart.reduce((sum, item) => sum + item.price, 0),
+    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
     summary: buildOrderSummary()
   };
 }
@@ -543,8 +597,14 @@ productGrid.addEventListener('click', event => {
     return;
   }
 
-  cart.push({ ...product, selectedColor });
+  const existingCartItem = findCartItem(product.code, selectedColor.name);
+  if (existingCartItem) {
+    existingCartItem.quantity += 1;
+  } else {
+    cart.push({ ...product, selectedColor, quantity: 1 });
+  }
   renderCart();
+  refreshProductStockDisplays();
 
   button.textContent = 'เพิ่มแล้ว';
   button.classList.add('added');
@@ -556,6 +616,33 @@ productGrid.addEventListener('click', event => {
   const card = button.closest('.product-card');
   const stockStatus = card.querySelector('[data-stock-id]');
   if (stockStatus) stockStatus.textContent = formatStockText(product);
+});
+
+cartItems.addEventListener('click', event => {
+  const button = event.target.closest('.quantity-button');
+  if (!button) return;
+
+  const cartItem = findCartItem(button.dataset.code, button.dataset.color);
+  if (!cartItem) return;
+
+  const product = getProductByCode(cartItem.code);
+
+  if (button.dataset.action === 'increase') {
+    if (product && isColorAvailable(product, cartItem.selectedColor)) {
+      cartItem.quantity += 1;
+    }
+  }
+
+  if (button.dataset.action === 'decrease') {
+    cartItem.quantity -= 1;
+    if (cartItem.quantity <= 0) {
+      const itemIndex = cart.indexOf(cartItem);
+      cart.splice(itemIndex, 1);
+    }
+  }
+
+  renderCart();
+  refreshProductStockDisplays();
 });
 
 menuButton.addEventListener('click', () => {
@@ -582,7 +669,7 @@ checkoutForm.addEventListener('submit', async event => {
   try {
     await submitOrderToSheet();
     await navigator.clipboard.writeText(orderSummary.textContent);
-    copyStatus.textContent = `สร้าง ${currentOrderId} และคัดลอกออเดอร์แล้ว สามารถส่งให้ร้านทาง Instagram ได้เลย`;
+    copyStatus.textContent = `สร้าง ${currentOrderId} เป็น pending และคัดลอกออเดอร์แล้ว ส่งสลิปให้ร้านเพื่อยืนยันชำระเงิน`;
   } catch (error) {
     copyStatus.textContent = `สร้าง ${currentOrderId} แล้ว แต่ยังบันทึก/คัดลอกไม่สำเร็จ: ${error.message}`;
   }

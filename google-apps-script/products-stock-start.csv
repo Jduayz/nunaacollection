@@ -83,8 +83,10 @@ nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nuna
 nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
 nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,เขียว,#94bd78,1,TRUE
 nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes.jpeg,ลายผ้าลินิน,"linear-gradient(135deg, #f2eadb 0 35%, #b8a58a 35% 50%, #f7f4ec 50% 68%, #6f7374 68% 100%)",1,TRUE
-nn-019 + nn-020,Spaghetti crop top + Shorts,640,Flowers collection • Set,assets/images/products/nn-019-020-flower-set.jpeg,ลายดอก,"linear-gradient(135deg, #f5efd9 0 40%, #d9b184 40% 50%, #f8f1df 50% 70%, #8ea36d 70% 100%)",1,TRUE
-nn-021 + nn-022,Puff Sleeve + Skirt,640,Flowers collection • Set,assets/images/products/nn-021-022-flower-set.jpeg,ลายดอก,"linear-gradient(135deg, #f5efd9 0 40%, #d9b184 40% 50%, #f8f1df 50% 70%, #8ea36d 70% 100%)",1,TRUE
+nn-019,Spaghetti crop top,320,Flowers collection • Top,assets/images/products/nn-019-020-flower-set.jpeg,ลายดอก,"linear-gradient(135deg, #f5efd9 0 40%, #d9b184 40% 50%, #f8f1df 50% 70%, #8ea36d 70% 100%)",1,TRUE
+nn-020,Shorts,320,Flowers collection • Shorts,assets/images/products/nn-019-020-flower-set.jpeg,ลายดอก,"linear-gradient(135deg, #f5efd9 0 40%, #d9b184 40% 50%, #f8f1df 50% 70%, #8ea36d 70% 100%)",1,TRUE
+nn-021,Puff Sleeve,320,Flowers collection • Top,assets/images/products/nn-021-022-flower-set.jpeg,ลายดอก,"linear-gradient(135deg, #f5efd9 0 40%, #d9b184 40% 50%, #f8f1df 50% 70%, #8ea36d 70% 100%)",1,TRUE
+nn-022,Skirt,320,Flowers collection • Skirt,assets/images/products/nn-021-022-flower-set.jpeg,ลายดอก,"linear-gradient(135deg, #f5efd9 0 40%, #d9b184 40% 50%, #f8f1df 50% 70%, #8ea36d 70% 100%)",1,TRUE
 nn-023,Cupcake top linen fabric,350,"Linen • Chest 24""-36""",assets/images/products/nn-023-cupcake-top-linen.jpeg,ลายผ้าลินิน,"linear-gradient(135deg, #f2eadb 0 35%, #b8a58a 35% 50%, #f7f4ec 50% 68%, #6f7374 68% 100%)",1,TRUE
 nn-024,Long sleeve candy collection,350,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,ขาว,#edf1ee,1,TRUE
 nn-024,Long sleeve candy collection,350,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,มัสตาร์ด,#e7b65d,1,TRUE

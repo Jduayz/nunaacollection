@@ -170,6 +170,40 @@ h2 { font-family: Georgia, serif; font-size: clamp(2rem, 4vw, 4rem); margin: 0; 
 .cart-panel { background: var(--paper); margin: 0 clamp(18px, 5vw, 72px); border-radius: var(--radius); border: 1px solid var(--line); }
 .cart-items { display: grid; gap: 12px; margin: 22px 0; }
 .cart-row { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.cart-row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+}
+.quantity-control {
+  display: inline-flex;
+  align-items: center;
+  min-width: 112px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255,250,242,.75);
+}
+.quantity-control span {
+  min-width: 36px;
+  text-align: center;
+  font-weight: 800;
+}
+.quantity-button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: var(--accent-dark);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+.quantity-button:hover {
+  background: rgba(138, 90, 68, .12);
+}
 .cart-total { display: flex; justify-content: space-between; font-size: 1.2rem; margin-bottom: 24px; }
 
 .split { display: grid; grid-template-columns: .8fr 1fr; gap: 28px; align-items: start; }
@@ -252,6 +286,8 @@ h2 { font-family: Georgia, serif; font-size: clamp(2rem, 4vw, 4rem); margin: 0; 
   .payment-box { grid-template-columns: 1fr; }
   .payment-box img { justify-self: start; max-width: 280px; }
   .product-image { height: 320px; }
+  .cart-row { display: grid; }
+  .cart-row-actions { justify-content: space-between; }
   .cart-panel { margin: 0 18px; }
   .site-footer { flex-direction: column; }
 }

@@ -1,6 +1,22 @@
 const PRODUCTS_SHEET = 'Products';
 const ORDERS_SHEET = 'Orders';
 const SPREADSHEET_ID = '1-ytw4BwY7E0LXAvkkI7B6_G2suv60l6-d_1UmfBE4g4';
+const ORDERS_HEADERS = [
+  'createdAt',
+  'orderId',
+  'status',
+  'stockDeducted',
+  'paidAt',
+  'customerName',
+  'phone',
+  'address',
+  'province',
+  'postal',
+  'note',
+  'items',
+  'total',
+  'summary'
+];
 
 function doGet(event) {
   const action = event.parameter.action || 'products';
@@ -63,50 +79,142 @@ function createOrder(payload) {
     const items = payload.items || [];
     if (!items.length) throw new Error('ไม่มีสินค้าในออเดอร์');
 
-    const productsSheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
     const ordersSheet = getOrCreateOrdersSheet();
-    const productValues = productsSheet.getDataRange().getValues();
-    const headers = productValues[0].map(String);
-    const codeIndex = headers.indexOf('code');
-    const colorIndex = headers.indexOf('colorName') >= 0 ? headers.indexOf('colorName') : headers.indexOf('color');
-    const stockIndex = headers.indexOf('stock');
+    validateStock(items);
+    appendPendingOrder(ordersSheet, orderId, payload, items);
 
-    if (codeIndex < 0 || colorIndex < 0 || stockIndex < 0) {
-      throw new Error('Products sheet ต้องมี column: code, colorName, stock');
-    }
-
-    items.forEach(item => {
-      const rowIndex = findProductRow(productValues, codeIndex, colorIndex, item.code, item.colorName);
-      if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${item.code} สี${item.colorName}`);
-
-      const currentStock = Number(productValues[rowIndex][stockIndex] || 0);
-      const quantity = Number(item.quantity || 1);
-      if (currentStock < quantity) {
-        throw new Error(`${item.code} สี${item.colorName} เหลือ ${currentStock} ชิ้น`);
-      }
-
-      productValues[rowIndex][stockIndex] = currentStock - quantity;
-      productsSheet.getRange(rowIndex + 1, stockIndex + 1).setValue(currentStock - quantity);
-    });
-
-    ordersSheet.appendRow([
-      new Date(),
-      orderId,
-      payload.customer && payload.customer.name,
-      payload.customer && payload.customer.phone,
-      payload.customer && payload.customer.address,
-      payload.customer && payload.customer.province,
-      payload.customer && payload.customer.postal,
-      payload.customer && payload.customer.note,
-      JSON.stringify(items),
-      Number(payload.total || 0),
-      payload.summary || ''
-    ]);
-
-    return { ok: true, orderId };
+    return { ok: true, orderId, status: 'pending' };
   } finally {
     lock.releaseLock();
   }
+}
+
+function appendPendingOrder(sheet, orderId, payload, items) {
+  const customer = payload.customer || {};
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
+  const values = {
+    createdAt: new Date(),
+    orderId,
+    status: 'pending',
+    stockDeducted: false,
+    paidAt: '',
+    customerName: customer.name || '',
+    phone: customer.phone || '',
+    address: customer.address || '',
+    province: customer.province || '',
+    postal: customer.postal || '',
+    note: customer.note || '',
+    items: JSON.stringify(items),
+    total: Number(payload.total || 0),
+    summary: payload.summary || ''
+  };
+
+  const row = headers.map(header => values[header] === undefined ? '' : values[header]);
+
+  sheet.appendRow(row);
+}
+
+function validateStock(items) {
+  const productsSheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
+  const productValues = productsSheet.getDataRange().getValues();
+  const headers = productValues[0].map(String);
+  const codeIndex = headers.indexOf('code');
+  const colorIndex = headers.indexOf('colorName') >= 0 ? headers.indexOf('colorName') : headers.indexOf('color');
+  const stockIndex = headers.indexOf('stock');
+
+  if (codeIndex < 0 || colorIndex < 0 || stockIndex < 0) {
+    throw new Error('Products sheet ต้องมี column: code, colorName, stock');
+  }
+
+  items.forEach(item => {
+    const rowIndex = findProductRow(productValues, codeIndex, colorIndex, item.code, item.colorName);
+    if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${item.code} สี${item.colorName}`);
+
+    const currentStock = Number(productValues[rowIndex][stockIndex] || 0);
+    const quantity = Number(item.quantity || 1);
+    if (currentStock < quantity) {
+      throw new Error(`${item.code} สี${item.colorName} เหลือ ${currentStock} ชิ้น`);
+    }
+  });
+}
+
+function onEdit(event) {
+  const range = event.range;
+  const sheet = range.getSheet();
+  if (sheet.getName() !== ORDERS_SHEET || range.getRow() === 1) return;
+
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
+  const statusColumn = headers.indexOf('status') + 1;
+  if (range.getColumn() !== statusColumn) return;
+
+  if (String(range.getValue()).toLowerCase() === 'paid') {
+    deductStockForOrderRow(sheet, range.getRow());
+  }
+}
+
+function processPaidOrders() {
+  const sheet = getOrCreateOrdersSheet();
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(String);
+  const statusIndex = headers.indexOf('status');
+  const stockDeductedIndex = headers.indexOf('stockDeducted');
+
+  for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
+    const status = String(values[rowIndex][statusIndex] || '').toLowerCase();
+    const stockDeducted = String(values[rowIndex][stockDeductedIndex] || '').toLowerCase();
+    if (status === 'paid' && stockDeducted !== 'true') {
+      deductStockForOrderRow(sheet, rowIndex + 1);
+    }
+  }
+}
+
+function deductStockForOrderRow(ordersSheet, rowNumber) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const headers = ordersSheet.getRange(1, 1, 1, ordersSheet.getLastColumn()).getValues()[0].map(String);
+    const row = ordersSheet.getRange(rowNumber, 1, 1, ordersSheet.getLastColumn()).getValues()[0];
+    const statusIndex = headers.indexOf('status');
+    const stockDeductedIndex = headers.indexOf('stockDeducted');
+    const paidAtIndex = headers.indexOf('paidAt');
+    const itemsIndex = headers.indexOf('items');
+
+    if (String(row[statusIndex]).toLowerCase() !== 'paid') return;
+    if (String(row[stockDeductedIndex]).toLowerCase() === 'true') return;
+
+    const items = JSON.parse(row[itemsIndex] || '[]');
+    reduceStock(items);
+
+    ordersSheet.getRange(rowNumber, stockDeductedIndex + 1).setValue(true);
+    ordersSheet.getRange(rowNumber, paidAtIndex + 1).setValue(new Date());
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function reduceStock(items) {
+  const productsSheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
+  const productValues = productsSheet.getDataRange().getValues();
+  const headers = productValues[0].map(String);
+  const codeIndex = headers.indexOf('code');
+  const colorIndex = headers.indexOf('colorName') >= 0 ? headers.indexOf('colorName') : headers.indexOf('color');
+  const stockIndex = headers.indexOf('stock');
+
+  items.forEach(item => {
+    const rowIndex = findProductRow(productValues, codeIndex, colorIndex, item.code, item.colorName);
+    if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${item.code} สี${item.colorName}`);
+
+    const currentStock = Number(productValues[rowIndex][stockIndex] || 0);
+    const quantity = Number(item.quantity || 1);
+    if (currentStock < quantity) {
+      throw new Error(`${item.code} สี${item.colorName} เหลือ ${currentStock} ชิ้น`);
+    }
+
+    const newStock = currentStock - quantity;
+    productValues[rowIndex][stockIndex] = newStock;
+    productsSheet.getRange(rowIndex + 1, stockIndex + 1).setValue(newStock);
+  });
 }
 
 function findProductRow(values, codeIndex, colorIndex, code, colorName) {
@@ -135,22 +243,21 @@ function getOrCreateOrdersSheet() {
 
   if (!sheet) {
     sheet = spreadsheet.insertSheet(ORDERS_SHEET);
-    sheet.appendRow([
-      'createdAt',
-      'orderId',
-      'customerName',
-      'phone',
-      'address',
-      'province',
-      'postal',
-      'note',
-      'items',
-      'total',
-      'summary'
-    ]);
+    sheet.appendRow(ORDERS_HEADERS);
+  } else {
+    ensureOrderHeaders(sheet);
   }
 
   return sheet;
+}
+
+function ensureOrderHeaders(sheet) {
+  const currentHeaders = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
+  const missingHeaders = ORDERS_HEADERS.filter(header => !currentHeaders.includes(header));
+
+  if (!missingHeaders.length) return;
+
+  sheet.getRange(1, currentHeaders.length + 1, 1, missingHeaders.length).setValues([missingHeaders]);
 }
 
 function getSpreadsheet() {

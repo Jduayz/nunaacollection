@@ -49,6 +49,17 @@ window.NUNAA_CONFIG = {
 
 - หน้าเว็บจะโหลดสินค้าและ stock จากชีต `Products`
 - ตอนลูกค้ากดคัดลอกออเดอร์ เว็บจะส่ง order ไป Apps Script
-- Apps Script จะบันทึก order ลงชีต `Orders`
-- Apps Script จะลด stock ในชีต `Products`
+- Apps Script จะบันทึก order ลงชีต `Orders` โดยตั้ง `status` เป็น `pending`
+- หลังร้านตรวจสลิปแล้ว ให้เปลี่ยน `status` ของ order เป็น `paid`
+- เมื่อ status เป็น `paid` Apps Script จะลด stock ในชีต `Products` และตั้ง `stockDeducted` เป็น `TRUE`
 - ถ้ายังไม่ใส่ `appsScriptUrl` เว็บจะใช้ข้อมูลสินค้าเดิมในไฟล์ `assets/js/app.js`
+
+## วิธีลด stock หลังยืนยันชำระเงิน
+
+ในชีต `Orders` ให้แก้ column `status` จาก `pending` เป็น `paid`
+
+ถ้า `onEdit` ไม่ทำงานอัตโนมัติ ให้กลับไป Apps Script แล้วกด Run ฟังก์ชัน:
+
+```text
+processPaidOrders
+```

@@ -1,0 +1,6 @@
+code,name,price,detail,image,colorName,colorValue,stock,active
+nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ขาว,#edf1ee,3,TRUE
+nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ชมพูอ่อน,#e9bdc0,2,TRUE
+nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ส้มอิฐ,#bb4a33,2,TRUE
+nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ขาว,#edf1ee,4,TRUE
+nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ดำ,#101010,1,TRUE

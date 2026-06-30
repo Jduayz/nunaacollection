@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nunaacollection.com" />
   <link rel="canonical" href="https://nunaacollection.com" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20260629-products" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260630-sheets-stock" />
 </head>
 <body>
   <header class="site-header">
@@ -21,6 +21,7 @@
       <a href="#fabric">Fabric</a>
       <a href="#care">Care</a>
       <a href="#order">Order</a>
+      <a class="cart-link" href="#cart">Cart <span id="cartCount" class="cart-count">0</span></a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
@@ -96,6 +97,54 @@
         <article><span>03</span><p>ชำระเงินผ่าน QR / โอนเงิน</p></article>
         <article><span>04</span><p>ส่งหลักฐานผ่าน Instagram DM</p></article>
       </div>
+      <form id="checkoutForm" class="checkout-form">
+        <div class="form-heading">
+          <h3>ข้อมูลจัดส่ง</h3>
+          <p>กรอกรายละเอียดสำหรับจัดส่งสินค้า</p>
+        </div>
+        <div class="form-grid">
+          <label>
+            ชื่อ-นามสกุล
+            <input id="customerName" name="customerName" type="text" autocomplete="name" required>
+          </label>
+          <label>
+            เบอร์ติดต่อ
+            <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" required>
+          </label>
+          <label class="full">
+            ที่อยู่จัดส่ง
+            <textarea id="customerAddress" name="customerAddress" rows="4" autocomplete="street-address" required></textarea>
+          </label>
+          <label>
+            จังหวัด
+            <input id="customerProvince" name="customerProvince" type="text" autocomplete="address-level1" required>
+          </label>
+          <label>
+            รหัสไปรษณีย์
+            <input id="customerPostal" name="customerPostal" type="text" inputmode="numeric" autocomplete="postal-code" required>
+          </label>
+          <label class="full">
+            หมายเหตุ
+            <textarea id="customerNote" name="customerNote" rows="3"></textarea>
+          </label>
+        </div>
+        <div class="order-summary-box">
+          <h3>สรุปออเดอร์</h3>
+          <pre id="orderSummary">เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์</pre>
+        </div>
+        <div class="payment-box">
+          <div>
+            <h3>ชำระเงินผ่าน QR</h3>
+          <p>สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram</p>
+          </div>
+          <img src="assets/images/payment/nunaa-promptpay-qr.jpeg" alt="Nunaa.Collection payment QR code">
+        </div>
+        <div class="checkout-actions">
+          <button class="button primary" type="submit">คัดลอกออเดอร์</button>
+          <a class="button ghost light" href="https://www.instagram.com/Nunaa.collection" target="_blank" rel="noreferrer">ส่งทาง Instagram</a>
+        </div>
+        <p id="copyStatus" class="copy-status" aria-live="polite"></p>
+      </form>
     </section>
 
     <section id="contact" class="section contact-section">
@@ -111,6 +160,7 @@
     <span>Everyday look, handmade piece by piece.</span>
   </footer>
 
-  <script src="assets/js/app.js?v=20260629-products"></script>
+  <script src="assets/js/config.js?v=20260630-sheets-stock"></script>
+  <script src="assets/js/app.js?v=20260630-sheets-stock"></script>
 </body>
 </html>

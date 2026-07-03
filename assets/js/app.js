@@ -565,6 +565,35 @@ function renderOrderSummary() {
   orderSummary.textContent = buildOrderSummary();
 }
 
+async function copyTextToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch (error) {
+      // Fall through to the selection-based copy for browsers that block async clipboard.
+    }
+  }
+
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.setAttribute('readonly', '');
+  textarea.style.position = 'fixed';
+  textarea.style.top = '0';
+  textarea.style.left = '-9999px';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+  textarea.setSelectionRange(0, textarea.value.length);
+
+  try {
+    return document.execCommand('copy');
+  } finally {
+    document.body.removeChild(textarea);
+  }
+}
+
 productGrid.addEventListener('click', event => {
   const colorButton = event.target.closest('.color-swatch');
   if (colorButton) {
@@ -665,13 +694,18 @@ checkoutForm.addEventListener('submit', async event => {
 
   currentOrderId = createOrderId();
   renderOrderSummary();
+  const summaryText = orderSummary.textContent;
+  const copied = await copyTextToClipboard(summaryText);
 
   try {
     await submitOrderToSheet();
-    await navigator.clipboard.writeText(orderSummary.textContent);
-    copyStatus.textContent = `สร้าง ${currentOrderId} เป็น pending และคัดลอกออเดอร์แล้ว ส่งสลิปให้ร้านเพื่อยืนยันชำระเงิน`;
+    copyStatus.textContent = copied
+      ? `สร้าง ${currentOrderId} เป็น pending และคัดลอกออเดอร์แล้ว ส่งสลิปให้ร้านเพื่อยืนยันชำระเงิน`
+      : `สร้าง ${currentOrderId} เป็น pending แล้ว แต่ browser ไม่อนุญาตให้คัดลอกอัตโนมัติ กรุณาเลือกข้อความสรุปออเดอร์แล้วคัดลอกเอง`;
   } catch (error) {
-    copyStatus.textContent = `สร้าง ${currentOrderId} แล้ว แต่ยังบันทึก/คัดลอกไม่สำเร็จ: ${error.message}`;
+    copyStatus.textContent = copied
+      ? `คัดลอกออเดอร์แล้ว แต่ยังบันทึก ${currentOrderId} ไม่สำเร็จ: ${error.message}`
+      : `สร้าง ${currentOrderId} แล้ว แต่ยังบันทึก/คัดลอกไม่สำเร็จ: ${error.message}`;
   }
 });
 

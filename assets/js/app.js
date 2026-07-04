@@ -37,7 +37,7 @@ const colorSets = {
 };
 
 function getColors(keys) {
-  return keys.map(key => colorOptions[key]);
+  return keys.map(key => ({ key, ...colorOptions[key] }));
 }
 
 function getSelectedColor(product) {
@@ -293,12 +293,19 @@ let products = [
 const cart = [];
 const selectedColors = new Map();
 const formatter = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 });
+const EMS_FLAT_RATE = 60;
+const EMS_FLAT_RATE_MAX_ITEMS = 10;
+const PENDING_ORDER_EXPIRY_MINUTES = 15;
 let currentOrderId = '';
+let currentPendingExpiresAt = '';
 
 const productGrid = document.querySelector('#productGrid');
 const cartItems = document.querySelector('#cartItems');
 const cartTotal = document.querySelector('#cartTotal');
+const cartShipping = document.querySelector('#cartShipping');
+const cartGrandTotal = document.querySelector('#cartGrandTotal');
 const cartCount = document.querySelector('#cartCount');
+const clearCartButton = document.querySelector('#clearCartButton');
 const menuButton = document.querySelector('.menu-button');
 const nav = document.querySelector('.nav');
 const checkoutForm = document.querySelector('#checkoutForm');
@@ -310,6 +317,340 @@ const customerAddress = document.querySelector('#customerAddress');
 const customerProvince = document.querySelector('#customerProvince');
 const customerPostal = document.querySelector('#customerPostal');
 const customerNote = document.querySelector('#customerNote');
+const languageButtons = document.querySelectorAll('.language-button');
+
+const translations = {
+  th: {
+    'meta.title': 'Nunaa.Collection | Everyday Look from Chiang Mai Local Fabric',
+    'meta.description': 'Nunaa.Collection เสื้อผ้า everyday look จากผ้าท้องถิ่นเชียงใหม่ ใส่สบาย แมตช์ง่าย และดูแลง่าย',
+    'menu.open': 'เปิดเมนู',
+    'nav.about': 'About',
+    'nav.shop': 'Shop',
+    'nav.fabric': 'Fabric',
+    'nav.care': 'Care',
+    'nav.order': 'Order',
+    'nav.cart': 'Cart',
+    'nav.contact': 'Contact',
+    'hero.eyebrow': 'Everyday Look • Chiang Mai Local Fabric',
+    'hero.title': 'เสื้อผ้าใส่สบายที่แมตช์ได้ทุกคอลเลคชั่น',
+    'hero.body': 'Nunaa.Collection ออกแบบเสื้อผ้าเรียบง่ายสำหรับทุกวัน ใช้ผ้าท้องถิ่นจากเชียงใหม่ ใส่แล้วสบาย ดูแลง่าย และอยู่กับตู้เสื้อผ้าได้นาน',
+    'hero.shopButton': 'ดูสินค้า',
+    'hero.cardLabel': 'Handmade',
+    'hero.cardTitle': 'piece by piece',
+    'hero.cardText': 'soft textures • timeless palette • local story',
+    'about.eyebrow': 'About Us',
+    'about.title': 'จุดเริ่มต้นจากงานฝีมือของคุณแม่และลูกสาว',
+    'about.bodyOne': 'จุดเริ่มต้นเกิดจากคุณแม่ที่ชอบทำงานฝีมือและลูกสาวที่นำงานฝีมือของคุณแม่มาต่อยอดและสร้างสรรค์เป็นงาน ผ่านลวดลายบนกระเป๋าผ้าฝ้ายธรรมชาติที่ออกแบบร่วมกันกับคุณแม่ โดยเน้นไปที่รูปดอกไม้ต่าง ๆ โดยงานออกแบบทั้งหมดจะถูกวาดโดยไหมปักผ้า เส้นด้าย บนผืนผ้าสีขาว ทั้ง 2 มิติ และ 3 มิติ',
+    'about.bodyTwo': 'งานเสื้อผ้าที่ออกแบบโดยลูกสาวและตัดเย็บทั้งหมดโดยคุณแม่ ทำควบคู่ไปกับกระเป๋าและเครื่องประดับคอเลกชันดอกไม้ เน้นไปที่ผ้าฝ้ายธรรมชาติ ผ้าลินิน เน้นงานออกแบบที่สวมใส่สบายและมีความน่ารัก โดยแนวคิดในการออกแบบคือ เสื้อผ้าสไตล์น่ารัก ๆ ที่คุณแม่อยากให้ลูกสาวได้ใส่',
+    'shop.eyebrow': 'New Collection',
+    'shop.title': 'สินค้าพร้อมสั่งซื้อ',
+    'cart.eyebrow': 'Cart',
+    'cart.title': 'ตะกร้าสินค้า',
+    'cart.total': 'รวมค่าสินค้า',
+    'cart.shipping': 'ค่าส่ง EMS',
+    'cart.grandTotal': 'ยอดรวมสุทธิ',
+    'cart.shippingEmpty': '-',
+    'cart.shippingFixed': '฿60',
+    'cart.shippingContact': 'ทางร้านจะติดต่อเพื่อแจ้งราคาค่าส่ง',
+    'cart.checkout': 'Checkout',
+    'cart.clear': 'Clear cart',
+    'fabric.eyebrow': 'Fabric',
+    'fabric.title': 'ผ้าท้องถิ่นจากเชียงใหม่',
+    'fabric.body': 'ผ้าจากทางร้านเป็นผ้าท้องถิ่นจากเชียงใหม่ เราเลือกเนื้อผ้าที่ใส่สบาย ระบายอากาศได้ดี และเหมาะกับ everyday look ที่หยิบมาแมตช์ได้ง่ายในหลายโอกาส',
+    'care.eyebrow': 'Care Guide',
+    'care.title': 'วิธีดูแลผ้า',
+    'care.itemOne': 'ซักมือจะช่วยถนอมเนื้อผ้าได้มากกว่า',
+    'care.itemTwo': 'สามารถซักเครื่องได้ โดยแนะนำใส่ถุงถนอมผ้า',
+    'care.itemThree': 'ใช้โหมดถนอมผ้าและน้ำอุณหภูมิปกติ',
+    'care.itemFour': 'หลีกเลี่ยงแดดจัดเพื่อรักษาสีและสัมผัสของผ้า',
+    'order.eyebrow': 'How to Order',
+    'order.title': 'วิธีสั่งซื้อ',
+    'order.stepOne': 'เลือกสินค้าและเพิ่มลงตะกร้า',
+    'order.stepTwo': 'กด Checkout แล้วกรอกชื่อ ที่อยู่ และเบอร์ติดต่อ',
+    'order.stepThree': 'ชำระเงินผ่าน QR / โอนเงิน แล้วส่งสลิป',
+    'order.stepFour': 'ร้านยืนยันชำระเงินและอัปเดต stock',
+    'form.title': 'ข้อมูลจัดส่ง',
+    'form.subtitle': 'กรอกรายละเอียดสำหรับจัดส่งสินค้า',
+    'form.name': 'ชื่อ-นามสกุล',
+    'form.phone': 'เบอร์ติดต่อ',
+    'form.address': 'ที่อยู่จัดส่ง',
+    'form.province': 'จังหวัด',
+    'form.postal': 'รหัสไปรษณีย์',
+    'form.note': 'หมายเหตุ',
+    'form.copyOrder': 'คัดลอกออเดอร์',
+    'form.sendInstagram': 'ส่งทาง Instagram',
+    'summary.title': 'สรุปออเดอร์',
+    'summary.empty': 'เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์',
+    'payment.title': 'ชำระเงินผ่าน QR',
+    'payment.body': 'สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram ระบบจะบันทึกออเดอร์เป็น pending ก่อน',
+    'payment.notice': 'ออเดอร์ pending จะหมดอายุใน 15 นาที และออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น',
+    'payment.qrAlt': 'Nunaa.Collection payment QR code',
+    'contact.eyebrow': 'Contact',
+    'contact.title': 'คุยกับร้าน',
+    'contact.body': 'สำหรับสอบถามสินค้า แจ้งชำระเงิน หรือเช็กออเดอร์ ติดต่อผ่าน Instagram ได้เลย',
+    'footer.tagline': 'Everyday look, handmade piece by piece.',
+    'product.color': 'สี',
+    'product.colorAria': 'เลือกสี',
+    'product.addCart': 'เพิ่มลงตะกร้า',
+    'product.added': 'เพิ่มแล้ว',
+    'product.soldOut': 'สินค้าหมด',
+    'product.ready': 'พร้อมสั่งซื้อ',
+    'product.remaining': 'เหลือ {count} ชิ้น',
+    'cart.empty': 'ยังไม่มีสินค้าในตะกร้า',
+    'cart.colorPrefix': 'สี',
+    'cart.quantity': 'จำนวน',
+    'cart.decrease': 'ลดจำนวน',
+    'cart.increase': 'เพิ่มจำนวน',
+    'summary.orderIdPending': 'จะสร้างเมื่อกดคัดลอกออเดอร์',
+    'summary.items': 'รายการสินค้า',
+    'summary.pendingExpires': 'ออเดอร์ pending หมดอายุ',
+    'summary.pendingNotice': 'ออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น',
+    'summary.total': 'รวมค่าสินค้า',
+    'summary.shippingFee': 'ค่าส่ง EMS',
+    'summary.grandTotal': 'ยอดรวมสุทธิ',
+    'summary.shippingDetails': 'ข้อมูลจัดส่ง',
+    'summary.name': 'ชื่อ',
+    'summary.phone': 'เบอร์',
+    'summary.address': 'ที่อยู่',
+    'summary.province': 'จังหวัด',
+    'summary.postal': 'รหัสไปรษณีย์',
+    'summary.note': 'หมายเหตุ',
+    'status.emptyCart': 'กรุณาเลือกสินค้าในตะกร้าก่อนสร้างออเดอร์',
+    'status.copySaved': 'สร้าง {orderId} เป็น pending และคัดลอกออเดอร์แล้ว กรุณาส่งสลิปภายใน 15 นาที ออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น',
+    'status.savedNoCopy': 'สร้าง {orderId} เป็น pending แล้ว กรุณาส่งสลิปภายใน 15 นาที แต่ browser ไม่อนุญาตให้คัดลอกอัตโนมัติ กรุณาเลือกข้อความสรุปออเดอร์แล้วคัดลอกเอง',
+    'status.copySaveFailed': 'คัดลอกออเดอร์แล้ว แต่ยังบันทึก {orderId} ไม่สำเร็จ: {message}',
+    'status.failed': 'สร้าง {orderId} แล้ว แต่ยังบันทึก/คัดลอกไม่สำเร็จ: {message}',
+    'error.saveOrder': 'ไม่สามารถบันทึกออเดอร์ได้'
+  },
+  en: {
+    'meta.title': 'Nunaa.Collection | Everyday Looks from Chiang Mai Local Fabric',
+    'meta.description': 'Nunaa.Collection makes comfortable everyday clothing from local Chiang Mai fabric, designed to mix easily and last in your wardrobe.',
+    'menu.open': 'Open menu',
+    'nav.about': 'About',
+    'nav.shop': 'Shop',
+    'nav.fabric': 'Fabric',
+    'nav.care': 'Care',
+    'nav.order': 'Order',
+    'nav.cart': 'Cart',
+    'nav.contact': 'Contact',
+    'hero.eyebrow': 'Everyday Look • Chiang Mai Local Fabric',
+    'hero.title': 'Comfortable pieces made to match every collection',
+    'hero.body': 'Nunaa.Collection designs simple everyday clothing with local fabrics from Chiang Mai. Each piece is comfortable, easy to style, easy to care for, and made to stay in your wardrobe.',
+    'hero.shopButton': 'Shop now',
+    'hero.cardLabel': 'Handmade',
+    'hero.cardTitle': 'piece by piece',
+    'hero.cardText': 'soft textures • timeless palette • local story',
+    'about.eyebrow': 'About Us',
+    'about.title': 'A mother and daughter story in handmade craft',
+    'about.bodyOne': 'Nunaa.Collection began with a mother who loves handmade work and a daughter who helped turn that craft into thoughtful designs. Their early pieces focused on natural cotton bags decorated with floral embroidery, drawn with thread on white fabric in both two- and three-dimensional details.',
+    'about.bodyTwo': 'Today the clothing is designed by the daughter and sewn by the mother, alongside bags and accessories from the floral collection. The pieces focus on natural cotton and linen, comfortable shapes, and a sweet feeling inspired by clothes a mother would love her daughter to wear.',
+    'shop.eyebrow': 'New Collection',
+    'shop.title': 'Ready-to-order pieces',
+    'cart.eyebrow': 'Cart',
+    'cart.title': 'Shopping cart',
+    'cart.total': 'Item total',
+    'cart.shipping': 'EMS shipping',
+    'cart.grandTotal': 'Grand total',
+    'cart.shippingEmpty': '-',
+    'cart.shippingFixed': '฿60',
+    'cart.shippingContact': 'The shop will contact you with the shipping fee.',
+    'cart.checkout': 'Checkout',
+    'cart.clear': 'Clear cart',
+    'fabric.eyebrow': 'Fabric',
+    'fabric.title': 'Local fabric from Chiang Mai',
+    'fabric.body': 'Our fabrics are sourced locally from Chiang Mai. We choose comfortable, breathable materials that work well for everyday looks and can be mixed easily for many occasions.',
+    'care.eyebrow': 'Care Guide',
+    'care.title': 'Fabric care',
+    'care.itemOne': 'Hand washing helps preserve the fabric best.',
+    'care.itemTwo': 'Machine washing is possible; we recommend using a laundry bag.',
+    'care.itemThree': 'Use a gentle cycle with normal-temperature water.',
+    'care.itemFour': 'Avoid harsh sunlight to protect color and texture.',
+    'order.eyebrow': 'How to Order',
+    'order.title': 'How to order',
+    'order.stepOne': 'Choose items and add them to your cart.',
+    'order.stepTwo': 'Tap Checkout and enter your name, address, and contact number.',
+    'order.stepThree': 'Pay by QR / bank transfer, then send the payment slip.',
+    'order.stepFour': 'The shop confirms payment and updates stock.',
+    'form.title': 'Shipping details',
+    'form.subtitle': 'Enter the details for delivery.',
+    'form.name': 'Full name',
+    'form.phone': 'Phone number',
+    'form.address': 'Shipping address',
+    'form.province': 'Province',
+    'form.postal': 'Postal code',
+    'form.note': 'Note',
+    'form.copyOrder': 'Copy order',
+    'form.sendInstagram': 'Send via Instagram',
+    'summary.title': 'Order summary',
+    'summary.empty': 'Add items to your cart to create an order summary.',
+    'payment.title': 'Pay by QR',
+    'payment.body': 'Scan the QR to pay, then send the payment slip with your order summary to the shop via Instagram. The order will be saved as pending first.',
+    'payment.notice': 'Pending orders expire in 15 minutes. Items are reserved only after the shop confirms your order.',
+    'payment.qrAlt': 'Nunaa.Collection payment QR code',
+    'contact.eyebrow': 'Contact',
+    'contact.title': 'Talk to the shop',
+    'contact.body': 'For product questions, payment slips, or order checks, contact us on Instagram.',
+    'footer.tagline': 'Everyday look, handmade piece by piece.',
+    'product.color': 'Color',
+    'product.colorAria': 'Choose color',
+    'product.addCart': 'Add to cart',
+    'product.added': 'Added',
+    'product.soldOut': 'Sold out',
+    'product.ready': 'Ready to order',
+    'product.remaining': '{count} left',
+    'cart.empty': 'Your cart is empty.',
+    'cart.colorPrefix': 'Color',
+    'cart.quantity': 'Quantity',
+    'cart.decrease': 'Decrease quantity',
+    'cart.increase': 'Increase quantity',
+    'summary.orderIdPending': 'created when you copy the order',
+    'summary.items': 'Items',
+    'summary.pendingExpires': 'Pending order expires',
+    'summary.pendingNotice': 'Items are reserved only after the shop confirms your order.',
+    'summary.total': 'Item total',
+    'summary.shippingFee': 'EMS shipping',
+    'summary.grandTotal': 'Grand total',
+    'summary.shippingDetails': 'Shipping details',
+    'summary.name': 'Name',
+    'summary.phone': 'Phone',
+    'summary.address': 'Address',
+    'summary.province': 'Province',
+    'summary.postal': 'Postal code',
+    'summary.note': 'Note',
+    'status.emptyCart': 'Please add items to your cart before creating an order.',
+    'status.copySaved': 'Created {orderId} as pending and copied the order. Please send the payment slip within 15 minutes. Items are reserved only after the shop confirms your order.',
+    'status.savedNoCopy': 'Created {orderId} as pending. Please send the payment slip within 15 minutes, but the browser did not allow automatic copy. Please select and copy the order summary manually.',
+    'status.copySaveFailed': 'The order was copied, but {orderId} could not be saved: {message}',
+    'status.failed': 'Created {orderId}, but saving/copying failed: {message}',
+    'error.saveOrder': 'Could not save the order.'
+  },
+  zh: {
+    'meta.title': 'Nunaa.Collection | 清迈本地布料日常穿搭',
+    'meta.description': 'Nunaa.Collection 使用清迈本地布料制作舒适日常服饰，容易搭配，也便于保养。',
+    'menu.open': '打开菜单',
+    'nav.about': '关于',
+    'nav.shop': '商品',
+    'nav.fabric': '布料',
+    'nav.care': '保养',
+    'nav.order': '订购',
+    'nav.cart': '购物车',
+    'nav.contact': '联系',
+    'hero.eyebrow': '日常穿搭 • 清迈本地布料',
+    'hero.title': '舒适好搭的日常服饰',
+    'hero.body': 'Nunaa.Collection 以清迈本地布料设计简约日常服饰。每一件都舒适、好搭、容易保养，也适合长久留在衣柜里。',
+    'hero.shopButton': '查看商品',
+    'hero.cardLabel': '手工制作',
+    'hero.cardTitle': '一件一件完成',
+    'hero.cardText': '柔软质感 • 耐看色调 • 在地故事',
+    'about.eyebrow': '关于我们',
+    'about.title': '来自母女手作的开始',
+    'about.bodyOne': 'Nunaa.Collection 的起点，是一位热爱手作的母亲，以及把妈妈的手艺延伸成设计的女儿。最初的作品以天然棉布包为主，并用刺绣线在白色布面上描绘花朵，呈现平面与立体的细节。',
+    'about.bodyTwo': '现在，服装由女儿设计、母亲亲手缝制，同时也延续花朵系列的包款与配饰。作品以天然棉与亚麻为主，强调舒适版型和可爱的气质，灵感来自妈妈想让女儿穿上的温柔衣服。',
+    'shop.eyebrow': '新品系列',
+    'shop.title': '可订购商品',
+    'cart.eyebrow': '购物车',
+    'cart.title': '购物车',
+    'cart.total': '商品小计',
+    'cart.shipping': 'EMS 运费',
+    'cart.grandTotal': '总计',
+    'cart.shippingEmpty': '-',
+    'cart.shippingFixed': '฿60',
+    'cart.shippingContact': '店铺会联系您确认运费。',
+    'cart.checkout': '结账',
+    'cart.clear': '清空购物车',
+    'fabric.eyebrow': '布料',
+    'fabric.title': '来自清迈的本地布料',
+    'fabric.body': '店内布料来自清迈本地。我们选择舒适、透气的材质，适合日常穿搭，也能轻松应对不同场合。',
+    'care.eyebrow': '保养说明',
+    'care.title': '布料保养',
+    'care.itemOne': '手洗更能保护布料质感。',
+    'care.itemTwo': '也可以机洗，建议放入洗衣袋。',
+    'care.itemThree': '使用轻柔模式与常温水清洗。',
+    'care.itemFour': '避免强烈日晒，以保持颜色与触感。',
+    'order.eyebrow': '订购方式',
+    'order.title': '如何订购',
+    'order.stepOne': '选择商品并加入购物车。',
+    'order.stepTwo': '点击结账，填写姓名、地址和联系电话。',
+    'order.stepThree': '通过 QR / 转账付款，并发送付款凭证。',
+    'order.stepFour': '店铺确认付款并更新库存。',
+    'form.title': '收件资料',
+    'form.subtitle': '填写配送所需资料。',
+    'form.name': '姓名',
+    'form.phone': '联系电话',
+    'form.address': '收件地址',
+    'form.province': '省 / 府',
+    'form.postal': '邮政编码',
+    'form.note': '备注',
+    'form.copyOrder': '复制订单',
+    'form.sendInstagram': '通过 Instagram 发送',
+    'summary.title': '订单摘要',
+    'summary.empty': '请先将商品加入购物车以生成订单摘要。',
+    'payment.title': 'QR 付款',
+    'payment.body': '扫描 QR 付款后，请将付款凭证和订单摘要通过 Instagram 发给店铺。订单会先保存为待确认状态。',
+    'payment.notice': '待确认订单会在 15 分钟后过期。商品只会在店铺确认后才会被预留。',
+    'payment.qrAlt': 'Nunaa.Collection 付款 QR 码',
+    'contact.eyebrow': '联系',
+    'contact.title': '联系店铺',
+    'contact.body': '如需询问商品、发送付款凭证或查询订单，请通过 Instagram 联系我们。',
+    'footer.tagline': '日常穿搭，一件一件手工制作。',
+    'product.color': '颜色',
+    'product.colorAria': '选择颜色',
+    'product.addCart': '加入购物车',
+    'product.added': '已加入',
+    'product.soldOut': '售罄',
+    'product.ready': '可订购',
+    'product.remaining': '剩余 {count} 件',
+    'cart.empty': '购物车还是空的。',
+    'cart.colorPrefix': '颜色',
+    'cart.quantity': '数量',
+    'cart.decrease': '减少数量',
+    'cart.increase': '增加数量',
+    'summary.orderIdPending': '复制订单时生成',
+    'summary.items': '商品列表',
+    'summary.pendingExpires': '待确认订单过期时间',
+    'summary.pendingNotice': '商品只会在店铺确认后才会被预留。',
+    'summary.total': '商品小计',
+    'summary.shippingFee': 'EMS 运费',
+    'summary.grandTotal': '总计',
+    'summary.shippingDetails': '收件资料',
+    'summary.name': '姓名',
+    'summary.phone': '电话',
+    'summary.address': '地址',
+    'summary.province': '省 / 府',
+    'summary.postal': '邮政编码',
+    'summary.note': '备注',
+    'status.emptyCart': '请先将商品加入购物车，再建立订单。',
+    'status.copySaved': '已建立 {orderId} 为待确认订单，并复制订单内容。请在 15 分钟内发送付款凭证。商品只会在店铺确认后才会被预留。',
+    'status.savedNoCopy': '已建立 {orderId} 为待确认订单，请在 15 分钟内发送付款凭证。但浏览器不允许自动复制，请手动选择并复制订单摘要。',
+    'status.copySaveFailed': '订单已复制，但 {orderId} 尚未保存成功：{message}',
+    'status.failed': '已建立 {orderId}，但保存/复制失败：{message}',
+    'error.saveOrder': '无法保存订单。'
+  }
+};
+
+const colorTranslations = {
+  white: { en: 'White', zh: '白色' },
+  cream: { en: 'Cream', zh: '米色' },
+  beige: { en: 'Beige', zh: '米棕色' },
+  pink: { en: 'Light pink', zh: '浅粉色' },
+  dustyPink: { en: 'Dusty pink', zh: '豆沙粉' },
+  coral: { en: 'Coral', zh: '珊瑚色' },
+  rust: { en: 'Rust', zh: '砖橙色' },
+  burgundy: { en: 'Burgundy', zh: '酒红色' },
+  mustard: { en: 'Mustard', zh: '芥末黄' },
+  green: { en: 'Green', zh: '绿色' },
+  olive: { en: 'Olive', zh: '橄榄绿' },
+  blueGray: { en: 'Blue gray', zh: '灰蓝色' },
+  navy: { en: 'Navy', zh: '藏青色' },
+  taupe: { en: 'Taupe', zh: '灰棕色' },
+  brown: { en: 'Brown', zh: '棕色' },
+  darkBrown: { en: 'Dark brown', zh: '深棕色' },
+  black: { en: 'Black', zh: '黑色' },
+  linenPattern: { en: 'Linen pattern', zh: '亚麻图案' },
+  flowerPattern: { en: 'Floral pattern', zh: '花朵图案' }
+};
+
+let currentLanguage = localStorage.getItem('nunaaLanguage') || 'th';
 
 function createOrderId() {
   const now = new Date();
@@ -325,6 +666,62 @@ function createOrderId() {
   ].join('');
   const randomPart = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `NUNAA-${datePart}-${timePart}-${randomPart}`;
+}
+
+function createPendingExpiresAt() {
+  return new Date(Date.now() + (PENDING_ORDER_EXPIRY_MINUTES * 60 * 1000)).toISOString();
+}
+
+function formatPendingExpiresAt() {
+  if (!currentPendingExpiresAt) return '-';
+
+  return new Intl.DateTimeFormat(currentLanguage === 'th' ? 'th-TH' : currentLanguage, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Asia/Bangkok'
+  }).format(new Date(currentPendingExpiresAt));
+}
+
+function t(key, values = {}) {
+  const template = translations[currentLanguage]?.[key] || translations.th[key] || key;
+  return Object.entries(values).reduce((text, [name, value]) => (
+    text.replaceAll(`{${name}}`, value)
+  ), template);
+}
+
+function getColorName(color) {
+  if (currentLanguage === 'th') return color.name;
+  if (color[`name${currentLanguage.toUpperCase()}`]) return color[`name${currentLanguage.toUpperCase()}`];
+  return colorTranslations[color.key]?.[currentLanguage] || color.name;
+}
+
+function updateLanguageButtons() {
+  languageButtons.forEach(button => {
+    const isActive = button.dataset.lang === currentLanguage;
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function applyTranslations() {
+  document.documentElement.lang = currentLanguage === 'zh' ? 'zh-Hans' : currentLanguage;
+  document.title = t('meta.title');
+  document.querySelector('meta[name="description"]')?.setAttribute('content', t('meta.description'));
+  document.querySelector('meta[property="og:description"]')?.setAttribute('content', t('meta.description'));
+
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    element.textContent = t(element.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-aria]').forEach(element => {
+    element.setAttribute('aria-label', t(element.dataset.i18nAria));
+  });
+  document.querySelectorAll('[data-i18n-alt]').forEach(element => {
+    element.setAttribute('alt', t(element.dataset.i18nAlt));
+  });
+
+  updateLanguageButtons();
+  renderProducts();
+  renderCart();
 }
 
 function isStockManaged(color) {
@@ -351,9 +748,9 @@ function getProductAvailability(product) {
 
 function formatStockText(product) {
   const selectedColor = getSelectedColor(product);
-  if (!isStockManaged(selectedColor)) return 'พร้อมสั่งซื้อ';
+  if (!isStockManaged(selectedColor)) return t('product.ready');
   const remaining = getRemainingStock(product, selectedColor);
-  return remaining > 0 ? `เหลือ ${remaining} ชิ้น` : 'สินค้าหมด';
+  return remaining > 0 ? t('product.remaining', { count: remaining }) : t('product.soldOut');
 }
 
 function findCartItem(code, colorName) {
@@ -362,6 +759,44 @@ function findCartItem(code, colorName) {
 
 function getProductByCode(code) {
   return products.find(product => product.code === code);
+}
+
+function getCartItemCount() {
+  return cart.reduce((sum, item) => sum + item.quantity, 0);
+}
+
+function getCartSubtotal() {
+  return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+function getShippingInfo() {
+  const itemCount = getCartItemCount();
+
+  if (itemCount === 0) {
+    return {
+      fee: 0,
+      isFixed: false,
+      label: t('cart.shippingEmpty'),
+      grandTotalLabel: formatter.format(0)
+    };
+  }
+
+  if (itemCount <= EMS_FLAT_RATE_MAX_ITEMS) {
+    const grandTotal = getCartSubtotal() + EMS_FLAT_RATE;
+    return {
+      fee: EMS_FLAT_RATE,
+      isFixed: true,
+      label: formatter.format(EMS_FLAT_RATE),
+      grandTotalLabel: formatter.format(grandTotal)
+    };
+  }
+
+  return {
+    fee: null,
+    isFixed: false,
+    label: t('cart.shippingContact'),
+    grandTotalLabel: t('cart.shippingContact')
+  };
 }
 
 function refreshProductStockDisplays() {
@@ -386,11 +821,21 @@ function refreshProductStockDisplays() {
 function normalizeProduct(row, index) {
   const colors = Array.isArray(row.colors) && row.colors.length > 0
     ? row.colors.map(color => ({
+      key: color.key,
       name: color.name || color.colorName || 'ไม่ระบุสี',
+      nameEN: color.nameEN || color.nameEn || color.colorNameEN || color.colorNameEn,
+      nameZH: color.nameZH || color.nameZh || color.colorNameZH || color.colorNameZh,
       value: color.value || color.colorValue || '#edf1ee',
       stock: color.stock === '' || color.stock === undefined ? undefined : Number(color.stock)
     }))
-    : [{ name: row.colorName || 'ไม่ระบุสี', value: row.colorValue || '#edf1ee', stock: Number(row.stock) }];
+    : [{
+      key: row.colorKey,
+      name: row.colorName || 'ไม่ระบุสี',
+      nameEN: row.colorNameEN || row.colorNameEn,
+      nameZH: row.colorNameZH || row.colorNameZh,
+      value: row.colorValue || '#edf1ee',
+      stock: Number(row.stock)
+    }];
 
   return {
     id: index + 1,
@@ -434,18 +879,18 @@ function renderProducts() {
         <strong>${formatter.format(product.price)}</strong>
       </div>
       <p class="stock-status" data-stock-id="${product.id}">${formatStockText(product)}</p>
-      <div class="color-picker" role="group" aria-label="เลือกสี ${product.name}">
-        <span>สี</span>
+      <div class="color-picker" role="group" aria-label="${t('product.colorAria')} ${product.name}">
+        <span>${t('product.color')}</span>
         <div class="color-options">
           ${product.colors.map((color, index) => `
             <button
-              class="color-swatch${index === 0 ? ' selected' : ''}"
+              class="color-swatch${index === (selectedColors.get(product.id) || 0) ? ' selected' : ''}"
               type="button"
               data-id="${product.id}"
               data-color-index="${index}"
-              aria-label="${product.name} สี${color.name}"
-              aria-pressed="${index === 0 ? 'true' : 'false'}"
-              title="${color.name}"
+              aria-label="${product.name} ${t('cart.colorPrefix')} ${getColorName(color)}"
+              aria-pressed="${index === (selectedColors.get(product.id) || 0) ? 'true' : 'false'}"
+              title="${getColorName(color)}"
               ${isColorAvailable(product, color) ? '' : 'disabled'}
             >
               <span style="background: ${color.value};"></span>
@@ -453,23 +898,23 @@ function renderProducts() {
           `).join('')}
         </div>
       </div>
-      <button class="button primary add-cart" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>เพิ่มลงตะกร้า</button>
+      <button class="button primary add-cart" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
     </article>
   `).join('');
 }
 
 function renderCart() {
   if (cart.length === 0) {
-    cartItems.innerHTML = '<p>ยังไม่มีสินค้าในตะกร้า</p>';
+    cartItems.innerHTML = `<p>${t('cart.empty')}</p>`;
   } else {
     cartItems.innerHTML = cart.map(item => `
       <div class="cart-row">
-        <span>${item.code} • ${item.name} • สี${item.selectedColor.name}</span>
+        <span>${item.code} • ${item.name} • ${t('cart.colorPrefix')} ${getColorName(item.selectedColor)}</span>
         <div class="cart-row-actions">
-          <div class="quantity-control" aria-label="จำนวน ${item.name} สี${item.selectedColor.name}">
-            <button type="button" class="quantity-button" data-action="decrease" data-code="${item.code}" data-color="${item.selectedColor.name}" aria-label="ลดจำนวน">−</button>
+          <div class="quantity-control" aria-label="${t('cart.quantity')} ${item.name} ${t('cart.colorPrefix')} ${getColorName(item.selectedColor)}">
+            <button type="button" class="quantity-button" data-action="decrease" data-code="${item.code}" data-color="${item.selectedColor.name}" aria-label="${t('cart.decrease')}">−</button>
             <span>${item.quantity}</span>
-            <button type="button" class="quantity-button" data-action="increase" data-code="${item.code}" data-color="${item.selectedColor.name}" aria-label="เพิ่มจำนวน">+</button>
+            <button type="button" class="quantity-button" data-action="increase" data-code="${item.code}" data-color="${item.selectedColor.name}" aria-label="${t('cart.increase')}">+</button>
           </div>
           <strong>${formatter.format(item.price * item.quantity)}</strong>
         </div>
@@ -477,38 +922,47 @@ function renderCart() {
     `).join('');
   }
 
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const itemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-  cartTotal.textContent = formatter.format(total);
+  const subtotal = getCartSubtotal();
+  const itemCount = getCartItemCount();
+  const shippingInfo = getShippingInfo();
+  cartTotal.textContent = formatter.format(subtotal);
+  cartShipping.textContent = shippingInfo.label;
+  cartGrandTotal.textContent = shippingInfo.grandTotalLabel;
   cartCount.textContent = itemCount;
+  clearCartButton.disabled = cart.length === 0;
   renderOrderSummary();
 }
 
 function buildOrderSummary() {
   if (cart.length === 0) {
-    return 'เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์';
+    return t('summary.empty');
   }
 
   const orderItems = cart.map((item, index) => (
-    `${index + 1}. ${item.code} • ${item.name} • สี${item.selectedColor.name} x ${item.quantity} - ${formatter.format(item.price * item.quantity)}`
+    `${index + 1}. ${item.code} • ${item.name} • ${t('cart.colorPrefix')} ${getColorName(item.selectedColor)} x ${item.quantity} - ${formatter.format(item.price * item.quantity)}`
   )).join('\n');
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const subtotal = getCartSubtotal();
+  const shippingInfo = getShippingInfo();
 
   return [
     'Nunaa.Collection Order',
-    `Order ID: ${currentOrderId || 'จะสร้างเมื่อกดคัดลอกออเดอร์'}`,
+    `Order ID: ${currentOrderId || t('summary.orderIdPending')}`,
+    `${t('summary.pendingExpires')}: ${formatPendingExpiresAt()}`,
+    t('summary.pendingNotice'),
     '',
-    'รายการสินค้า',
+    t('summary.items'),
     orderItems,
-    `รวมทั้งหมด: ${formatter.format(total)}`,
+    `${t('summary.total')}: ${formatter.format(subtotal)}`,
+    `${t('summary.shippingFee')}: ${shippingInfo.label}`,
+    `${t('summary.grandTotal')}: ${shippingInfo.grandTotalLabel}`,
     '',
-    'ข้อมูลจัดส่ง',
-    `ชื่อ: ${customerName.value.trim() || '-'}`,
-    `เบอร์: ${customerPhone.value.trim() || '-'}`,
-    `ที่อยู่: ${customerAddress.value.trim() || '-'}`,
-    `จังหวัด: ${customerProvince.value.trim() || '-'}`,
-    `รหัสไปรษณีย์: ${customerPostal.value.trim() || '-'}`,
-    `หมายเหตุ: ${customerNote.value.trim() || '-'}`
+    t('summary.shippingDetails'),
+    `${t('summary.name')}: ${customerName.value.trim() || '-'}`,
+    `${t('summary.phone')}: ${customerPhone.value.trim() || '-'}`,
+    `${t('summary.address')}: ${customerAddress.value.trim() || '-'}`,
+    `${t('summary.province')}: ${customerProvince.value.trim() || '-'}`,
+    `${t('summary.postal')}: ${customerPostal.value.trim() || '-'}`,
+    `${t('summary.note')}: ${customerNote.value.trim() || '-'}`
   ].join('\n');
 }
 
@@ -532,7 +986,12 @@ function buildOrderPayload() {
       note: customerNote.value.trim()
     },
     items,
-    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+    subtotal: getCartSubtotal(),
+    shippingFee: getShippingInfo().fee,
+    total: getShippingInfo().isFixed ? getCartSubtotal() + getShippingInfo().fee : getCartSubtotal(),
+    shippingNote: getShippingInfo().isFixed ? '' : getShippingInfo().label,
+    pendingExpiresAt: currentPendingExpiresAt,
+    reserveAfterConfirmationOnly: true,
     summary: buildOrderSummary()
   };
 }
@@ -550,7 +1009,7 @@ async function submitOrderToSheet() {
   const data = await response.json();
 
   if (!response.ok || !data.ok) {
-    throw new Error(data.message || 'ไม่สามารถบันทึกออเดอร์ได้');
+    throw new Error(data.message || t('error.saveOrder'));
   }
 
   if (data.orderId) {
@@ -619,9 +1078,9 @@ productGrid.addEventListener('click', event => {
   const selectedColor = getSelectedColor(product);
 
   if (!selectedColor || !isColorAvailable(product, selectedColor)) {
-    button.textContent = 'สินค้าหมด';
+    button.textContent = t('product.soldOut');
     window.setTimeout(() => {
-      button.textContent = 'เพิ่มลงตะกร้า';
+      button.textContent = t('product.addCart');
     }, 1200);
     return;
   }
@@ -635,10 +1094,10 @@ productGrid.addEventListener('click', event => {
   renderCart();
   refreshProductStockDisplays();
 
-  button.textContent = 'เพิ่มแล้ว';
+  button.textContent = t('product.added');
   button.classList.add('added');
   window.setTimeout(() => {
-    button.textContent = 'เพิ่มลงตะกร้า';
+    button.textContent = t('product.addCart');
     button.classList.remove('added');
   }, 1200);
 
@@ -674,8 +1133,28 @@ cartItems.addEventListener('click', event => {
   refreshProductStockDisplays();
 });
 
+clearCartButton.addEventListener('click', () => {
+  if (cart.length === 0) return;
+  cart.splice(0, cart.length);
+  currentOrderId = '';
+  currentPendingExpiresAt = '';
+  copyStatus.textContent = '';
+  renderCart();
+  refreshProductStockDisplays();
+});
+
 menuButton.addEventListener('click', () => {
   nav.classList.toggle('open');
+});
+
+languageButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    const nextLanguage = button.dataset.lang;
+    if (!translations[nextLanguage] || nextLanguage === currentLanguage) return;
+    currentLanguage = nextLanguage;
+    localStorage.setItem('nunaaLanguage', currentLanguage);
+    applyTranslations();
+  });
 });
 
 checkoutForm.addEventListener('input', () => {
@@ -687,12 +1166,13 @@ checkoutForm.addEventListener('submit', async event => {
   event.preventDefault();
 
   if (cart.length === 0) {
-    copyStatus.textContent = 'กรุณาเลือกสินค้าในตะกร้าก่อนสร้างออเดอร์';
+    copyStatus.textContent = t('status.emptyCart');
     document.querySelector('#shop').scrollIntoView({ behavior: 'smooth' });
     return;
   }
 
   currentOrderId = createOrderId();
+  currentPendingExpiresAt = createPendingExpiresAt();
   renderOrderSummary();
   const summaryText = orderSummary.textContent;
   const copied = await copyTextToClipboard(summaryText);
@@ -700,19 +1180,19 @@ checkoutForm.addEventListener('submit', async event => {
   try {
     await submitOrderToSheet();
     copyStatus.textContent = copied
-      ? `สร้าง ${currentOrderId} เป็น pending และคัดลอกออเดอร์แล้ว ส่งสลิปให้ร้านเพื่อยืนยันชำระเงิน`
-      : `สร้าง ${currentOrderId} เป็น pending แล้ว แต่ browser ไม่อนุญาตให้คัดลอกอัตโนมัติ กรุณาเลือกข้อความสรุปออเดอร์แล้วคัดลอกเอง`;
+      ? t('status.copySaved', { orderId: currentOrderId })
+      : t('status.savedNoCopy', { orderId: currentOrderId });
   } catch (error) {
     copyStatus.textContent = copied
-      ? `คัดลอกออเดอร์แล้ว แต่ยังบันทึก ${currentOrderId} ไม่สำเร็จ: ${error.message}`
-      : `สร้าง ${currentOrderId} แล้ว แต่ยังบันทึก/คัดลอกไม่สำเร็จ: ${error.message}`;
+      ? t('status.copySaveFailed', { orderId: currentOrderId, message: error.message })
+      : t('status.failed', { orderId: currentOrderId, message: error.message });
   }
 });
 
 async function init() {
+  if (!translations[currentLanguage]) currentLanguage = 'th';
   await loadProductsFromSheet();
-  renderProducts();
-  renderCart();
+  applyTranslations();
 }
 
 init();

@@ -5,6 +5,7 @@ const ORDERS_HEADERS = [
   'createdAt',
   'orderId',
   'status',
+  'expiresAt',
   'stockDeducted',
   'paidAt',
   'customerName',
@@ -75,6 +76,7 @@ function createOrder(payload) {
   lock.waitLock(30000);
 
   try {
+    expirePendingOrders();
     const orderId = payload.orderId || createOrderId();
     const items = payload.items || [];
     if (!items.length) throw new Error('ไม่มีสินค้าในออเดอร์');
@@ -96,6 +98,7 @@ function appendPendingOrder(sheet, orderId, payload, items) {
     createdAt: new Date(),
     orderId,
     status: 'pending',
+    expiresAt: payload.pendingExpiresAt ? new Date(payload.pendingExpiresAt) : createPendingExpiresAt(),
     stockDeducted: false,
     paidAt: '',
     customerName: customer.name || '',
@@ -148,12 +151,14 @@ function onEdit(event) {
   if (range.getColumn() !== statusColumn) return;
 
   if (String(range.getValue()).toLowerCase() === 'paid') {
+    expirePendingOrders(sheet);
     deductStockForOrderRow(sheet, range.getRow());
   }
 }
 
 function processPaidOrders() {
   const sheet = getOrCreateOrdersSheet();
+  expirePendingOrders(sheet);
   const values = sheet.getDataRange().getValues();
   const headers = values[0].map(String);
   const statusIndex = headers.indexOf('status');
@@ -164,6 +169,31 @@ function processPaidOrders() {
     const stockDeducted = String(values[rowIndex][stockDeductedIndex] || '').toLowerCase();
     if (status === 'paid' && stockDeducted !== 'true') {
       deductStockForOrderRow(sheet, rowIndex + 1);
+    }
+  }
+}
+
+function expirePendingOrders(sheet) {
+  const ordersSheet = sheet || getOrCreateOrdersSheet();
+  const values = ordersSheet.getDataRange().getValues();
+  if (values.length < 2) return;
+
+  const headers = values[0].map(String);
+  const statusIndex = headers.indexOf('status');
+  const expiresAtIndex = headers.indexOf('expiresAt');
+  const stockDeductedIndex = headers.indexOf('stockDeducted');
+  if (statusIndex < 0 || expiresAtIndex < 0) return;
+
+  const now = new Date();
+  for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
+    const status = String(values[rowIndex][statusIndex] || '').toLowerCase();
+    const stockDeducted = stockDeductedIndex >= 0
+      ? String(values[rowIndex][stockDeductedIndex] || '').toLowerCase()
+      : 'false';
+    const expiresAt = values[rowIndex][expiresAtIndex];
+
+    if (status === 'pending' && stockDeducted !== 'true' && expiresAt && new Date(expiresAt) <= now) {
+      ordersSheet.getRange(rowIndex + 1, statusIndex + 1).setValue('expired');
     }
   }
 }
@@ -269,6 +299,10 @@ function createOrderId() {
   const date = Utilities.formatDate(now, 'Asia/Bangkok', 'yyyyMMdd-HHmmss');
   const random = Math.random().toString(36).slice(2, 6).toUpperCase();
   return `NUNAA-${date}-${random}`;
+}
+
+function createPendingExpiresAt() {
+  return new Date(Date.now() + (15 * 60 * 1000));
 }
 
 function jsonResponse(payload) {

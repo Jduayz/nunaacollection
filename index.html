@@ -15,159 +15,174 @@
 <body>
   <header class="site-header">
     <a class="brand" href="#home">Nunaa.Collection</a>
-    <button class="menu-button" aria-label="Open menu">☰</button>
+    <button class="menu-button" aria-label="Open menu" data-i18n-aria="menu.open">☰</button>
     <nav class="nav" aria-label="Main navigation">
-      <a href="#about">About</a>
-      <a href="#shop">Shop</a>
-      <a href="#fabric">Fabric</a>
-      <a href="#care">Care</a>
-      <a href="#order">Order</a>
-      <a class="cart-link" href="#cart">Cart <span id="cartCount" class="cart-count">0</span></a>
-      <a href="#contact">Contact</a>
+      <a href="#about" data-i18n="nav.about">About</a>
+      <a href="#shop" data-i18n="nav.shop">Shop</a>
+      <a href="#fabric" data-i18n="nav.fabric">Fabric</a>
+      <a href="#care" data-i18n="nav.care">Care</a>
+      <a href="#order" data-i18n="nav.order">Order</a>
+      <a class="cart-link" href="#cart"><span data-i18n="nav.cart">Cart</span> <span id="cartCount" class="cart-count">0</span></a>
+      <a href="#contact" data-i18n="nav.contact">Contact</a>
     </nav>
+    <div class="language-switcher" aria-label="Language selector">
+      <button type="button" class="language-button active" data-lang="th">TH</button>
+      <button type="button" class="language-button" data-lang="en">EN</button>
+      <button type="button" class="language-button" data-lang="zh">中文</button>
+    </div>
   </header>
 
   <main>
     <section id="home" class="hero section">
+      <div class="hero-cover" aria-label="Nunaa.Collection clothing and handmade display">
+        <img src="assets/images/cover/nunaa-cover.jpg" alt="Nunaa.Collection clothing and handmade fabric display">
+      </div>
       <div class="hero-copy">
-        <p class="eyebrow">Everyday Look • Chiang Mai Local Fabric</p>
-        <h1>เสื้อผ้าใส่สบายที่แมตช์ได้ทุกคอลเลคชั่น</h1>
-        <p>Nunaa.Collection ออกแบบเสื้อผ้าเรียบง่ายสำหรับทุกวัน ใช้ผ้าท้องถิ่นจากเชียงใหม่ ใส่แล้วสบาย ดูแลง่าย และอยู่กับตู้เสื้อผ้าได้นาน</p>
+        <p class="eyebrow" data-i18n="hero.eyebrow">Everyday Look • Chiang Mai Local Fabric</p>
+        <h1 data-i18n="hero.title">เสื้อผ้าใส่สบายที่แมตช์ได้ทุกคอลเลคชั่น</h1>
+        <p data-i18n="hero.body">Nunaa.Collection ออกแบบเสื้อผ้าเรียบง่ายสำหรับทุกวัน ใช้ผ้าท้องถิ่นจากเชียงใหม่ ใส่แล้วสบาย ดูแลง่าย และอยู่กับตู้เสื้อผ้าได้นาน</p>
         <div class="hero-actions">
-          <a class="button primary" href="#shop">ดูสินค้า</a>
+          <a class="button primary" href="#shop" data-i18n="hero.shopButton">ดูสินค้า</a>
           <a class="button ghost" href="https://www.instagram.com/Nunaa.collection" target="_blank" rel="noreferrer">Instagram</a>
         </div>
-      </div>
-      <div class="hero-card" aria-label="Brand mood card">
-        <span>Handmade</span>
-        <strong>piece by piece</strong>
-        <small>soft textures • timeless palette • local story</small>
       </div>
     </section>
 
     <section id="about" class="section about-section">
       <div class="about-copy">
-        <p class="eyebrow">About Us</p>
-        <h2>จุดเริ่มต้นจากงานฝีมือของคุณแม่และลูกสาว</h2>
-        <p>จุดเริ่มต้นเกิดจากคุณแม่ที่ชอบทำงานฝีมือและลูกสาวที่นำงานฝีมือของคุณแม่มาต่อยอดและสร้างสรรค์เป็นงาน ผ่านลวดลายบนกระเป๋าผ้าฝ้ายธรรมชาติที่ออกแบบร่วมกันกับคุณแม่ โดยเน้นไปที่รูปดอกไม้ต่าง ๆ โดยงานออกแบบทั้งหมดจะถูกวาดโดยไหมปักผ้า เส้นด้าย บนผืนผ้าสีขาว ทั้ง 2 มิติ และ 3 มิติ</p>
-        <p>งานเสื้อผ้าที่ออกแบบโดยลูกสาวและตัดเย็บทั้งหมดโดยคุณแม่ ทำควบคู่ไปกับกระเป๋าและเครื่องประดับคอเลกชันดอกไม้ เน้นไปที่ผ้าฝ้ายธรรมชาติ ผ้าลินิน เน้นงานออกแบบที่สวมใส่สบายและมีความน่ารัก โดยแนวคิดในการออกแบบคือ เสื้อผ้าสไตล์น่ารัก ๆ ที่คุณแม่อยากให้ลูกสาวได้ใส่</p>
+        <p class="eyebrow" data-i18n="about.eyebrow">About Us</p>
+        <h2 data-i18n="about.title">จุดเริ่มต้นจากงานฝีมือของคุณแม่และลูกสาว</h2>
+        <p data-i18n="about.bodyOne">จุดเริ่มต้นเกิดจากคุณแม่ที่ชอบทำงานฝีมือและลูกสาวที่นำงานฝีมือของคุณแม่มาต่อยอดและสร้างสรรค์เป็นงาน ผ่านลวดลายบนกระเป๋าผ้าฝ้ายธรรมชาติที่ออกแบบร่วมกันกับคุณแม่ โดยเน้นไปที่รูปดอกไม้ต่าง ๆ โดยงานออกแบบทั้งหมดจะถูกวาดโดยไหมปักผ้า เส้นด้าย บนผืนผ้าสีขาว ทั้ง 2 มิติ และ 3 มิติ</p>
+        <p data-i18n="about.bodyTwo">งานเสื้อผ้าที่ออกแบบโดยลูกสาวและตัดเย็บทั้งหมดโดยคุณแม่ ทำควบคู่ไปกับกระเป๋าและเครื่องประดับคอเลกชันดอกไม้ เน้นไปที่ผ้าฝ้ายธรรมชาติ ผ้าลินิน เน้นงานออกแบบที่สวมใส่สบายและมีความน่ารัก โดยแนวคิดในการออกแบบคือ เสื้อผ้าสไตล์น่ารัก ๆ ที่คุณแม่อยากให้ลูกสาวได้ใส่</p>
       </div>
     </section>
 
     <section id="shop" class="section">
       <div class="section-heading">
-        <p class="eyebrow">New Collection</p>
-        <h2>สินค้าพร้อมสั่งซื้อ</h2>
+        <p class="eyebrow" data-i18n="shop.eyebrow">New Collection</p>
+        <h2 data-i18n="shop.title">สินค้าพร้อมสั่งซื้อ</h2>
       </div>
       <div class="product-grid" id="productGrid"></div>
     </section>
 
     <section id="cart" class="section cart-panel">
       <div>
-        <p class="eyebrow">Cart</p>
-        <h2>ตะกร้าสินค้า</h2>
+        <p class="eyebrow" data-i18n="cart.eyebrow">Cart</p>
+        <h2 data-i18n="cart.title">ตะกร้าสินค้า</h2>
       </div>
       <div id="cartItems" class="cart-items"></div>
       <div class="cart-total">
-        <span>รวมทั้งหมด</span>
+        <span data-i18n="cart.total">รวมค่าสินค้า</span>
         <strong id="cartTotal">฿0</strong>
       </div>
-      <a class="button primary" href="#order">Checkout</a>
+      <div class="cart-total shipping-total">
+        <span data-i18n="cart.shipping">ค่าส่ง EMS</span>
+        <strong id="cartShipping">-</strong>
+      </div>
+      <div class="cart-total grand-total">
+        <span data-i18n="cart.grandTotal">ยอดรวมสุทธิ</span>
+        <strong id="cartGrandTotal">฿0</strong>
+      </div>
+      <div class="cart-actions">
+        <a class="button primary" href="#order" data-i18n="cart.checkout">Checkout</a>
+        <button class="button ghost clear-cart" id="clearCartButton" type="button" data-i18n="cart.clear">Clear cart</button>
+      </div>
     </section>
 
     <section id="fabric" class="section split">
       <div>
-        <p class="eyebrow">About Us</p>
-        <h2>ผ้าท้องถิ่นจากเชียงใหม่</h2>
+        <p class="eyebrow" data-i18n="fabric.eyebrow">Fabric</p>
+        <h2 data-i18n="fabric.title">ผ้าท้องถิ่นจากเชียงใหม่</h2>
       </div>
-      <p>ผ้าจากทางร้านเป็นผ้าท้องถิ่นจากเชียงใหม่ เราเลือกเนื้อผ้าที่ใส่สบาย ระบายอากาศได้ดี และเหมาะกับ everyday look ที่หยิบมาแมตช์ได้ง่ายในหลายโอกาส</p>
+      <p data-i18n="fabric.body">ผ้าจากทางร้านเป็นผ้าท้องถิ่นจากเชียงใหม่ เราเลือกเนื้อผ้าที่ใส่สบาย ระบายอากาศได้ดี และเหมาะกับ everyday look ที่หยิบมาแมตช์ได้ง่ายในหลายโอกาส</p>
     </section>
 
     <section id="care" class="section split alt">
       <div>
-        <p class="eyebrow">Care Guide</p>
-        <h2>วิธีดูแลผ้า</h2>
+        <p class="eyebrow" data-i18n="care.eyebrow">Care Guide</p>
+        <h2 data-i18n="care.title">วิธีดูแลผ้า</h2>
       </div>
       <ul class="care-list">
-        <li>ซักมือจะช่วยถนอมเนื้อผ้าได้มากกว่า</li>
-        <li>สามารถซักเครื่องได้ โดยแนะนำใส่ถุงถนอมผ้า</li>
-        <li>ใช้โหมดถนอมผ้าและน้ำอุณหภูมิปกติ</li>
-        <li>หลีกเลี่ยงแดดจัดเพื่อรักษาสีและสัมผัสของผ้า</li>
+        <li data-i18n="care.itemOne">ซักมือจะช่วยถนอมเนื้อผ้าได้มากกว่า</li>
+        <li data-i18n="care.itemTwo">สามารถซักเครื่องได้ โดยแนะนำใส่ถุงถนอมผ้า</li>
+        <li data-i18n="care.itemThree">ใช้โหมดถนอมผ้าและน้ำอุณหภูมิปกติ</li>
+        <li data-i18n="care.itemFour">หลีกเลี่ยงแดดจัดเพื่อรักษาสีและสัมผัสของผ้า</li>
       </ul>
     </section>
 
     <section id="order" class="section order-section">
       <div>
-        <p class="eyebrow">How to Order</p>
-        <h2>วิธีสั่งซื้อ</h2>
+        <p class="eyebrow" data-i18n="order.eyebrow">How to Order</p>
+        <h2 data-i18n="order.title">วิธีสั่งซื้อ</h2>
       </div>
       <div class="steps">
-        <article><span>01</span><p>เลือกสินค้าและเพิ่มลงตะกร้า</p></article>
-        <article><span>02</span><p>กด Checkout แล้วกรอกชื่อ ที่อยู่ และเบอร์ติดต่อ</p></article>
-        <article><span>03</span><p>ชำระเงินผ่าน QR / โอนเงิน แล้วส่งสลิป</p></article>
-        <article><span>04</span><p>ร้านยืนยันชำระเงินและอัปเดต stock</p></article>
+        <article><span>01</span><p data-i18n="order.stepOne">เลือกสินค้าและเพิ่มลงตะกร้า</p></article>
+        <article><span>02</span><p data-i18n="order.stepTwo">กด Checkout แล้วกรอกชื่อ ที่อยู่ และเบอร์ติดต่อ</p></article>
+        <article><span>03</span><p data-i18n="order.stepThree">ชำระเงินผ่าน QR / โอนเงิน แล้วส่งสลิป</p></article>
+        <article><span>04</span><p data-i18n="order.stepFour">ร้านยืนยันชำระเงินและอัปเดต stock</p></article>
       </div>
       <form id="checkoutForm" class="checkout-form">
         <div class="form-heading">
-          <h3>ข้อมูลจัดส่ง</h3>
-          <p>กรอกรายละเอียดสำหรับจัดส่งสินค้า</p>
+          <h3 data-i18n="form.title">ข้อมูลจัดส่ง</h3>
+          <p data-i18n="form.subtitle">กรอกรายละเอียดสำหรับจัดส่งสินค้า</p>
         </div>
         <div class="form-grid">
           <label>
-            ชื่อ-นามสกุล
+            <span data-i18n="form.name">ชื่อ-นามสกุล</span>
             <input id="customerName" name="customerName" type="text" autocomplete="name" required>
           </label>
           <label>
-            เบอร์ติดต่อ
+            <span data-i18n="form.phone">เบอร์ติดต่อ</span>
             <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" required>
           </label>
           <label class="full">
-            ที่อยู่จัดส่ง
+            <span data-i18n="form.address">ที่อยู่จัดส่ง</span>
             <textarea id="customerAddress" name="customerAddress" rows="4" autocomplete="street-address" required></textarea>
           </label>
           <label>
-            จังหวัด
+            <span data-i18n="form.province">จังหวัด</span>
             <input id="customerProvince" name="customerProvince" type="text" autocomplete="address-level1" required>
           </label>
           <label>
-            รหัสไปรษณีย์
+            <span data-i18n="form.postal">รหัสไปรษณีย์</span>
             <input id="customerPostal" name="customerPostal" type="text" inputmode="numeric" autocomplete="postal-code" required>
           </label>
           <label class="full">
-            หมายเหตุ
+            <span data-i18n="form.note">หมายเหตุ</span>
             <textarea id="customerNote" name="customerNote" rows="3"></textarea>
           </label>
         </div>
         <div class="order-summary-box">
-          <h3>สรุปออเดอร์</h3>
-          <pre id="orderSummary">เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์</pre>
+          <h3 data-i18n="summary.title">สรุปออเดอร์</h3>
+          <pre id="orderSummary" data-i18n="summary.empty">เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์</pre>
         </div>
         <div class="payment-box">
           <div>
-            <h3>ชำระเงินผ่าน QR</h3>
-          <p>สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram ระบบจะบันทึกออเดอร์เป็น pending ก่อน</p>
+            <h3 data-i18n="payment.title">ชำระเงินผ่าน QR</h3>
+          <p data-i18n="payment.body">สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram ระบบจะบันทึกออเดอร์เป็น pending ก่อน</p>
+          <p class="payment-note" data-i18n="payment.notice">ออเดอร์ pending จะหมดอายุใน 15 นาที และออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น</p>
           </div>
-          <img src="assets/images/payment/nunaa-promptpay-qr.jpeg" alt="Nunaa.Collection payment QR code">
+          <img src="assets/images/payment/nunaa-promptpay-qr.jpeg" alt="Nunaa.Collection payment QR code" data-i18n-alt="payment.qrAlt">
         </div>
         <div class="checkout-actions">
-          <button class="button primary" type="submit">คัดลอกออเดอร์</button>
-          <a class="button ghost light" href="https://www.instagram.com/Nunaa.collection" target="_blank" rel="noreferrer">ส่งทาง Instagram</a>
+          <button class="button primary" type="submit" data-i18n="form.copyOrder">คัดลอกออเดอร์</button>
+          <a class="button ghost light" href="https://www.instagram.com/Nunaa.collection" target="_blank" rel="noreferrer" data-i18n="form.sendInstagram">ส่งทาง Instagram</a>
         </div>
         <p id="copyStatus" class="copy-status" aria-live="polite"></p>
       </form>
     </section>
 
     <section id="contact" class="section contact-section">
-      <p class="eyebrow">Contact</p>
-      <h2>คุยกับร้าน</h2>
-      <p>สำหรับสอบถามสินค้า แจ้งชำระเงิน หรือเช็กออเดอร์ ติดต่อผ่าน Instagram ได้เลย</p>
+      <p class="eyebrow" data-i18n="contact.eyebrow">Contact</p>
+      <h2 data-i18n="contact.title">คุยกับร้าน</h2>
+      <p data-i18n="contact.body">สำหรับสอบถามสินค้า แจ้งชำระเงิน หรือเช็กออเดอร์ ติดต่อผ่าน Instagram ได้เลย</p>
       <a class="button primary" href="https://www.instagram.com/Nunaa.collection" target="_blank" rel="noreferrer">@Nunaa.collection</a>
     </section>
   </main>
 
   <footer class="site-footer">
     <span>© Nunaa.Collection</span>
-    <span>Everyday look, handmade piece by piece.</span>
+    <span data-i18n="footer.tagline">Everyday look, handmade piece by piece.</span>
   </footer>
 
   <script src="assets/js/config.js?v=20260630-sheets-stock"></script>

@@ -418,8 +418,10 @@ const translations = {
     'status.emptyCart': 'กรุณาเลือกสินค้าในตะกร้าก่อนสร้างออเดอร์',
     'status.copySaved': 'สร้าง {orderId} เป็น pending และคัดลอกออเดอร์แล้ว กรุณาส่งสลิปภายใน 15 นาที ออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น',
     'status.savedNoCopy': 'สร้าง {orderId} เป็น pending แล้ว กรุณาส่งสลิปภายใน 15 นาที แต่ browser ไม่อนุญาตให้คัดลอกอัตโนมัติ กรุณาเลือกข้อความสรุปออเดอร์แล้วคัดลอกเอง',
-    'status.copySaveFailed': 'คัดลอกออเดอร์แล้ว แต่ยังบันทึก {orderId} ไม่สำเร็จ: {message}',
-    'status.failed': 'สร้าง {orderId} แล้ว แต่ยังบันทึก/คัดลอกไม่สำเร็จ: {message}',
+    'status.copySaveFailed': 'ยังไม่ได้บันทึกออเดอร์ {orderId}: {message} กรุณาแก้ตะกร้าแล้วลองคัดลอกใหม่',
+    'status.failed': 'ยังไม่ได้บันทึก/คัดลอกออเดอร์ {orderId}: {message}',
+    'status.stockUnavailable': '{item} เหลือ {available} ชิ้น กรุณาแก้ตะกร้าก่อนสร้างออเดอร์',
+    'status.stockMissing': 'ไม่พบสินค้า {item} ใน stock ล่าสุด กรุณาแก้ตะกร้าก่อนสร้างออเดอร์',
     'error.saveOrder': 'ไม่สามารถบันทึกออเดอร์ได้'
   },
   en: {
@@ -520,8 +522,10 @@ const translations = {
     'status.emptyCart': 'Please add items to your cart before creating an order.',
     'status.copySaved': 'Created {orderId} as pending and copied the order. Please send the payment slip within 15 minutes. Items are reserved only after the shop confirms your order.',
     'status.savedNoCopy': 'Created {orderId} as pending. Please send the payment slip within 15 minutes, but the browser did not allow automatic copy. Please select and copy the order summary manually.',
-    'status.copySaveFailed': 'The order was copied, but {orderId} could not be saved: {message}',
-    'status.failed': 'Created {orderId}, but saving/copying failed: {message}',
+    'status.copySaveFailed': 'Order {orderId} was not saved: {message} Please update your cart and copy again.',
+    'status.failed': 'Order {orderId} was not saved/copied: {message}',
+    'status.stockUnavailable': '{item} has {available} left. Please update your cart before creating the order.',
+    'status.stockMissing': '{item} was not found in the latest stock. Please update your cart before creating the order.',
     'error.saveOrder': 'Could not save the order.'
   },
   zh: {
@@ -622,8 +626,10 @@ const translations = {
     'status.emptyCart': '请先将商品加入购物车，再建立订单。',
     'status.copySaved': '已建立 {orderId} 为待确认订单，并复制订单内容。请在 15 分钟内发送付款凭证。商品只会在店铺确认后才会被预留。',
     'status.savedNoCopy': '已建立 {orderId} 为待确认订单，请在 15 分钟内发送付款凭证。但浏览器不允许自动复制，请手动选择并复制订单摘要。',
-    'status.copySaveFailed': '订单已复制，但 {orderId} 尚未保存成功：{message}',
-    'status.failed': '已建立 {orderId}，但保存/复制失败：{message}',
+    'status.copySaveFailed': '订单 {orderId} 尚未保存成功：{message} 请调整购物车后重新复制。',
+    'status.failed': '订单 {orderId} 尚未保存/复制成功：{message}',
+    'status.stockUnavailable': '{item} 剩余 {available} 件。请先调整购物车再建立订单。',
+    'status.stockMissing': '最新库存中找不到 {item}。请先调整购物车再建立订单。',
     'error.saveOrder': '无法保存订单。'
   }
 };
@@ -761,6 +767,37 @@ function getProductByCode(code) {
   return products.find(product => product.code === code);
 }
 
+function getCartItemLabel(item) {
+  return `${item.code} ${t('cart.colorPrefix')} ${getColorName(item.selectedColor)}`;
+}
+
+function getLatestColorForCartItem(item) {
+  const product = getProductByCode(item.code);
+  if (!product) return null;
+
+  return product.colors.find(color => color.name === item.selectedColor.name) || null;
+}
+
+function validateCartStockAgainstLatestProducts() {
+  for (const item of cart) {
+    const latestColor = getLatestColorForCartItem(item);
+    const itemLabel = getCartItemLabel(item);
+
+    if (!latestColor) {
+      return t('status.stockMissing', { item: itemLabel });
+    }
+
+    if (isStockManaged(latestColor) && Number(latestColor.stock) < item.quantity) {
+      return t('status.stockUnavailable', {
+        item: itemLabel,
+        available: Math.max(0, Number(latestColor.stock))
+      });
+    }
+  }
+
+  return '';
+}
+
 function getCartItemCount() {
   return cart.reduce((sum, item) => sum + item.quantity, 0);
 }
@@ -848,6 +885,18 @@ function normalizeProduct(row, index) {
   };
 }
 
+function syncCartItemsWithProducts() {
+  cart.forEach(item => {
+    const product = getProductByCode(item.code);
+    if (!product) return;
+
+    const latestColor = product.colors.find(color => color.name === item.selectedColor.name);
+    if (latestColor) {
+      item.selectedColor = latestColor;
+    }
+  });
+}
+
 async function loadProductsFromSheet() {
   if (!appConfig.appsScriptUrl) return;
 
@@ -858,6 +907,7 @@ async function loadProductsFromSheet() {
     const sheetProducts = Array.isArray(data.products) ? data.products : [];
     if (sheetProducts.length > 0) {
       products = sheetProducts.map(normalizeProduct);
+      syncCartItemsWithProducts();
     }
   } catch (error) {
     console.warn('Using fallback products because Google Sheets data could not be loaded.', error);
@@ -1001,6 +1051,14 @@ async function submitOrderToSheet() {
     return { ok: true, skipped: true };
   }
 
+  await loadProductsFromSheet();
+  const stockError = validateCartStockAgainstLatestProducts();
+  if (stockError) {
+    renderProducts();
+    renderCart();
+    throw new Error(stockError);
+  }
+
   const response = await fetch(appConfig.appsScriptUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -1009,7 +1067,7 @@ async function submitOrderToSheet() {
   const data = await response.json();
 
   if (!response.ok || !data.ok) {
-    throw new Error(data.message || t('error.saveOrder'));
+    throw new Error(normalizeErrorMessage(data.message || t('error.saveOrder')));
   }
 
   if (data.orderId) {
@@ -1022,6 +1080,27 @@ async function submitOrderToSheet() {
 
 function renderOrderSummary() {
   orderSummary.textContent = buildOrderSummary();
+}
+
+function normalizeErrorMessage(message) {
+  const text = String(message || t('error.saveOrder'));
+
+  if (!text.includes('เธ')) return text;
+
+  const cleanedText = text
+    .replaceAll('เธชเธต', 'สี')
+    .replaceAll('เน«เธซเธฅเธทเธญ', 'เหลือ')
+    .replaceAll('เธ๊เธดเน้เธ้', 'ชิ้น');
+  const stockMatch = cleanedText.match(/^(nn-\d+)\s+สี(.+?)\s+เหลือ\s+(\d+)/i);
+
+  if (stockMatch) {
+    return t('status.stockUnavailable', {
+      item: `${stockMatch[1]} ${t('cart.colorPrefix')} ${stockMatch[2].trim()}`,
+      available: Number(stockMatch[3])
+    });
+  }
+
+  return cleanedText;
 }
 
 async function copyTextToClipboard(text) {
@@ -1174,18 +1253,16 @@ checkoutForm.addEventListener('submit', async event => {
   currentOrderId = createOrderId();
   currentPendingExpiresAt = createPendingExpiresAt();
   renderOrderSummary();
-  const summaryText = orderSummary.textContent;
-  const copied = await copyTextToClipboard(summaryText);
 
   try {
     await submitOrderToSheet();
+    const summaryText = orderSummary.textContent;
+    const copied = await copyTextToClipboard(summaryText);
     copyStatus.textContent = copied
       ? t('status.copySaved', { orderId: currentOrderId })
       : t('status.savedNoCopy', { orderId: currentOrderId });
   } catch (error) {
-    copyStatus.textContent = copied
-      ? t('status.copySaveFailed', { orderId: currentOrderId, message: error.message })
-      : t('status.failed', { orderId: currentOrderId, message: error.message });
+    copyStatus.textContent = t('status.failed', { orderId: currentOrderId, message: error.message });
   }
 });
 

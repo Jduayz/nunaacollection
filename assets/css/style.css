@@ -388,9 +388,8 @@ button.product-image:focus-visible::after {
 }
 
 .split { display: grid; grid-template-columns: .8fr 1fr; gap: 28px; align-items: start; }
-.split p, .care-list { color: var(--muted); font-size: 1.05rem; line-height: 1.9; margin: 0; }
+.split p { color: var(--muted); font-size: 1.05rem; line-height: 1.9; margin: 0; }
 .alt { background: #efe3d5; }
-.care-list { padding-left: 22px; }
 .order-section { background: var(--ink); color: var(--paper); }
 .order-section .eyebrow { color: #d9c4ad; }
 .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 28px; }

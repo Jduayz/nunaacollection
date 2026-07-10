@@ -211,7 +211,7 @@ let products = [
     id: 19,
     code: 'nn-019',
     name: 'Spaghetti crop top',
-    price: 320,
+    price: 290,
     detail: 'Flowers collection • Top',
     colors: getColors(colorSets.flowerPattern),
     image: 'assets/images/products/nn-019-020-flower-set.jpeg'
@@ -220,7 +220,7 @@ let products = [
     id: 20,
     code: 'nn-020',
     name: 'Shorts',
-    price: 320,
+    price: 350,
     detail: 'Flowers collection • Shorts',
     colors: getColors(colorSets.flowerPattern),
     image: 'assets/images/products/nn-019-020-flower-set.jpeg'
@@ -229,7 +229,7 @@ let products = [
     id: 21,
     code: 'nn-021',
     name: 'Puff Sleeve',
-    price: 320,
+    price: 290,
     detail: 'Flowers collection • Top',
     colors: getColors(colorSets.flowerPattern),
     image: 'assets/images/products/nn-021-022-flower-set.jpeg'
@@ -238,7 +238,7 @@ let products = [
     id: 22,
     code: 'nn-022',
     name: 'Skirt',
-    price: 320,
+    price: 350,
     detail: 'Flowers collection • Skirt',
     colors: getColors(colorSets.flowerPattern),
     image: 'assets/images/products/nn-021-022-flower-set.jpeg'

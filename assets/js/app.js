@@ -318,6 +318,10 @@ const customerProvince = document.querySelector('#customerProvince');
 const customerPostal = document.querySelector('#customerPostal');
 const customerNote = document.querySelector('#customerNote');
 const languageButtons = document.querySelectorAll('.language-button');
+const productModal = document.querySelector('#productModal');
+const productModalContent = document.querySelector('#productModalContent');
+const modalCloseControls = document.querySelectorAll('[data-modal-close]');
+let activeDetailProductId = null;
 
 const translations = {
   th: {
@@ -393,6 +397,8 @@ const translations = {
     'product.colorAria': 'เลือกสี',
     'product.addCart': 'เพิ่มลงตะกร้า',
     'product.added': 'เพิ่มแล้ว',
+    'product.viewDetails': 'ดูรายละเอียด',
+    'product.details': 'รายละเอียดสินค้า',
     'product.soldOut': 'สินค้าหมด',
     'product.ready': 'พร้อมสั่งซื้อ',
     'product.remaining': 'เหลือ {count} ชิ้น',
@@ -497,6 +503,8 @@ const translations = {
     'product.colorAria': 'Choose color',
     'product.addCart': 'Add to cart',
     'product.added': 'Added',
+    'product.viewDetails': 'View details',
+    'product.details': 'Product details',
     'product.soldOut': 'Sold out',
     'product.ready': 'Ready to order',
     'product.remaining': '{count} left',
@@ -601,6 +609,8 @@ const translations = {
     'product.colorAria': '选择颜色',
     'product.addCart': '加入购物车',
     'product.added': '已加入',
+    'product.viewDetails': '查看详情',
+    'product.details': '商品详情',
     'product.soldOut': '售罄',
     'product.ready': '可订购',
     'product.remaining': '剩余 {count} 件',
@@ -855,6 +865,67 @@ function refreshProductStockDisplays() {
   });
 }
 
+function renderColorSwatches(product, context) {
+  return product.colors.map((color, index) => `
+    <button
+      class="color-swatch${index === (selectedColors.get(product.id) || 0) ? ' selected' : ''}"
+      type="button"
+      data-id="${product.id}"
+      data-color-index="${index}"
+      data-context="${context}"
+      aria-label="${product.name} ${t('cart.colorPrefix')} ${getColorName(color)}"
+      aria-pressed="${index === (selectedColors.get(product.id) || 0) ? 'true' : 'false'}"
+      title="${getColorName(color)}"
+      ${isColorAvailable(product, color) ? '' : 'disabled'}
+    >
+      <span style="background: ${color.value};"></span>
+    </button>
+  `).join('');
+}
+
+function addProductToCart(product, feedbackButton) {
+  const selectedColor = getSelectedColor(product);
+  const feedbackIsInModal = Boolean(feedbackButton?.closest('.product-modal'));
+
+  if (!selectedColor || !isColorAvailable(product, selectedColor)) {
+    if (feedbackButton) {
+      feedbackButton.textContent = t('product.soldOut');
+      window.setTimeout(() => {
+        feedbackButton.textContent = t('product.addCart');
+      }, 1200);
+    }
+    return false;
+  }
+
+  const existingCartItem = findCartItem(product.code, selectedColor.name);
+  if (existingCartItem) {
+    existingCartItem.quantity += 1;
+  } else {
+    cart.push({ ...product, selectedColor, quantity: 1 });
+  }
+  renderCart();
+  refreshProductStockDisplays();
+  if (activeDetailProductId !== null && !feedbackIsInModal) {
+    const activeProduct = products.find(item => item.id === activeDetailProductId);
+    if (activeProduct) renderProductDetail(activeProduct);
+  }
+
+  if (feedbackButton) {
+    feedbackButton.textContent = t('product.added');
+    feedbackButton.classList.add('added');
+    window.setTimeout(() => {
+      if (feedbackIsInModal && activeDetailProductId === product.id) {
+        renderProductDetail(product);
+      } else {
+        feedbackButton.textContent = t('product.addCart');
+        feedbackButton.classList.remove('added');
+      }
+    }, 1200);
+  }
+
+  return true;
+}
+
 function normalizeProduct(row, index) {
   const colors = Array.isArray(row.colors) && row.colors.length > 0
     ? row.colors.map(color => ({
@@ -917,9 +988,9 @@ async function loadProductsFromSheet() {
 function renderProducts() {
   productGrid.innerHTML = products.map(product => `
     <article class="product-card${getProductAvailability(product) ? '' : ' sold-out'}" data-product-id="${product.id}">
-      <div class="product-image">
+      <button class="product-image product-detail-trigger" type="button" data-id="${product.id}" data-detail-label="${t('product.viewDetails')}" aria-label="${t('product.viewDetails')} ${product.name}">
         <img src="${product.image}" alt="${product.name}" loading="lazy">
-      </div>
+      </button>
       <div class="product-meta">
         <div>
           <span class="product-code">${product.code}</span>
@@ -932,20 +1003,7 @@ function renderProducts() {
       <div class="color-picker" role="group" aria-label="${t('product.colorAria')} ${product.name}">
         <span>${t('product.color')}</span>
         <div class="color-options">
-          ${product.colors.map((color, index) => `
-            <button
-              class="color-swatch${index === (selectedColors.get(product.id) || 0) ? ' selected' : ''}"
-              type="button"
-              data-id="${product.id}"
-              data-color-index="${index}"
-              aria-label="${product.name} ${t('cart.colorPrefix')} ${getColorName(color)}"
-              aria-pressed="${index === (selectedColors.get(product.id) || 0) ? 'true' : 'false'}"
-              title="${getColorName(color)}"
-              ${isColorAvailable(product, color) ? '' : 'disabled'}
-            >
-              <span style="background: ${color.value};"></span>
-            </button>
-          `).join('')}
+          ${renderColorSwatches(product, 'card')}
         </div>
       </div>
       <button class="button primary add-cart" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
@@ -981,6 +1039,50 @@ function renderCart() {
   cartCount.textContent = itemCount;
   clearCartButton.disabled = cart.length === 0;
   renderOrderSummary();
+}
+
+function renderProductDetail(product) {
+  if (!productModalContent) return;
+
+  const selectedColor = getSelectedColor(product);
+  productModalContent.innerHTML = `
+    <article class="product-detail" data-product-id="${product.id}">
+      <div class="product-detail-image">
+        <img src="${product.image}" alt="${product.name}">
+      </div>
+      <div class="product-detail-info">
+        <span class="product-code">${product.code}</span>
+        <h3 id="productModalTitle">${product.name}</h3>
+        <strong class="product-detail-price">${formatter.format(product.price)}</strong>
+        <p>${product.detail}</p>
+        <p class="stock-status" data-detail-stock-id="${product.id}">
+          ${isStockManaged(selectedColor) ? formatStockText(product) : t('product.ready')}
+        </p>
+        <div class="color-picker" role="group" aria-label="${t('product.colorAria')} ${product.name}">
+          <span>${t('product.color')}</span>
+          <div class="color-options">
+            ${renderColorSwatches(product, 'modal')}
+          </div>
+        </div>
+        <button class="button primary modal-add-cart" type="button" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
+      </div>
+    </article>
+  `;
+}
+
+function openProductDetail(product) {
+  activeDetailProductId = product.id;
+  renderProductDetail(product);
+  productModal.classList.add('open');
+  productModal.setAttribute('aria-hidden', 'false');
+  productModal.querySelector('.modal-close')?.focus();
+}
+
+function closeProductDetail() {
+  activeDetailProductId = null;
+  productModal.classList.remove('open');
+  productModal.setAttribute('aria-hidden', 'true');
+  productModalContent.innerHTML = '';
 }
 
 function buildOrderSummary() {
@@ -1133,6 +1235,13 @@ async function copyTextToClipboard(text) {
 }
 
 productGrid.addEventListener('click', event => {
+  const detailButton = event.target.closest('.product-detail-trigger');
+  if (detailButton) {
+    const product = products.find(item => item.id === Number(detailButton.dataset.id));
+    if (product) openProductDetail(product);
+    return;
+  }
+
   const colorButton = event.target.closest('.color-swatch');
   if (colorButton) {
     const productId = Number(colorButton.dataset.id);
@@ -1154,35 +1263,41 @@ productGrid.addEventListener('click', event => {
   const button = event.target.closest('.add-cart');
   if (!button) return;
   const product = products.find(item => item.id === Number(button.dataset.id));
-  const selectedColor = getSelectedColor(product);
+  if (product) addProductToCart(product, button);
+});
 
-  if (!selectedColor || !isColorAvailable(product, selectedColor)) {
-    button.textContent = t('product.soldOut');
-    window.setTimeout(() => {
-      button.textContent = t('product.addCart');
-    }, 1200);
+productModal.addEventListener('click', event => {
+  const closeControl = event.target.closest('[data-modal-close]');
+  if (closeControl) {
+    closeProductDetail();
     return;
   }
 
-  const existingCartItem = findCartItem(product.code, selectedColor.name);
-  if (existingCartItem) {
-    existingCartItem.quantity += 1;
-  } else {
-    cart.push({ ...product, selectedColor, quantity: 1 });
+  const colorButton = event.target.closest('.color-swatch');
+  if (colorButton) {
+    const productId = Number(colorButton.dataset.id);
+    const product = products.find(item => item.id === productId);
+    selectedColors.set(productId, Number(colorButton.dataset.colorIndex));
+    if (product) renderProductDetail(product);
+    refreshProductStockDisplays();
+    return;
   }
-  renderCart();
-  refreshProductStockDisplays();
 
-  button.textContent = t('product.added');
-  button.classList.add('added');
-  window.setTimeout(() => {
-    button.textContent = t('product.addCart');
-    button.classList.remove('added');
-  }, 1200);
+  const addButton = event.target.closest('.modal-add-cart');
+  if (!addButton) return;
 
-  const card = button.closest('.product-card');
-  const stockStatus = card.querySelector('[data-stock-id]');
-  if (stockStatus) stockStatus.textContent = formatStockText(product);
+  const product = products.find(item => item.id === Number(addButton.dataset.id));
+  if (product) addProductToCart(product, addButton);
+});
+
+modalCloseControls.forEach(control => {
+  control.addEventListener('click', closeProductDetail);
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && productModal.classList.contains('open')) {
+    closeProductDetail();
+  }
 });
 
 cartItems.addEventListener('click', event => {

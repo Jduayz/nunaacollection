@@ -48,8 +48,9 @@ window.NUNAA_CONFIG = {
 ## การทำงาน
 
 - หน้าเว็บจะโหลดสินค้าและ stock จากชีต `Products`
-- ตอนลูกค้ากดคัดลอกออเดอร์ เว็บจะส่ง order ไป Apps Script
+- ตอนลูกค้ายืนยันออเดอร์ เว็บจะส่ง order ไป Apps Script
 - Apps Script จะตรวจ stock, ลด stock ในชีต `Products` ทันที และบันทึก order ลงชีต `Orders` โดยตั้ง `status` เป็น `pending`
+- เมื่อลูกค้าส่งสลิปแล้วกดแจ้งชำระเงิน สถานะจะเปลี่ยนเป็น `payment_reported` และหยุดการหมดอายุระหว่างรอร้านตรวจสลิป
 - ถ้า order ยังเป็น `pending` จนครบ 15 นาที ระบบจะเปลี่ยนเป็น `expired` และคืน stock ให้อัตโนมัติเมื่อมีการเรียก Apps Script ครั้งถัดไป
 - หลังร้านตรวจสลิปแล้ว ให้เปลี่ยน `status` ของ order เป็น `paid` เพื่อบันทึกเวลา `paidAt` โดยระบบจะไม่ลด stock ซ้ำ
 - ถ้าต้องยกเลิก order ให้เปลี่ยน `status` เป็น `cancelled` หรือ `expired` ระบบจะคืน stock ให้ถ้า order นั้นเคยหัก stock แล้ว
@@ -60,6 +61,7 @@ window.NUNAA_CONFIG = {
 ในชีต `Orders`:
 
 - ถ้าลูกค้าโอนแล้ว ให้แก้ column `status` จาก `pending` เป็น `paid`
+- ถ้าสถานะเป็น `payment_reported` และสลิปถูกต้อง ให้เปลี่ยนเป็น `paid`; หากสลิปไม่ถูกต้องให้เปลี่ยนเป็น `payment_rejected` เพื่อคืน stock
 - ถ้าลูกค้ายกเลิกหรือไม่โอน ให้แก้ column `status` เป็น `cancelled` หรือ `expired`
 
 ถ้า `onEdit` ไม่ทำงานอัตโนมัติ ให้กลับไป Apps Script แล้วกด Run ฟังก์ชัน:

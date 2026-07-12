@@ -404,6 +404,7 @@ const CART_STORAGE_KEY = 'nunaaCartV1';
 let currentOrderId = '';
 let currentPendingExpiresAt = '';
 let submittedOrderSummary = '';
+let submittedOrderId = '';
 let submittedOrderExpiresAt = '';
 let isSubmittingOrder = false;
 let countdownTimer = null;
@@ -425,6 +426,7 @@ const paymentConfirmation = document.querySelector('#paymentConfirmation');
 const confirmedOrderId = document.querySelector('#confirmedOrderId');
 const confirmationCountdown = document.querySelector('#confirmationCountdown');
 const sendInstagramButton = document.querySelector('#sendInstagramButton');
+const reportPaymentButton = document.querySelector('#reportPaymentButton');
 const copyOrderIdButton = document.querySelector('#copyOrderIdButton');
 const customerName = document.querySelector('#customerName');
 const customerPhone = document.querySelector('#customerPhone');
@@ -499,12 +501,15 @@ const translations = {
     'form.reserveOrder': 'ยืนยันออเดอร์และจองสินค้า',
     'form.reserving': 'กำลังจองสินค้า…',
     'form.copyAndInstagram': 'คัดลอกออเดอร์และเปิด Instagram',
+    'form.reportPayment': 'ส่งสลิปแล้ว — แจ้งชำระเงิน',
+    'form.reportingPayment': 'กำลังแจ้งชำระเงิน…',
     'form.copyOrderId': 'คัดลอก Order ID',
     'form.sendInstagram': 'ส่งทาง Instagram',
     'confirmation.eyebrow': 'Order reserved',
     'confirmation.title': 'จองสินค้าเรียบร้อยแล้ว',
     'confirmation.timeLeft': 'กรุณาชำระและส่งสลิปภายใน {time}',
     'confirmation.expired': 'หมดเวลาจองแล้ว กรุณาสร้างออเดอร์ใหม่ก่อนชำระเงิน',
+    'confirmation.paymentReported': 'แจ้งชำระเงินแล้ว สินค้ายังคงถูกจองระหว่างรอร้านตรวจสลิป',
     'summary.title': 'สรุปออเดอร์',
     'summary.empty': 'เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์',
     'payment.title': 'ชำระเงินผ่าน QR',
@@ -549,6 +554,8 @@ const translations = {
     'status.orderIdCopied': 'คัดลอก Order ID แล้ว',
     'status.orderCopied': 'คัดลอกออเดอร์แล้ว กรุณาวางข้อความและแนบสลิปใน Instagram',
     'status.copyUnavailable': 'เปิด Instagram แล้ว แต่คัดลอกอัตโนมัติไม่ได้ กรุณาคัดลอกจากสรุปออเดอร์',
+    'status.paymentReported': 'แจ้งชำระเงินสำหรับ {orderId} แล้ว กรุณารอร้านตรวจสลิปและยืนยันออเดอร์',
+    'status.paymentReportFailed': 'ยังแจ้งชำระเงินไม่ได้: {message}',
     'status.copySaveFailed': 'ยังไม่ได้บันทึกออเดอร์ {orderId}: {message} กรุณาแก้ตะกร้าแล้วลองคัดลอกใหม่',
     'status.failed': 'ยังไม่ได้บันทึก/คัดลอกออเดอร์ {orderId}: {message}',
     'status.stockUnavailable': '{item} เหลือ {available} ชิ้น กรุณาแก้ตะกร้าก่อนสร้างออเดอร์',
@@ -615,12 +622,15 @@ const translations = {
     'form.reserveOrder': 'Confirm and reserve items',
     'form.reserving': 'Reserving items…',
     'form.copyAndInstagram': 'Copy order and open Instagram',
+    'form.reportPayment': 'Slip sent — report payment',
+    'form.reportingPayment': 'Reporting payment…',
     'form.copyOrderId': 'Copy Order ID',
     'form.sendInstagram': 'Send via Instagram',
     'confirmation.eyebrow': 'Order reserved',
     'confirmation.title': 'Your items are reserved',
     'confirmation.timeLeft': 'Please pay and send the slip within {time}',
     'confirmation.expired': 'The reservation has expired. Please create a new order before paying.',
+    'confirmation.paymentReported': 'Payment reported. Your items remain reserved while the shop checks the slip.',
     'summary.title': 'Order summary',
     'summary.empty': 'Add items to your cart to create an order summary.',
     'payment.title': 'Pay by QR',
@@ -665,6 +675,8 @@ const translations = {
     'status.orderIdCopied': 'Order ID copied.',
     'status.orderCopied': 'Order copied. Paste it and attach your payment slip in Instagram.',
     'status.copyUnavailable': 'Instagram opened, but automatic copy was unavailable. Please copy the order summary manually.',
+    'status.paymentReported': 'Payment reported for {orderId}. Please wait for the shop to verify the slip.',
+    'status.paymentReportFailed': 'Payment could not be reported: {message}',
     'status.copySaveFailed': 'Order {orderId} was not saved: {message} Please update your cart and copy again.',
     'status.failed': 'Order {orderId} was not saved/copied: {message}',
     'status.stockUnavailable': '{item} has {available} left. Please update your cart before creating the order.',
@@ -731,12 +743,15 @@ const translations = {
     'form.reserveOrder': '确认订单并预留商品',
     'form.reserving': '正在预留商品…',
     'form.copyAndInstagram': '复制订单并打开 Instagram',
+    'form.reportPayment': '已发送凭证 — 通知付款',
+    'form.reportingPayment': '正在通知付款…',
     'form.copyOrderId': '复制订单编号',
     'form.sendInstagram': '通过 Instagram 发送',
     'confirmation.eyebrow': '已预留订单',
     'confirmation.title': '商品已成功预留',
     'confirmation.timeLeft': '请在 {time} 内付款并发送凭证',
     'confirmation.expired': '预留时间已结束。请先重新建立订单再付款。',
+    'confirmation.paymentReported': '已通知付款。店铺核对凭证期间，商品将继续为您保留。',
     'summary.title': '订单摘要',
     'summary.empty': '请先将商品加入购物车以生成订单摘要。',
     'payment.title': 'QR 付款',
@@ -781,6 +796,8 @@ const translations = {
     'status.orderIdCopied': '订单编号已复制。',
     'status.orderCopied': '订单已复制。请在 Instagram 粘贴并附上付款凭证。',
     'status.copyUnavailable': 'Instagram 已打开，但无法自动复制。请手动复制订单摘要。',
+    'status.paymentReported': '已通知订单 {orderId} 的付款。请等待店铺核对凭证。',
+    'status.paymentReportFailed': '无法通知付款：{message}',
     'status.copySaveFailed': '订单 {orderId} 尚未保存成功：{message} 请调整购物车后重新复制。',
     'status.failed': '订单 {orderId} 尚未保存/复制成功：{message}',
     'status.stockUnavailable': '{item} 剩余 {available} 件。请先调整购物车再建立订单。',
@@ -1393,6 +1410,21 @@ async function submitOrderToSheet() {
   return data;
 }
 
+async function reportPaymentToSheet(orderId) {
+  if (!appConfig.appsScriptUrl) throw new Error(t('error.saveOrder'));
+
+  const response = await fetch(appConfig.appsScriptUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ action: 'reportPayment', orderId })
+  });
+  const data = await response.json();
+  if (!response.ok || !data.ok) {
+    throw new Error(normalizeErrorMessage(data.message || t('error.saveOrder')));
+  }
+  return data;
+}
+
 function renderOrderSummary() {
   orderSummary.textContent = cart.length === 0 && submittedOrderSummary
     ? submittedOrderSummary
@@ -1454,6 +1486,7 @@ function updateConfirmationCountdown() {
   if (!submittedOrderExpiresAt || remainingMs <= 0) {
     confirmationCountdown.textContent = t('confirmation.expired');
     sendInstagramButton.disabled = true;
+    reportPaymentButton.disabled = true;
     paymentConfirmation.classList.add('expired');
     if (countdownTimer) window.clearInterval(countdownTimer);
     countdownTimer = null;
@@ -1468,11 +1501,13 @@ function updateConfirmationCountdown() {
 
 function showPaymentConfirmation(orderId, summaryText, expiresAt) {
   submittedOrderSummary = summaryText;
+  submittedOrderId = orderId;
   submittedOrderExpiresAt = expiresAt;
   confirmedOrderId.textContent = orderId;
   paymentConfirmation.hidden = false;
   paymentConfirmation.classList.remove('expired');
   sendInstagramButton.disabled = false;
+  reportPaymentButton.disabled = false;
   if (countdownTimer) window.clearInterval(countdownTimer);
   updateConfirmationCountdown();
   countdownTimer = window.setInterval(updateConfirmationCountdown, 1000);
@@ -1654,6 +1689,27 @@ sendInstagramButton.addEventListener('click', async () => {
     window.location.href = 'https://www.instagram.com/Nunaa.collection';
   }
   copyStatus.textContent = copied ? t('status.orderCopied') : t('status.copyUnavailable');
+});
+
+reportPaymentButton.addEventListener('click', async () => {
+  if (!submittedOrderId || reportPaymentButton.disabled) return;
+  reportPaymentButton.disabled = true;
+  reportPaymentButton.textContent = t('form.reportingPayment');
+
+  try {
+    await reportPaymentToSheet(submittedOrderId);
+    if (countdownTimer) window.clearInterval(countdownTimer);
+    countdownTimer = null;
+    confirmationCountdown.textContent = t('confirmation.paymentReported');
+    paymentConfirmation.classList.add('payment-reported');
+    sendInstagramButton.disabled = true;
+    copyStatus.textContent = t('status.paymentReported', { orderId: submittedOrderId });
+    reportPaymentButton.textContent = t('form.reportPayment');
+  } catch (error) {
+    reportPaymentButton.disabled = false;
+    reportPaymentButton.textContent = t('form.reportPayment');
+    copyStatus.textContent = t('status.paymentReportFailed', { message: error.message });
+  }
 });
 
 copyOrderIdButton.addEventListener('click', async () => {

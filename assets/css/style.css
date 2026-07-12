@@ -422,6 +422,7 @@ button.product-image:focus-visible::after {
 .confirmation-order-id { color: #f7eadb; overflow-wrap: anywhere; }
 .confirmation-countdown { margin: 0 0 16px; color: #f7eadb; font-weight: 800; }
 .payment-confirmation.expired .payment-box { display: none; }
+.payment-confirmation.payment-reported .payment-box { display: none; }
 .confirmation-actions { margin-top: 16px; }
 .checkout-actions button:disabled { cursor: wait; opacity: .62; }
 .form-heading { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 18px; }

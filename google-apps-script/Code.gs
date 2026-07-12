@@ -8,6 +8,7 @@ const ORDERS_HEADERS = [
   'expiresAt',
   'stockDeducted',
   'paidAt',
+  'paymentReportedAt',
   'customerName',
   'phone',
   'address',
@@ -79,7 +80,9 @@ function doGet(event) {
 function doPost(event) {
   try {
     const payload = JSON.parse(event.postData.contents || '{}');
-    const result = createOrder(payload);
+    const result = payload.action === 'reportPayment'
+      ? reportPayment(payload)
+      : createOrder(payload);
     return jsonResponse(result);
   } catch (error) {
     return jsonResponse({ ok: false, message: error.message }, 400);
@@ -238,7 +241,7 @@ function createOrder(payload) {
     const existingOrder = findOrderById(ordersSheet, orderId);
     if (existingOrder) {
       const existingStatus = String(existingOrder.status || 'pending').toLowerCase();
-      if (existingStatus !== 'pending' && existingStatus !== 'paid') {
+      if (existingStatus !== 'pending' && existingStatus !== 'payment_reported' && existingStatus !== 'paid') {
         throw new Error(`ออเดอร์ ${orderId} อยู่ในสถานะ ${existingStatus} กรุณาสร้างออเดอร์ใหม่`);
       }
       return {
@@ -255,6 +258,46 @@ function createOrder(payload) {
     appendPendingOrder(ordersSheet, orderId, payload, items, true);
 
     return { ok: true, orderId, status: 'pending', stockDeducted: true, products: getProducts() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function reportPayment(payload) {
+  const orderId = String(payload.orderId || '').trim();
+  if (!orderId) throw new Error('ไม่พบ Order ID');
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    expirePendingOrders();
+    const sheet = getOrCreateOrdersSheet();
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(String);
+    const orderIdIndex = headers.indexOf('orderId');
+    const statusIndex = headers.indexOf('status');
+    const paymentReportedAtIndex = headers.indexOf('paymentReportedAt');
+
+    for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
+      if (String(values[rowIndex][orderIdIndex]) !== orderId) continue;
+
+      const status = String(values[rowIndex][statusIndex] || '').toLowerCase();
+      if (status === 'payment_reported' || status === 'paid') {
+        return { ok: true, orderId, status };
+      }
+      if (status !== 'pending') {
+        throw new Error(`ออเดอร์ ${orderId} อยู่ในสถานะ ${status} ไม่สามารถแจ้งชำระเงินได้`);
+      }
+
+      sheet.getRange(rowIndex + 1, statusIndex + 1).setValue('payment_reported');
+      if (paymentReportedAtIndex >= 0) {
+        sheet.getRange(rowIndex + 1, paymentReportedAtIndex + 1).setValue(new Date());
+      }
+      return { ok: true, orderId, status: 'payment_reported' };
+    }
+
+    throw new Error(`ไม่พบออเดอร์ ${orderId}`);
   } finally {
     lock.releaseLock();
   }
@@ -288,6 +331,7 @@ function appendPendingOrder(sheet, orderId, payload, items, stockDeducted) {
     expiresAt: payload.pendingExpiresAt ? new Date(payload.pendingExpiresAt) : createPendingExpiresAt(),
     stockDeducted: Boolean(stockDeducted),
     paidAt: '',
+    paymentReportedAt: '',
     customerName: customer.name || '',
     phone: customer.phone || '',
     address: customer.address || '',
@@ -347,7 +391,7 @@ function handleOrderStatusEdit(event) {
   if (status === 'paid') {
     expirePendingOrders(sheet);
     deductStockForOrderRow(sheet, range.getRow());
-  } else if (status === 'cancelled' || status === 'canceled' || status === 'expired') {
+  } else if (status === 'cancelled' || status === 'canceled' || status === 'expired' || status === 'payment_rejected') {
     restoreStockForOrderRow(sheet, range.getRow());
   }
 }
@@ -368,7 +412,7 @@ function processCancelledOrders() {
   for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
     const status = String(values[rowIndex][statusIndex] || '').toLowerCase();
     const stockDeducted = String(values[rowIndex][stockDeductedIndex] || '').toLowerCase();
-    if ((status === 'cancelled' || status === 'canceled' || status === 'expired') && stockDeducted === 'true') {
+    if ((status === 'cancelled' || status === 'canceled' || status === 'expired' || status === 'payment_rejected') && stockDeducted === 'true') {
       restoreStockForOrderRow(sheet, rowIndex + 1);
       restoredCount += 1;
     }

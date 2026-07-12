@@ -1,3 +1,3 @@
 window.NUNAA_CONFIG = {
-  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbwiuhQpqWbTJ0Ya4v2Rf9bxiUtKtM94I6nbre8afR1caCuGdFftFd3yXICqjFvfmQc/exec'
+  appsScriptUrl: 'https://script.google.com/macros/s/AKfycbzylYCa74xebV79pDV_9N6dXEvR91W5fk6HIcU8aq1rGwaPGjE8nwKuAagi511586c4-w/exec'
 };

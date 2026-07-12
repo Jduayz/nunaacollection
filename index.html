@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nunaacollection.com" />
   <link rel="canonical" href="https://nunaacollection.com" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20260710-product-details" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260712-checkout-flow-v2" />
 </head>
 <body>
   <header class="site-header">
@@ -96,7 +96,7 @@
         <article><span>01</span><p data-i18n="order.stepOne">เลือกสินค้าและเพิ่มลงตะกร้า</p></article>
         <article><span>02</span><p data-i18n="order.stepTwo">กด Checkout แล้วกรอกชื่อ ที่อยู่ และเบอร์ติดต่อ</p></article>
         <article><span>03</span><p data-i18n="order.stepThree">ชำระเงินผ่าน QR / โอนเงิน แล้วส่งสลิป</p></article>
-        <article><span>04</span><p data-i18n="order.stepFour">ร้านยืนยันชำระเงินและอัปเดต stock</p></article>
+        <article><span>04</span><p data-i18n="order.stepFour">ระบบจอง stock อัตโนมัติระหว่างรอชำระเงิน</p></article>
       </div>
       <form id="checkoutForm" class="checkout-form">
         <div class="form-heading">
@@ -133,17 +133,30 @@
           <h3 data-i18n="summary.title">สรุปออเดอร์</h3>
           <pre id="orderSummary" data-i18n="summary.empty">เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์</pre>
         </div>
-        <div class="payment-box">
+        <div id="paymentConfirmation" class="payment-confirmation" hidden>
+          <div class="confirmation-heading">
+            <div>
+              <p class="eyebrow" data-i18n="confirmation.eyebrow">Order reserved</p>
+              <h3 data-i18n="confirmation.title">จองสินค้าเรียบร้อยแล้ว</h3>
+            </div>
+            <strong id="confirmedOrderId" class="confirmation-order-id"></strong>
+          </div>
+          <p id="confirmationCountdown" class="confirmation-countdown" aria-live="polite"></p>
+          <div class="payment-box">
           <div>
             <h3 data-i18n="payment.title">ชำระเงินผ่าน QR</h3>
-          <p data-i18n="payment.body">สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram ระบบจะบันทึกออเดอร์เป็น pending ก่อน</p>
-          <p class="payment-note" data-i18n="payment.notice">ออเดอร์ pending จะหมดอายุใน 15 นาที และออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น</p>
+            <p data-i18n="payment.body">สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram</p>
+            <p class="payment-note" data-i18n="payment.notice">กรุณาส่งสลิปก่อนหมดเวลาจอง 15 นาที</p>
           </div>
           <img src="assets/images/payment/nunaa-promptpay-qr.jpeg" alt="Nunaa.Collection payment QR code" data-i18n-alt="payment.qrAlt">
+          </div>
+          <div class="checkout-actions confirmation-actions">
+            <button id="sendInstagramButton" class="button primary" type="button" data-i18n="form.copyAndInstagram">คัดลอกออเดอร์และเปิด Instagram</button>
+            <button id="copyOrderIdButton" class="button ghost light" type="button" data-i18n="form.copyOrderId">คัดลอก Order ID</button>
+          </div>
         </div>
         <div class="checkout-actions">
-          <button class="button primary" type="submit" data-i18n="form.copyOrder">คัดลอกออเดอร์</button>
-          <a class="button ghost light" href="https://www.instagram.com/Nunaa.collection" target="_blank" rel="noreferrer" data-i18n="form.sendInstagram">ส่งทาง Instagram</a>
+          <button id="reserveOrderButton" class="button primary" type="submit" data-i18n="form.reserveOrder">ยืนยันออเดอร์และจองสินค้า</button>
         </div>
         <p id="copyStatus" class="copy-status" aria-live="polite"></p>
       </form>
@@ -170,7 +183,7 @@
     <span data-i18n="footer.tagline">Everyday look, handmade piece by piece.</span>
   </footer>
 
-  <script src="assets/js/config.js?v=20260630-sheets-stock"></script>
-  <script src="assets/js/app.js?v=20260710-no-care-section"></script>
+  <script src="assets/js/config.js?v=20260711-new-sheets-url"></script>
+  <script src="assets/js/app.js?v=20260712-checkout-flow-v2"></script>
 </body>
 </html>

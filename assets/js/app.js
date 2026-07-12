@@ -40,6 +40,77 @@ function getColors(keys) {
   return keys.map(key => ({ key, ...colorOptions[key] }));
 }
 
+const flowerColorOptions = [
+  {
+    key: 'flowerA',
+    name: 'A',
+    value: "url('assets/images/patterns/flower-a.jpeg?v=20260711-fill') center / cover no-repeat"
+  },
+  {
+    key: 'flowerB',
+    name: 'B',
+    value: "url('assets/images/patterns/flower-b.jpeg?v=20260711-fill') center / cover no-repeat"
+  },
+  {
+    key: 'flowerC',
+    name: 'C',
+    value: "url('assets/images/patterns/flower-c.jpeg?v=20260711-fill') center / cover no-repeat"
+  },
+  {
+    key: 'flowerD',
+    name: 'D',
+    value: "url('assets/images/patterns/flower-d.jpeg?v=20260711-fill-d2') center / cover no-repeat"
+  }
+];
+
+function getFlowerColors(sourceColors = []) {
+  const source = Array.isArray(sourceColors) ? sourceColors : [];
+
+  return flowerColorOptions.map((color, index) => {
+    const sourceColor = source.find(item => item.name === color.name || item.colorName === color.name)
+      || (source.length === flowerColorOptions.length ? source[index] : {});
+    const rawStock = sourceColor.stock;
+
+    return {
+      ...color,
+      stock: rawStock === undefined || rawStock === '' ? undefined : Number(rawStock)
+    };
+  });
+}
+
+const linenColorOptions = [
+  {
+    key: 'linen23A',
+    name: 'A',
+    value: "url('assets/images/patterns/linen-a.jpeg?v=20260711-linen') center / cover no-repeat"
+  },
+  {
+    key: 'linen23B',
+    name: 'B',
+    value: "url('assets/images/patterns/linen-b.jpeg?v=20260711-linen') center / cover no-repeat"
+  },
+  {
+    key: 'linen23C',
+    name: 'C',
+    value: "url('assets/images/patterns/linen-c.jpeg?v=20260711-linen') center / cover no-repeat"
+  }
+];
+
+function getLinenColors(sourceColors = []) {
+  const source = Array.isArray(sourceColors) ? sourceColors : [];
+
+  return linenColorOptions.map((color, index) => {
+    const sourceColor = source.find(item => item.name === color.name || item.colorName === color.name)
+      || (source.length === linenColorOptions.length ? source[index] : {});
+    const rawStock = sourceColor.stock;
+
+    return {
+      ...color,
+      stock: rawStock === undefined || rawStock === '' ? undefined : Number(rawStock)
+    };
+  });
+}
+
 function getSelectedColor(product) {
   return product.colors[selectedColors.get(product.id) || 0] || product.colors[0];
 }
@@ -210,47 +281,47 @@ let products = [
   {
     id: 19,
     code: 'nn-019',
-    name: 'Spaghetti crop top',
+    name: 'Spaghetti crop top (Flowers collection)',
     price: 290,
-    detail: 'Flowers collection • Top',
-    colors: getColors(colorSets.flowerPattern),
-    image: 'assets/images/products/nn-019-020-flower-set.jpeg'
+    detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
+    colors: getFlowerColors(),
+    image: 'assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg'
   },
   {
     id: 20,
     code: 'nn-020',
-    name: 'Shorts',
+    name: 'Nunaa Shorts (Flowers collection)',
     price: 350,
-    detail: 'Flowers collection • Shorts',
-    colors: getColors(colorSets.flowerPattern),
-    image: 'assets/images/products/nn-019-020-flower-set.jpeg'
+    detail: 'Salou cotton • Waist 24"-36" • Hips 40" • Length 14"',
+    colors: getFlowerColors(),
+    image: 'assets/images/products/nn-020-nunaa-shorts-flowers.jpeg'
   },
   {
     id: 21,
     code: 'nn-021',
-    name: 'Puff Sleeve',
+    name: 'Puff Sleeve (Flowers collection)',
     price: 290,
-    detail: 'Flowers collection • Top',
-    colors: getColors(colorSets.flowerPattern),
-    image: 'assets/images/products/nn-021-022-flower-set.jpeg'
+    detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
+    colors: getFlowerColors(),
+    image: 'assets/images/products/nn-021-puff-sleeve-flowers.jpeg'
   },
   {
     id: 22,
     code: 'nn-022',
-    name: 'Skirt',
+    name: 'Skirt (Flowers collection)',
     price: 350,
-    detail: 'Flowers collection • Skirt',
-    colors: getColors(colorSets.flowerPattern),
-    image: 'assets/images/products/nn-021-022-flower-set.jpeg'
+    detail: 'Salou cotton • Waist 24"-36" • Length 15"',
+    colors: getFlowerColors(),
+    image: 'assets/images/products/nn-022-skirt-flowers.jpeg'
   },
   {
     id: 23,
     code: 'nn-023',
     name: 'Cupcake top linen fabric',
     price: 350,
-    detail: 'Linen • Chest 24"-36"',
-    colors: getColors(colorSets.linenPattern),
-    image: 'assets/images/products/nn-023-cupcake-top-linen.jpeg'
+    detail: 'Linen • Chest 24"-36" • Length 15"',
+    colors: getLinenColors(),
+    image: 'assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg'
   },
   {
     id: 24,
@@ -290,14 +361,52 @@ let products = [
   }
 ];
 
+const productOverrides = {
+  'nn-019': {
+    name: 'Spaghetti crop top (Flowers collection)',
+    detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
+    image: 'assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg',
+    colors: getFlowerColors
+  },
+  'nn-020': {
+    name: 'Nunaa Shorts (Flowers collection)',
+    detail: 'Salou cotton • Waist 24"-36" • Hips 40" • Length 14"',
+    image: 'assets/images/products/nn-020-nunaa-shorts-flowers.jpeg',
+    colors: getFlowerColors
+  },
+  'nn-021': {
+    name: 'Puff Sleeve (Flowers collection)',
+    detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
+    image: 'assets/images/products/nn-021-puff-sleeve-flowers.jpeg',
+    colors: getFlowerColors
+  },
+  'nn-022': {
+    name: 'Skirt (Flowers collection)',
+    detail: 'Salou cotton • Waist 24"-36" • Length 15"',
+    image: 'assets/images/products/nn-022-skirt-flowers.jpeg',
+    colors: getFlowerColors
+  },
+  'nn-023': {
+    name: 'Cupcake top linen fabric',
+    detail: 'Linen • Chest 24"-36" • Length 15"',
+    image: 'assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg',
+    colors: getLinenColors
+  }
+};
+
 const cart = [];
 const selectedColors = new Map();
 const formatter = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB', maximumFractionDigits: 0 });
 const EMS_FLAT_RATE = 60;
 const EMS_FLAT_RATE_MAX_ITEMS = 10;
 const PENDING_ORDER_EXPIRY_MINUTES = 15;
+const CART_STORAGE_KEY = 'nunaaCartV1';
 let currentOrderId = '';
 let currentPendingExpiresAt = '';
+let submittedOrderSummary = '';
+let submittedOrderExpiresAt = '';
+let isSubmittingOrder = false;
+let countdownTimer = null;
 
 const productGrid = document.querySelector('#productGrid');
 const cartItems = document.querySelector('#cartItems');
@@ -311,6 +420,12 @@ const nav = document.querySelector('.nav');
 const checkoutForm = document.querySelector('#checkoutForm');
 const orderSummary = document.querySelector('#orderSummary');
 const copyStatus = document.querySelector('#copyStatus');
+const reserveOrderButton = document.querySelector('#reserveOrderButton');
+const paymentConfirmation = document.querySelector('#paymentConfirmation');
+const confirmedOrderId = document.querySelector('#confirmedOrderId');
+const confirmationCountdown = document.querySelector('#confirmationCountdown');
+const sendInstagramButton = document.querySelector('#sendInstagramButton');
+const copyOrderIdButton = document.querySelector('#copyOrderIdButton');
 const customerName = document.querySelector('#customerName');
 const customerPhone = document.querySelector('#customerPhone');
 const customerAddress = document.querySelector('#customerAddress');
@@ -372,7 +487,7 @@ const translations = {
     'order.stepOne': 'เลือกสินค้าและเพิ่มลงตะกร้า',
     'order.stepTwo': 'กด Checkout แล้วกรอกชื่อ ที่อยู่ และเบอร์ติดต่อ',
     'order.stepThree': 'ชำระเงินผ่าน QR / โอนเงิน แล้วส่งสลิป',
-    'order.stepFour': 'ร้านยืนยันชำระเงินและอัปเดต stock',
+    'order.stepFour': 'ระบบจอง stock อัตโนมัติระหว่างรอชำระเงิน',
     'form.title': 'ข้อมูลจัดส่ง',
     'form.subtitle': 'กรอกรายละเอียดสำหรับจัดส่งสินค้า',
     'form.name': 'ชื่อ-นามสกุล',
@@ -381,13 +496,20 @@ const translations = {
     'form.province': 'จังหวัด',
     'form.postal': 'รหัสไปรษณีย์',
     'form.note': 'หมายเหตุ',
-    'form.copyOrder': 'คัดลอกออเดอร์',
+    'form.reserveOrder': 'ยืนยันออเดอร์และจองสินค้า',
+    'form.reserving': 'กำลังจองสินค้า…',
+    'form.copyAndInstagram': 'คัดลอกออเดอร์และเปิด Instagram',
+    'form.copyOrderId': 'คัดลอก Order ID',
     'form.sendInstagram': 'ส่งทาง Instagram',
+    'confirmation.eyebrow': 'Order reserved',
+    'confirmation.title': 'จองสินค้าเรียบร้อยแล้ว',
+    'confirmation.timeLeft': 'กรุณาชำระและส่งสลิปภายใน {time}',
+    'confirmation.expired': 'หมดเวลาจองแล้ว กรุณาสร้างออเดอร์ใหม่ก่อนชำระเงิน',
     'summary.title': 'สรุปออเดอร์',
     'summary.empty': 'เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์',
     'payment.title': 'ชำระเงินผ่าน QR',
-    'payment.body': 'สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram ระบบจะบันทึกออเดอร์เป็น pending ก่อน',
-    'payment.notice': 'ออเดอร์ pending จะหมดอายุใน 15 นาที และออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น',
+    'payment.body': 'สแกน QR เพื่อชำระเงิน แล้วส่งสลิปพร้อมสรุปออเดอร์ให้ร้านทาง Instagram',
+    'payment.notice': 'กรุณาส่งสลิปก่อนหมดเวลาจอง 15 นาที',
     'payment.qrAlt': 'Nunaa.Collection payment QR code',
     'contact.eyebrow': 'Contact',
     'contact.title': 'คุยกับร้าน',
@@ -407,10 +529,10 @@ const translations = {
     'cart.quantity': 'จำนวน',
     'cart.decrease': 'ลดจำนวน',
     'cart.increase': 'เพิ่มจำนวน',
-    'summary.orderIdPending': 'จะสร้างเมื่อกดคัดลอกออเดอร์',
+    'summary.orderIdPending': 'จะสร้างเมื่อยืนยันและจองสินค้า',
     'summary.items': 'รายการสินค้า',
     'summary.pendingExpires': 'ออเดอร์ pending หมดอายุ',
-    'summary.pendingNotice': 'ออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น',
+    'summary.pendingNotice': 'สินค้าถูกจองระหว่างที่ออเดอร์ pending นี้ยังไม่หมดอายุ',
     'summary.total': 'รวมค่าสินค้า',
     'summary.shippingFee': 'ค่าส่ง EMS',
     'summary.grandTotal': 'ยอดรวมสุทธิ',
@@ -422,8 +544,11 @@ const translations = {
     'summary.postal': 'รหัสไปรษณีย์',
     'summary.note': 'หมายเหตุ',
     'status.emptyCart': 'กรุณาเลือกสินค้าในตะกร้าก่อนสร้างออเดอร์',
-    'status.copySaved': 'สร้าง {orderId} เป็น pending และคัดลอกออเดอร์แล้ว กรุณาส่งสลิปภายใน 15 นาที ออเดอร์จะถูกจองหลังร้านยืนยันเท่านั้น',
-    'status.savedNoCopy': 'สร้าง {orderId} เป็น pending แล้ว กรุณาส่งสลิปภายใน 15 นาที แต่ browser ไม่อนุญาตให้คัดลอกอัตโนมัติ กรุณาเลือกข้อความสรุปออเดอร์แล้วคัดลอกเอง',
+    'status.copySaved': 'สร้าง {orderId} เป็น pending และจองสินค้าแล้ว กรุณาส่งสลิปภายใน 15 นาที',
+    'status.savedNoCopy': 'สร้าง {orderId} เป็น pending และจองสินค้าแล้ว กรุณาส่งสลิปภายใน 15 นาที แต่ browser ไม่อนุญาตให้คัดลอกอัตโนมัติ กรุณาเลือกข้อความสรุปออเดอร์แล้วคัดลอกเอง',
+    'status.orderIdCopied': 'คัดลอก Order ID แล้ว',
+    'status.orderCopied': 'คัดลอกออเดอร์แล้ว กรุณาวางข้อความและแนบสลิปใน Instagram',
+    'status.copyUnavailable': 'เปิด Instagram แล้ว แต่คัดลอกอัตโนมัติไม่ได้ กรุณาคัดลอกจากสรุปออเดอร์',
     'status.copySaveFailed': 'ยังไม่ได้บันทึกออเดอร์ {orderId}: {message} กรุณาแก้ตะกร้าแล้วลองคัดลอกใหม่',
     'status.failed': 'ยังไม่ได้บันทึก/คัดลอกออเดอร์ {orderId}: {message}',
     'status.stockUnavailable': '{item} เหลือ {available} ชิ้น กรุณาแก้ตะกร้าก่อนสร้างออเดอร์',
@@ -478,7 +603,7 @@ const translations = {
     'order.stepOne': 'Choose items and add them to your cart.',
     'order.stepTwo': 'Tap Checkout and enter your name, address, and contact number.',
     'order.stepThree': 'Pay by QR / bank transfer, then send the payment slip.',
-    'order.stepFour': 'The shop confirms payment and updates stock.',
+    'order.stepFour': 'The order reserves stock automatically while pending.',
     'form.title': 'Shipping details',
     'form.subtitle': 'Enter the details for delivery.',
     'form.name': 'Full name',
@@ -487,13 +612,20 @@ const translations = {
     'form.province': 'Province',
     'form.postal': 'Postal code',
     'form.note': 'Note',
-    'form.copyOrder': 'Copy order',
+    'form.reserveOrder': 'Confirm and reserve items',
+    'form.reserving': 'Reserving items…',
+    'form.copyAndInstagram': 'Copy order and open Instagram',
+    'form.copyOrderId': 'Copy Order ID',
     'form.sendInstagram': 'Send via Instagram',
+    'confirmation.eyebrow': 'Order reserved',
+    'confirmation.title': 'Your items are reserved',
+    'confirmation.timeLeft': 'Please pay and send the slip within {time}',
+    'confirmation.expired': 'The reservation has expired. Please create a new order before paying.',
     'summary.title': 'Order summary',
     'summary.empty': 'Add items to your cart to create an order summary.',
     'payment.title': 'Pay by QR',
-    'payment.body': 'Scan the QR to pay, then send the payment slip with your order summary to the shop via Instagram. The order will be saved as pending first.',
-    'payment.notice': 'Pending orders expire in 15 minutes. Items are reserved only after the shop confirms your order.',
+    'payment.body': 'Scan the QR to pay, then send the payment slip with your order summary to the shop via Instagram.',
+    'payment.notice': 'Please send the payment slip before the 15-minute reservation expires.',
     'payment.qrAlt': 'Nunaa.Collection payment QR code',
     'contact.eyebrow': 'Contact',
     'contact.title': 'Talk to the shop',
@@ -513,10 +645,10 @@ const translations = {
     'cart.quantity': 'Quantity',
     'cart.decrease': 'Decrease quantity',
     'cart.increase': 'Increase quantity',
-    'summary.orderIdPending': 'created when you copy the order',
+    'summary.orderIdPending': 'created when you confirm and reserve items',
     'summary.items': 'Items',
     'summary.pendingExpires': 'Pending order expires',
-    'summary.pendingNotice': 'Items are reserved only after the shop confirms your order.',
+    'summary.pendingNotice': 'Items are reserved while this pending order is active.',
     'summary.total': 'Item total',
     'summary.shippingFee': 'EMS shipping',
     'summary.grandTotal': 'Grand total',
@@ -528,8 +660,11 @@ const translations = {
     'summary.postal': 'Postal code',
     'summary.note': 'Note',
     'status.emptyCart': 'Please add items to your cart before creating an order.',
-    'status.copySaved': 'Created {orderId} as pending and copied the order. Please send the payment slip within 15 minutes. Items are reserved only after the shop confirms your order.',
-    'status.savedNoCopy': 'Created {orderId} as pending. Please send the payment slip within 15 minutes, but the browser did not allow automatic copy. Please select and copy the order summary manually.',
+    'status.copySaved': 'Created {orderId} as pending and reserved the items. Please send the payment slip within 15 minutes.',
+    'status.savedNoCopy': 'Created {orderId} as pending and reserved the items. Please send the payment slip within 15 minutes, but the browser did not allow automatic copy. Please select and copy the order summary manually.',
+    'status.orderIdCopied': 'Order ID copied.',
+    'status.orderCopied': 'Order copied. Paste it and attach your payment slip in Instagram.',
+    'status.copyUnavailable': 'Instagram opened, but automatic copy was unavailable. Please copy the order summary manually.',
     'status.copySaveFailed': 'Order {orderId} was not saved: {message} Please update your cart and copy again.',
     'status.failed': 'Order {orderId} was not saved/copied: {message}',
     'status.stockUnavailable': '{item} has {available} left. Please update your cart before creating the order.',
@@ -584,7 +719,7 @@ const translations = {
     'order.stepOne': '选择商品并加入购物车。',
     'order.stepTwo': '点击结账，填写姓名、地址和联系电话。',
     'order.stepThree': '通过 QR / 转账付款，并发送付款凭证。',
-    'order.stepFour': '店铺确认付款并更新库存。',
+    'order.stepFour': '待确认订单会自动预留库存。',
     'form.title': '收件资料',
     'form.subtitle': '填写配送所需资料。',
     'form.name': '姓名',
@@ -593,13 +728,20 @@ const translations = {
     'form.province': '省 / 府',
     'form.postal': '邮政编码',
     'form.note': '备注',
-    'form.copyOrder': '复制订单',
+    'form.reserveOrder': '确认订单并预留商品',
+    'form.reserving': '正在预留商品…',
+    'form.copyAndInstagram': '复制订单并打开 Instagram',
+    'form.copyOrderId': '复制订单编号',
     'form.sendInstagram': '通过 Instagram 发送',
+    'confirmation.eyebrow': '已预留订单',
+    'confirmation.title': '商品已成功预留',
+    'confirmation.timeLeft': '请在 {time} 内付款并发送凭证',
+    'confirmation.expired': '预留时间已结束。请先重新建立订单再付款。',
     'summary.title': '订单摘要',
     'summary.empty': '请先将商品加入购物车以生成订单摘要。',
     'payment.title': 'QR 付款',
-    'payment.body': '扫描 QR 付款后，请将付款凭证和订单摘要通过 Instagram 发给店铺。订单会先保存为待确认状态。',
-    'payment.notice': '待确认订单会在 15 分钟后过期。商品只会在店铺确认后才会被预留。',
+    'payment.body': '扫描 QR 付款后，请将付款凭证和订单摘要通过 Instagram 发给店铺。',
+    'payment.notice': '请在 15 分钟预留时间结束前发送付款凭证。',
     'payment.qrAlt': 'Nunaa.Collection 付款 QR 码',
     'contact.eyebrow': '联系',
     'contact.title': '联系店铺',
@@ -619,10 +761,10 @@ const translations = {
     'cart.quantity': '数量',
     'cart.decrease': '减少数量',
     'cart.increase': '增加数量',
-    'summary.orderIdPending': '复制订单时生成',
+    'summary.orderIdPending': '确认并预留商品时生成',
     'summary.items': '商品列表',
     'summary.pendingExpires': '待确认订单过期时间',
-    'summary.pendingNotice': '商品只会在店铺确认后才会被预留。',
+    'summary.pendingNotice': '商品会在此待确认订单有效期间被预留。',
     'summary.total': '商品小计',
     'summary.shippingFee': 'EMS 运费',
     'summary.grandTotal': '总计',
@@ -634,8 +776,11 @@ const translations = {
     'summary.postal': '邮政编码',
     'summary.note': '备注',
     'status.emptyCart': '请先将商品加入购物车，再建立订单。',
-    'status.copySaved': '已建立 {orderId} 为待确认订单，并复制订单内容。请在 15 分钟内发送付款凭证。商品只会在店铺确认后才会被预留。',
-    'status.savedNoCopy': '已建立 {orderId} 为待确认订单，请在 15 分钟内发送付款凭证。但浏览器不允许自动复制，请手动选择并复制订单摘要。',
+    'status.copySaved': '已建立 {orderId} 为待确认订单并预留商品。请在 15 分钟内发送付款凭证。',
+    'status.savedNoCopy': '已建立 {orderId} 为待确认订单并预留商品。请在 15 分钟内发送付款凭证。但浏览器不允许自动复制，请手动选择并复制订单摘要。',
+    'status.orderIdCopied': '订单编号已复制。',
+    'status.orderCopied': '订单已复制。请在 Instagram 粘贴并附上付款凭证。',
+    'status.copyUnavailable': 'Instagram 已打开，但无法自动复制。请手动复制订单摘要。',
     'status.copySaveFailed': '订单 {orderId} 尚未保存成功：{message} 请调整购物车后重新复制。',
     'status.failed': '订单 {orderId} 尚未保存/复制成功：{message}',
     'status.stockUnavailable': '{item} 剩余 {available} 件。请先调整购物车再建立订单。',
@@ -808,6 +953,54 @@ function validateCartStockAgainstLatestProducts() {
   return '';
 }
 
+function saveCart() {
+  try {
+    const savedItems = cart.map(item => ({
+      code: item.code,
+      colorName: item.selectedColor.name,
+      quantity: item.quantity
+    }));
+    if (savedItems.length) {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(savedItems));
+    } else {
+      localStorage.removeItem(CART_STORAGE_KEY);
+    }
+  } catch (error) {
+    // Shopping remains available when browser storage is blocked.
+  }
+}
+
+function restoreCart() {
+  let savedItems = [];
+  try {
+    savedItems = JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || '[]');
+  } catch (error) {
+    savedItems = [];
+  }
+
+  if (!Array.isArray(savedItems)) return;
+  cart.length = 0;
+  savedItems.forEach(savedItem => {
+    const product = getProductByCode(savedItem.code);
+    const selectedColor = product?.colors.find(color => color.name === savedItem.colorName);
+    if (!product || !selectedColor || !isColorAvailable(product, selectedColor)) return;
+
+    const requestedQuantity = Math.max(1, Number(savedItem.quantity) || 1);
+    const availableQuantity = isStockManaged(selectedColor)
+      ? Math.max(0, Number(selectedColor.stock))
+      : requestedQuantity;
+    const quantity = Math.min(requestedQuantity, availableQuantity);
+    if (quantity > 0) cart.push({ ...product, selectedColor, quantity });
+  });
+  saveCart();
+}
+
+function resetPendingOrderDraft() {
+  if (isSubmittingOrder) return;
+  currentOrderId = '';
+  currentPendingExpiresAt = '';
+}
+
 function getCartItemCount() {
   return cart.reduce((sum, item) => sum + item.quantity, 0);
 }
@@ -868,7 +1061,7 @@ function refreshProductStockDisplays() {
 function renderColorSwatches(product, context) {
   return product.colors.map((color, index) => `
     <button
-      class="color-swatch${index === (selectedColors.get(product.id) || 0) ? ' selected' : ''}"
+      class="color-swatch${color.key?.startsWith('flower') || color.key?.startsWith('linen23') ? ' pattern-swatch' : ''}${index === (selectedColors.get(product.id) || 0) ? ' selected' : ''}"
       type="button"
       data-id="${product.id}"
       data-color-index="${index}"
@@ -897,6 +1090,7 @@ function addProductToCart(product, feedbackButton) {
     return false;
   }
 
+  resetPendingOrderDraft();
   const existingCartItem = findCartItem(product.code, selectedColor.name);
   if (existingCartItem) {
     existingCartItem.quantity += 1;
@@ -927,8 +1121,22 @@ function addProductToCart(product, feedbackButton) {
 }
 
 function normalizeProduct(row, index) {
-  const colors = Array.isArray(row.colors) && row.colors.length > 0
-    ? row.colors.map(color => ({
+  const override = productOverrides[row.code] || {};
+  const sourceColors = Array.isArray(row.colors) && row.colors.length > 0
+    ? row.colors
+    : [{
+      key: row.colorKey,
+      name: row.colorName,
+      nameEN: row.colorNameEN || row.colorNameEn,
+      nameZH: row.colorNameZH || row.colorNameZh,
+      value: row.colorValue,
+      stock: row.stock
+    }];
+
+  const colors = typeof override.colors === 'function'
+    ? override.colors(sourceColors)
+    : sourceColors.length > 0
+    ? sourceColors.map(color => ({
       key: color.key,
       name: color.name || color.colorName || 'ไม่ระบุสี',
       nameEN: color.nameEN || color.nameEn || color.colorNameEN || color.colorNameEn,
@@ -948,10 +1156,10 @@ function normalizeProduct(row, index) {
   return {
     id: index + 1,
     code: row.code,
-    name: row.name,
+    name: override.name || row.name,
     price: Number(row.price) || 0,
-    detail: row.detail || '',
-    image: row.image || '',
+    detail: override.detail || row.detail || '',
+    image: override.image || row.image || '',
     colors
   };
 }
@@ -968,6 +1176,14 @@ function syncCartItemsWithProducts() {
   });
 }
 
+function applySheetProducts(sheetProducts, syncCart = true) {
+  if (!Array.isArray(sheetProducts) || sheetProducts.length === 0) return false;
+
+  products = sheetProducts.map(normalizeProduct);
+  if (syncCart) syncCartItemsWithProducts();
+  return true;
+}
+
 async function loadProductsFromSheet() {
   if (!appConfig.appsScriptUrl) return;
 
@@ -976,10 +1192,7 @@ async function loadProductsFromSheet() {
     if (!response.ok) throw new Error('Products API failed');
     const data = await response.json();
     const sheetProducts = Array.isArray(data.products) ? data.products : [];
-    if (sheetProducts.length > 0) {
-      products = sheetProducts.map(normalizeProduct);
-      syncCartItemsWithProducts();
-    }
+    applySheetProducts(sheetProducts);
   } catch (error) {
     console.warn('Using fallback products because Google Sheets data could not be loaded.', error);
   }
@@ -1038,6 +1251,7 @@ function renderCart() {
   cartGrandTotal.textContent = shippingInfo.grandTotalLabel;
   cartCount.textContent = itemCount;
   clearCartButton.disabled = cart.length === 0;
+  saveCart();
   renderOrderSummary();
 }
 
@@ -1143,14 +1357,13 @@ function buildOrderPayload() {
     total: getShippingInfo().isFixed ? getCartSubtotal() + getShippingInfo().fee : getCartSubtotal(),
     shippingNote: getShippingInfo().isFixed ? '' : getShippingInfo().label,
     pendingExpiresAt: currentPendingExpiresAt,
-    reserveAfterConfirmationOnly: true,
     summary: buildOrderSummary()
   };
 }
 
 async function submitOrderToSheet() {
   if (!appConfig.appsScriptUrl) {
-    return { ok: true, skipped: true };
+    throw new Error(t('error.saveOrder'));
   }
 
   await loadProductsFromSheet();
@@ -1181,7 +1394,9 @@ async function submitOrderToSheet() {
 }
 
 function renderOrderSummary() {
-  orderSummary.textContent = buildOrderSummary();
+  orderSummary.textContent = cart.length === 0 && submittedOrderSummary
+    ? submittedOrderSummary
+    : buildOrderSummary();
 }
 
 function normalizeErrorMessage(message) {
@@ -1232,6 +1447,36 @@ async function copyTextToClipboard(text) {
   } finally {
     document.body.removeChild(textarea);
   }
+}
+
+function updateConfirmationCountdown() {
+  const remainingMs = new Date(submittedOrderExpiresAt).getTime() - Date.now();
+  if (!submittedOrderExpiresAt || remainingMs <= 0) {
+    confirmationCountdown.textContent = t('confirmation.expired');
+    sendInstagramButton.disabled = true;
+    paymentConfirmation.classList.add('expired');
+    if (countdownTimer) window.clearInterval(countdownTimer);
+    countdownTimer = null;
+    return;
+  }
+
+  const totalSeconds = Math.ceil(remainingMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = String(totalSeconds % 60).padStart(2, '0');
+  confirmationCountdown.textContent = t('confirmation.timeLeft', { time: `${minutes}:${seconds}` });
+}
+
+function showPaymentConfirmation(orderId, summaryText, expiresAt) {
+  submittedOrderSummary = summaryText;
+  submittedOrderExpiresAt = expiresAt;
+  confirmedOrderId.textContent = orderId;
+  paymentConfirmation.hidden = false;
+  paymentConfirmation.classList.remove('expired');
+  sendInstagramButton.disabled = false;
+  if (countdownTimer) window.clearInterval(countdownTimer);
+  updateConfirmationCountdown();
+  countdownTimer = window.setInterval(updateConfirmationCountdown, 1000);
+  paymentConfirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 productGrid.addEventListener('click', event => {
@@ -1308,6 +1553,7 @@ cartItems.addEventListener('click', event => {
   if (!cartItem) return;
 
   const product = getProductByCode(cartItem.code);
+  resetPendingOrderDraft();
 
   if (button.dataset.action === 'increase') {
     if (product && isColorAvailable(product, cartItem.selectedColor)) {
@@ -1330,8 +1576,7 @@ cartItems.addEventListener('click', event => {
 clearCartButton.addEventListener('click', () => {
   if (cart.length === 0) return;
   cart.splice(0, cart.length);
-  currentOrderId = '';
-  currentPendingExpiresAt = '';
+  resetPendingOrderDraft();
   copyStatus.textContent = '';
   renderCart();
   refreshProductStockDisplays();
@@ -1352,12 +1597,14 @@ languageButtons.forEach(button => {
 });
 
 checkoutForm.addEventListener('input', () => {
+  resetPendingOrderDraft();
   copyStatus.textContent = '';
   renderOrderSummary();
 });
 
 checkoutForm.addEventListener('submit', async event => {
   event.preventDefault();
+  if (isSubmittingOrder) return;
 
   if (cart.length === 0) {
     copyStatus.textContent = t('status.emptyCart');
@@ -1365,25 +1612,60 @@ checkoutForm.addEventListener('submit', async event => {
     return;
   }
 
-  currentOrderId = createOrderId();
-  currentPendingExpiresAt = createPendingExpiresAt();
+  if (!currentOrderId) currentOrderId = createOrderId();
+  if (!currentPendingExpiresAt) currentPendingExpiresAt = createPendingExpiresAt();
   renderOrderSummary();
+  isSubmittingOrder = true;
+  reserveOrderButton.disabled = true;
+  reserveOrderButton.textContent = t('form.reserving');
 
   try {
-    await submitOrderToSheet();
+    const orderResult = await submitOrderToSheet();
     const summaryText = orderSummary.textContent;
-    const copied = await copyTextToClipboard(summaryText);
-    copyStatus.textContent = copied
-      ? t('status.copySaved', { orderId: currentOrderId })
-      : t('status.savedNoCopy', { orderId: currentOrderId });
+    const confirmedId = currentOrderId;
+    const confirmedExpiresAt = currentPendingExpiresAt;
+    applySheetProducts(orderResult.products, false);
+    cart.length = 0;
+    saveCart();
+    renderProducts();
+    renderCart();
+    orderSummary.textContent = summaryText;
+    showPaymentConfirmation(confirmedId, summaryText, confirmedExpiresAt);
+    copyStatus.textContent = t('status.copySaved', { orderId: confirmedId });
+    currentOrderId = '';
+    currentPendingExpiresAt = '';
   } catch (error) {
     copyStatus.textContent = t('status.failed', { orderId: currentOrderId, message: error.message });
+  } finally {
+    isSubmittingOrder = false;
+    reserveOrderButton.disabled = false;
+    reserveOrderButton.textContent = t('form.reserveOrder');
   }
+});
+
+sendInstagramButton.addEventListener('click', async () => {
+  if (!submittedOrderSummary || sendInstagramButton.disabled) return;
+  const instagramWindow = window.open('', '_blank');
+  const copied = await copyTextToClipboard(submittedOrderSummary);
+  if (instagramWindow) {
+    instagramWindow.opener = null;
+    instagramWindow.location.href = 'https://www.instagram.com/Nunaa.collection';
+  } else {
+    window.location.href = 'https://www.instagram.com/Nunaa.collection';
+  }
+  copyStatus.textContent = copied ? t('status.orderCopied') : t('status.copyUnavailable');
+});
+
+copyOrderIdButton.addEventListener('click', async () => {
+  if (!confirmedOrderId.textContent) return;
+  const copied = await copyTextToClipboard(confirmedOrderId.textContent);
+  copyStatus.textContent = copied ? t('status.orderIdCopied') : t('status.copyUnavailable');
 });
 
 async function init() {
   if (!translations[currentLanguage]) currentLanguage = 'th';
   await loadProductsFromSheet();
+  restoreCart();
   applyTranslations();
 }
 

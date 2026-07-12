@@ -208,6 +208,11 @@ button.product-image:focus-visible::after {
   background: var(--paper);
   cursor: pointer;
 }
+.color-swatch.pattern-swatch {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+}
 .color-swatch:disabled {
   cursor: not-allowed;
   opacity: .35;
@@ -397,6 +402,28 @@ button.product-image:focus-visible::after {
 .steps span { color: #d9c4ad; font-weight: 800; }
 .steps p { line-height: 1.7; }
 .checkout-form { margin-top: 28px; padding: 24px; border: 1px solid rgba(255,250,242,.18); border-radius: 22px; background: rgba(255,250,242,.05); }
+.payment-confirmation {
+  margin-top: 22px;
+  padding: 20px;
+  border: 1px solid rgba(255,250,242,.28);
+  border-radius: 18px;
+  background: rgba(255,250,242,.08);
+}
+.payment-confirmation[hidden] { display: none; }
+.confirmation-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 18px;
+  margin-bottom: 12px;
+}
+.confirmation-heading h3 { margin: 4px 0 0; font-family: Georgia, serif; font-size: 1.55rem; }
+.confirmation-heading .eyebrow { margin: 0; }
+.confirmation-order-id { color: #f7eadb; overflow-wrap: anywhere; }
+.confirmation-countdown { margin: 0 0 16px; color: #f7eadb; font-weight: 800; }
+.payment-confirmation.expired .payment-box { display: none; }
+.confirmation-actions { margin-top: 16px; }
+.checkout-actions button:disabled { cursor: wait; opacity: .62; }
 .form-heading { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 18px; }
 .form-heading h3, .order-summary-box h3 { margin: 0; font-family: Georgia, serif; font-size: 1.55rem; }
 .form-heading p { margin: 0; color: #d9c4ad; }

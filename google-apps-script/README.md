@@ -49,17 +49,23 @@ window.NUNAA_CONFIG = {
 
 - หน้าเว็บจะโหลดสินค้าและ stock จากชีต `Products`
 - ตอนลูกค้ากดคัดลอกออเดอร์ เว็บจะส่ง order ไป Apps Script
-- Apps Script จะบันทึก order ลงชีต `Orders` โดยตั้ง `status` เป็น `pending`
-- หลังร้านตรวจสลิปแล้ว ให้เปลี่ยน `status` ของ order เป็น `paid`
-- เมื่อ status เป็น `paid` Apps Script จะลด stock ในชีต `Products` และตั้ง `stockDeducted` เป็น `TRUE`
+- Apps Script จะตรวจ stock, ลด stock ในชีต `Products` ทันที และบันทึก order ลงชีต `Orders` โดยตั้ง `status` เป็น `pending`
+- ถ้า order ยังเป็น `pending` จนครบ 15 นาที ระบบจะเปลี่ยนเป็น `expired` และคืน stock ให้อัตโนมัติเมื่อมีการเรียก Apps Script ครั้งถัดไป
+- หลังร้านตรวจสลิปแล้ว ให้เปลี่ยน `status` ของ order เป็น `paid` เพื่อบันทึกเวลา `paidAt` โดยระบบจะไม่ลด stock ซ้ำ
+- ถ้าต้องยกเลิก order ให้เปลี่ยน `status` เป็น `cancelled` หรือ `expired` ระบบจะคืน stock ให้ถ้า order นั้นเคยหัก stock แล้ว
 - ถ้ายังไม่ใส่ `appsScriptUrl` เว็บจะใช้ข้อมูลสินค้าเดิมในไฟล์ `assets/js/app.js`
 
-## วิธีลด stock หลังยืนยันชำระเงิน
+## วิธีจัดการ order หลังลูกค้าสั่งซื้อ
 
-ในชีต `Orders` ให้แก้ column `status` จาก `pending` เป็น `paid`
+ในชีต `Orders`:
+
+- ถ้าลูกค้าโอนแล้ว ให้แก้ column `status` จาก `pending` เป็น `paid`
+- ถ้าลูกค้ายกเลิกหรือไม่โอน ให้แก้ column `status` เป็น `cancelled` หรือ `expired`
 
 ถ้า `onEdit` ไม่ทำงานอัตโนมัติ ให้กลับไป Apps Script แล้วกด Run ฟังก์ชัน:
 
 ```text
 processPaidOrders
 ```
+
+สำหรับ order ที่หมดอายุ ให้เรียก action `products` จากหน้าเว็บหรือเปิดเว็บตามปกติ ระบบจะรัน `expirePendingOrders` ตอนสร้าง order ใหม่ หรือจะเพิ่ม time-driven trigger ให้รันฟังก์ชัน `expirePendingOrders` เป็นระยะก็ได้

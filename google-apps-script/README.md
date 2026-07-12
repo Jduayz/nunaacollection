@@ -68,4 +68,6 @@ window.NUNAA_CONFIG = {
 processPaidOrders
 ```
 
+หลัง deploy ครั้งแรก ให้กด Run ฟังก์ชัน `setupOrderEditTrigger` หนึ่งครั้งและอนุญาตสิทธิ์ เพื่อให้การเปลี่ยน `status` คืน/หัก stock ได้อัตโนมัติ หากมีออเดอร์ `cancelled` หรือ `expired` ที่ยังไม่คืน stock ให้กด Run ฟังก์ชัน `processCancelledOrders`
+
 สำหรับ order ที่หมดอายุ ให้เรียก action `products` จากหน้าเว็บหรือเปิดเว็บตามปกติ ระบบจะรัน `expirePendingOrders` ตอนสร้าง order ใหม่ หรือจะเพิ่ม time-driven trigger ให้รันฟังก์ชัน `expirePendingOrders` เป็นระยะก็ได้

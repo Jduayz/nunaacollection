@@ -329,6 +329,11 @@ function validateStock(items) {
 }
 
 function onEdit(event) {
+  handleOrderStatusEdit(event);
+}
+
+function handleOrderStatusEdit(event) {
+  if (!event || !event.range) return;
   const range = event.range;
   const sheet = range.getSheet();
   if (sheet.getName() !== ORDERS_SHEET || range.getRow() === 1) return;
@@ -345,6 +350,45 @@ function onEdit(event) {
   } else if (status === 'cancelled' || status === 'canceled' || status === 'expired') {
     restoreStockForOrderRow(sheet, range.getRow());
   }
+}
+
+function processCancelledOrders() {
+  const sheet = getOrCreateOrdersSheet();
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return 'No orders to process.';
+
+  const headers = values[0].map(String);
+  const statusIndex = headers.indexOf('status');
+  const stockDeductedIndex = headers.indexOf('stockDeducted');
+  if (statusIndex < 0 || stockDeductedIndex < 0) {
+    throw new Error('Orders sheet ต้องมี column: status, stockDeducted');
+  }
+
+  let restoredCount = 0;
+  for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
+    const status = String(values[rowIndex][statusIndex] || '').toLowerCase();
+    const stockDeducted = String(values[rowIndex][stockDeductedIndex] || '').toLowerCase();
+    if ((status === 'cancelled' || status === 'canceled' || status === 'expired') && stockDeducted === 'true') {
+      restoreStockForOrderRow(sheet, rowIndex + 1);
+      restoredCount += 1;
+    }
+  }
+
+  return `Restored stock for ${restoredCount} order(s).`;
+}
+
+function setupOrderEditTrigger() {
+  const spreadsheet = getSpreadsheet();
+  ScriptApp.getProjectTriggers()
+    .filter(trigger => trigger.getHandlerFunction() === 'handleOrderStatusEdit')
+    .forEach(trigger => ScriptApp.deleteTrigger(trigger));
+
+  ScriptApp.newTrigger('handleOrderStatusEdit')
+    .forSpreadsheet(spreadsheet)
+    .onEdit()
+    .create();
+
+  return 'Installed order status edit trigger.';
 }
 
 function processPaidOrders() {

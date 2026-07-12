@@ -510,6 +510,7 @@ const translations = {
     'confirmation.timeLeft': 'กรุณาชำระและส่งสลิปภายใน {time}',
     'confirmation.expired': 'หมดเวลาจองแล้ว กรุณาสร้างออเดอร์ใหม่ก่อนชำระเงิน',
     'confirmation.paymentReported': 'แจ้งชำระเงินแล้ว สินค้ายังคงถูกจองระหว่างรอร้านตรวจสลิป',
+    'confirmation.paymentReportedAfterHours': 'แจ้งชำระเงินแล้ว ร้านจะตรวจสอบภายใน {deadline} สินค้ายังคงถูกจองระหว่างรอตรวจสอบ',
     'summary.title': 'สรุปออเดอร์',
     'summary.empty': 'เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์',
     'payment.title': 'ชำระเงินผ่าน QR',
@@ -631,6 +632,7 @@ const translations = {
     'confirmation.timeLeft': 'Please pay and send the slip within {time}',
     'confirmation.expired': 'The reservation has expired. Please create a new order before paying.',
     'confirmation.paymentReported': 'Payment reported. Your items remain reserved while the shop checks the slip.',
+    'confirmation.paymentReportedAfterHours': 'Payment reported. The shop will verify it by {deadline}. Your items remain reserved while waiting.',
     'summary.title': 'Order summary',
     'summary.empty': 'Add items to your cart to create an order summary.',
     'payment.title': 'Pay by QR',
@@ -752,6 +754,7 @@ const translations = {
     'confirmation.timeLeft': '请在 {time} 内付款并发送凭证',
     'confirmation.expired': '预留时间已结束。请先重新建立订单再付款。',
     'confirmation.paymentReported': '已通知付款。店铺核对凭证期间，商品将继续为您保留。',
+    'confirmation.paymentReportedAfterHours': '已通知付款。店铺将在 {deadline} 前核对，等待期间商品将继续为您保留。',
     'summary.title': '订单摘要',
     'summary.empty': '请先将商品加入购物车以生成订单摘要。',
     'payment.title': 'QR 付款',
@@ -858,6 +861,15 @@ function formatPendingExpiresAt() {
     timeStyle: 'short',
     timeZone: 'Asia/Bangkok'
   }).format(new Date(currentPendingExpiresAt));
+}
+
+function formatReviewDueAt(value) {
+  if (!value) return '';
+  return new Intl.DateTimeFormat(currentLanguage === 'th' ? 'th-TH' : currentLanguage, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Asia/Bangkok'
+  }).format(new Date(value));
 }
 
 function t(key, values = {}) {
@@ -1697,10 +1709,12 @@ reportPaymentButton.addEventListener('click', async () => {
   reportPaymentButton.textContent = t('form.reportingPayment');
 
   try {
-    await reportPaymentToSheet(submittedOrderId);
+    const paymentResult = await reportPaymentToSheet(submittedOrderId);
     if (countdownTimer) window.clearInterval(countdownTimer);
     countdownTimer = null;
-    confirmationCountdown.textContent = t('confirmation.paymentReported');
+    confirmationCountdown.textContent = paymentResult.afterHours
+      ? t('confirmation.paymentReportedAfterHours', { deadline: formatReviewDueAt(paymentResult.reviewDueAt) })
+      : t('confirmation.paymentReported');
     paymentConfirmation.classList.add('payment-reported');
     sendInstagramButton.disabled = true;
     copyStatus.textContent = t('status.paymentReported', { orderId: submittedOrderId });

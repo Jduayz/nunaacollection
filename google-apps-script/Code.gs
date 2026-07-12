@@ -278,13 +278,15 @@ function reportPayment(payload) {
     const orderIdIndex = headers.indexOf('orderId');
     const statusIndex = headers.indexOf('status');
     const paymentReportedAtIndex = headers.indexOf('paymentReportedAt');
+    const createdAtIndex = headers.indexOf('createdAt');
 
     for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
       if (String(values[rowIndex][orderIdIndex]) !== orderId) continue;
 
       const status = String(values[rowIndex][statusIndex] || '').toLowerCase();
+      const reviewInfo = getPaymentReviewInfo(values[rowIndex][createdAtIndex]);
       if (status === 'payment_reported' || status === 'paid') {
-        return { ok: true, orderId, status };
+        return { ok: true, orderId, status, ...reviewInfo };
       }
       if (status !== 'pending') {
         throw new Error(`ออเดอร์ ${orderId} อยู่ในสถานะ ${status} ไม่สามารถแจ้งชำระเงินได้`);
@@ -294,13 +296,26 @@ function reportPayment(payload) {
       if (paymentReportedAtIndex >= 0) {
         sheet.getRange(rowIndex + 1, paymentReportedAtIndex + 1).setValue(new Date());
       }
-      return { ok: true, orderId, status: 'payment_reported' };
+      return { ok: true, orderId, status: 'payment_reported', ...reviewInfo };
     }
 
     throw new Error(`ไม่พบออเดอร์ ${orderId}`);
   } finally {
     lock.releaseLock();
   }
+}
+
+function getPaymentReviewInfo(createdAt) {
+  const orderCreatedAt = createdAt ? new Date(createdAt) : new Date();
+  const bangkokHour = Number(Utilities.formatDate(orderCreatedAt, 'Asia/Bangkok', 'H'));
+  if (bangkokHour < 22) {
+    return { afterHours: false, reviewDueAt: '' };
+  }
+
+  const bangkokDate = Utilities.formatDate(orderCreatedAt, 'Asia/Bangkok', 'yyyy-MM-dd');
+  const nextDayAtOnePm = new Date(`${bangkokDate}T13:00:00+07:00`);
+  nextDayAtOnePm.setTime(nextDayAtOnePm.getTime() + (24 * 60 * 60 * 1000));
+  return { afterHours: true, reviewDueAt: nextDayAtOnePm.toISOString() };
 }
 
 function findOrderById(sheet, orderId) {

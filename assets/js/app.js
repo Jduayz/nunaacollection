@@ -1668,9 +1668,9 @@ checkoutForm.addEventListener('submit', async event => {
 
   try {
     const orderResult = await submitOrderToSheet();
-    const summaryText = orderSummary.textContent;
-    const confirmedId = currentOrderId;
-    const confirmedExpiresAt = currentPendingExpiresAt;
+    const summaryText = orderResult.summary || orderSummary.textContent;
+    const confirmedId = orderResult.orderId || currentOrderId;
+    const confirmedExpiresAt = orderResult.pendingExpiresAt || currentPendingExpiresAt;
     applySheetProducts(orderResult.products, false);
     cart.length = 0;
     saveCart();

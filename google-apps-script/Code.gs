@@ -1,6 +1,10 @@
 const PRODUCTS_SHEET = 'Products';
 const ORDERS_SHEET = 'Orders';
 const SPREADSHEET_ID = '1J_9ip5tz6MrVN4XFrMEzvwvxvARmLETtsDs-qX4vg-g';
+const EMS_FLAT_RATE = 60;
+const EMS_FLAT_RATE_MAX_ITEMS = 10;
+const MAX_QUANTITY_PER_ITEM = 10;
+const MAX_ITEMS_PER_ORDER = 10;
 const ORDERS_HEADERS = [
   'createdAt',
   'orderId',
@@ -233,9 +237,9 @@ function createOrder(payload) {
   try {
     ensureFlowerProductsAreVariants();
     expirePendingOrders();
-    const orderId = payload.orderId || createOrderId();
-    const items = payload.items || [];
-    if (!items.length) throw new Error('ไม่มีสินค้าในออเดอร์');
+    const orderId = payload.orderId ? validateOrderId(payload.orderId) : createOrderId();
+    const requestedItems = payload.items || [];
+    if (!requestedItems.length) throw new Error('ไม่มีสินค้าในออเดอร์');
 
     const ordersSheet = getOrCreateOrdersSheet();
     const existingOrder = findOrderById(ordersSheet, orderId);
@@ -250,21 +254,52 @@ function createOrder(payload) {
         status: existingStatus,
         stockDeducted: String(existingOrder.stockDeducted).toLowerCase() === 'true',
         duplicate: true,
+        total: Number(existingOrder.total || 0),
+        pendingExpiresAt: existingOrder.expiresAt instanceof Date
+          ? existingOrder.expiresAt.toISOString()
+          : String(existingOrder.expiresAt || ''),
+        summary: String(existingOrder.summary || ''),
         products: getProducts()
       };
     }
-    validateStock(items);
-    reduceStock(items);
-    appendPendingOrder(ordersSheet, orderId, payload, items, true);
+    const reservation = prepareStockReservation(requestedItems);
+    const expiresAt = createPendingExpiresAt();
+    const totals = calculateOrderTotals(reservation.items);
+    const customer = normalizeCustomer(payload.customer || {});
+    const summary = buildServerOrderSummary(orderId, customer, reservation.items, totals, expiresAt);
+    const serverPayload = {
+      customer,
+      total: totals.total,
+      summary
+    };
 
-    return { ok: true, orderId, status: 'pending', stockDeducted: true, products: getProducts() };
+    reservation.commit();
+    try {
+      appendPendingOrder(ordersSheet, orderId, serverPayload, reservation.items, true, expiresAt);
+    } catch (error) {
+      reservation.rollback();
+      throw error;
+    }
+
+    return {
+      ok: true,
+      orderId,
+      status: 'pending',
+      stockDeducted: true,
+      subtotal: totals.subtotal,
+      shippingFee: totals.shippingFee,
+      total: totals.total,
+      pendingExpiresAt: expiresAt.toISOString(),
+      summary,
+      products: getProducts()
+    };
   } finally {
     lock.releaseLock();
   }
 }
 
 function reportPayment(payload) {
-  const orderId = String(payload.orderId || '').trim();
+  const orderId = validateOrderId(payload.orderId);
   if (!orderId) throw new Error('ไม่พบ Order ID');
 
   const lock = LockService.getScriptLock();
@@ -336,23 +371,185 @@ function findOrderById(sheet, orderId) {
   return null;
 }
 
-function appendPendingOrder(sheet, orderId, payload, items, stockDeducted) {
+function prepareStockReservation(requestedItems) {
+  if (!Array.isArray(requestedItems) || !requestedItems.length) {
+    throw new Error('ไม่มีสินค้าในออเดอร์');
+  }
+
+  const aggregated = {};
+  let totalQuantity = 0;
+  requestedItems.forEach(item => {
+    const code = String(item.code || '').trim();
+    const colorName = String(item.colorName || '').trim();
+    const quantity = Number(item.quantity);
+    if (!code || !colorName) throw new Error('ข้อมูลสินค้าไม่ครบถ้วน');
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY_PER_ITEM) {
+      throw new Error(`จำนวนสินค้า ${code} ต้องเป็นจำนวนเต็ม 1-${MAX_QUANTITY_PER_ITEM}`);
+    }
+
+    const key = `${code}\u0000${colorName}`;
+    if (!aggregated[key]) aggregated[key] = { code, colorName, quantity: 0 };
+    aggregated[key].quantity += quantity;
+    if (aggregated[key].quantity > MAX_QUANTITY_PER_ITEM) {
+      throw new Error(`จำนวนสินค้า ${code} ต้องไม่เกิน ${MAX_QUANTITY_PER_ITEM} ชิ้น`);
+    }
+    totalQuantity += quantity;
+  });
+  if (totalQuantity > MAX_ITEMS_PER_ORDER) {
+    throw new Error(`หนึ่งออเดอร์สั่งได้ไม่เกิน ${MAX_ITEMS_PER_ORDER} ชิ้น`);
+  }
+
+  const sheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
+  if (!sheet) throw new Error(`Missing sheet: ${PRODUCTS_SHEET}`);
+  const values = sheet.getDataRange().getValues();
+  const headers = values[0].map(String);
+  const codeIndex = headers.indexOf('code');
+  const nameIndex = headers.indexOf('name');
+  const colorIndex = headers.indexOf('colorName') >= 0 ? headers.indexOf('colorName') : headers.indexOf('color');
+  const priceIndex = headers.indexOf('price');
+  const stockIndex = headers.indexOf('stock');
+  const activeIndex = headers.indexOf('active');
+  if ([codeIndex, nameIndex, colorIndex, priceIndex, stockIndex].some(index => index < 0)) {
+    throw new Error('Products sheet มี column ไม่ครบสำหรับสร้างออเดอร์');
+  }
+
+  const changes = [];
+  const items = Object.keys(aggregated).map(key => {
+    const requested = aggregated[key];
+    const rowIndex = findProductRow(values, codeIndex, colorIndex, requested.code, requested.colorName);
+    if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${requested.code} สี${requested.colorName}`);
+
+    const active = activeIndex < 0 || !['false', '0'].includes(String(values[rowIndex][activeIndex]).toLowerCase());
+    if (!active) throw new Error(`สินค้า ${requested.code} สี${requested.colorName} ไม่เปิดจำหน่าย`);
+    const currentStock = Number(values[rowIndex][stockIndex]);
+    const price = Number(values[rowIndex][priceIndex]);
+    if (!Number.isFinite(currentStock) || currentStock < requested.quantity) {
+      throw new Error(`${requested.code} สี${requested.colorName} เหลือ ${Math.max(0, currentStock || 0)} ชิ้น`);
+    }
+    if (!Number.isFinite(price) || price < 0) {
+      throw new Error(`ราคาสินค้า ${requested.code} ไม่ถูกต้อง`);
+    }
+
+    changes.push({ rowNumber: rowIndex + 1, oldStock: currentStock, newStock: currentStock - requested.quantity });
+    return {
+      code: String(values[rowIndex][codeIndex]),
+      name: String(values[rowIndex][nameIndex] || requested.code),
+      colorName: String(values[rowIndex][colorIndex]),
+      price,
+      quantity: requested.quantity
+    };
+  });
+
+  let committed = false;
+  return {
+    items,
+    commit() {
+      try {
+        changes.forEach(change => sheet.getRange(change.rowNumber, stockIndex + 1).setValue(change.newStock));
+        committed = true;
+      } catch (error) {
+        changes.forEach(change => sheet.getRange(change.rowNumber, stockIndex + 1).setValue(change.oldStock));
+        throw error;
+      }
+    },
+    rollback() {
+      if (!committed) return;
+      changes.forEach(change => sheet.getRange(change.rowNumber, stockIndex + 1).setValue(change.oldStock));
+      committed = false;
+    }
+  };
+}
+
+function validateOrderId(value) {
+  const orderId = String(value || '').trim();
+  if (!/^NUNAA-\d{8}-\d{6}-[A-Z0-9]{4}$/.test(orderId)) {
+    throw new Error('Order ID ไม่ถูกต้อง');
+  }
+  return orderId;
+}
+
+function validateQuantity(value, code) {
+  const quantity = Number(value);
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY_PER_ITEM) {
+    throw new Error(`จำนวนสินค้า ${code || ''} ต้องเป็นจำนวนเต็ม 1-${MAX_QUANTITY_PER_ITEM}`);
+  }
+  return quantity;
+}
+
+function calculateOrderTotals(items) {
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const shippingFee = itemCount <= EMS_FLAT_RATE_MAX_ITEMS ? EMS_FLAT_RATE : null;
+  return {
+    subtotal,
+    shippingFee,
+    total: shippingFee === null ? subtotal : subtotal + shippingFee
+  };
+}
+
+function normalizeCustomer(customer) {
+  const normalized = {
+    name: String(customer.name || '').trim().slice(0, 120),
+    phone: String(customer.phone || '').trim().slice(0, 30),
+    address: String(customer.address || '').trim().slice(0, 500),
+    province: String(customer.province || '').trim().slice(0, 100),
+    postal: String(customer.postal || '').trim().slice(0, 20),
+    note: String(customer.note || '').trim().slice(0, 500)
+  };
+  if (!normalized.name || !normalized.phone || !normalized.address || !normalized.province || !normalized.postal) {
+    throw new Error('กรุณากรอกข้อมูลจัดส่งให้ครบถ้วน');
+  }
+  return normalized;
+}
+
+function sanitizeSheetText(value) {
+  const text = String(value || '');
+  return /^[=+\-@]/.test(text) ? `'${text}` : text;
+}
+
+function buildServerOrderSummary(orderId, customer, items, totals, expiresAt) {
+  const itemLines = items.map((item, index) => (
+    `${index + 1}. ${item.code} • ${item.name} • สี ${item.colorName} x ${item.quantity} - ฿${item.price * item.quantity}`
+  ));
+  return [
+    'Nunaa.Collection Order',
+    `Order ID: ${orderId}`,
+    `ออเดอร์ pending หมดอายุ: ${Utilities.formatDate(expiresAt, 'Asia/Bangkok', 'dd/MM/yyyy HH:mm')}`,
+    'สินค้าถูกจองระหว่างที่ออเดอร์ pending นี้ยังไม่หมดอายุ',
+    '',
+    'รายการสินค้า',
+    ...itemLines,
+    `รวมค่าสินค้า: ฿${totals.subtotal}`,
+    `ค่าส่ง EMS: ${totals.shippingFee === null ? 'ทางร้านจะแจ้งภายหลัง' : `฿${totals.shippingFee}`}`,
+    `ยอดรวมสุทธิ: ฿${totals.total}`,
+    '',
+    'ข้อมูลจัดส่ง',
+    `ชื่อ: ${customer.name}`,
+    `เบอร์: ${customer.phone}`,
+    `ที่อยู่: ${customer.address}`,
+    `จังหวัด: ${customer.province}`,
+    `รหัสไปรษณีย์: ${customer.postal}`,
+    `หมายเหตุ: ${customer.note || '-'}`
+  ].join('\n');
+}
+
+function appendPendingOrder(sheet, orderId, payload, items, stockDeducted, expiresAt) {
   const customer = payload.customer || {};
   const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
   const values = {
     createdAt: new Date(),
     orderId,
     status: 'pending',
-    expiresAt: payload.pendingExpiresAt ? new Date(payload.pendingExpiresAt) : createPendingExpiresAt(),
+    expiresAt: expiresAt || createPendingExpiresAt(),
     stockDeducted: Boolean(stockDeducted),
     paidAt: '',
     paymentReportedAt: '',
-    customerName: customer.name || '',
-    phone: customer.phone || '',
-    address: customer.address || '',
-    province: customer.province || '',
-    postal: customer.postal || '',
-    note: customer.note || '',
+    customerName: sanitizeSheetText(customer.name),
+    phone: sanitizeSheetText(customer.phone),
+    address: sanitizeSheetText(customer.address),
+    province: sanitizeSheetText(customer.province),
+    postal: sanitizeSheetText(customer.postal),
+    note: sanitizeSheetText(customer.note),
     items: JSON.stringify(items),
     total: Number(payload.total || 0),
     summary: payload.summary || ''
@@ -380,7 +577,7 @@ function validateStock(items) {
     if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${item.code} สี${item.colorName}`);
 
     const currentStock = Number(productValues[rowIndex][stockIndex] || 0);
-    const quantity = Number(item.quantity || 1);
+    const quantity = validateQuantity(item.quantity, item.code);
     if (currentStock < quantity) {
       throw new Error(`${item.code} สี${item.colorName} เหลือ ${currentStock} ชิ้น`);
     }
@@ -565,7 +762,7 @@ function reduceStock(items) {
     if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${item.code} สี${item.colorName}`);
 
     const currentStock = Number(productValues[rowIndex][stockIndex] || 0);
-    const quantity = Number(item.quantity || 1);
+    const quantity = validateQuantity(item.quantity, item.code);
     if (currentStock < quantity) {
       throw new Error(`${item.code} สี${item.colorName} เหลือ ${currentStock} ชิ้น`);
     }
@@ -589,7 +786,7 @@ function restoreStock(items) {
     if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${item.code} สี${item.colorName}`);
 
     const currentStock = Number(productValues[rowIndex][stockIndex] || 0);
-    const quantity = Number(item.quantity || 1);
+    const quantity = validateQuantity(item.quantity, item.code);
     const newStock = currentStock + quantity;
     productValues[rowIndex][stockIndex] = newStock;
     productsSheet.getRange(rowIndex + 1, stockIndex + 1).setValue(newStock);

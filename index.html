@@ -110,7 +110,7 @@
           </label>
           <label>
             <span data-i18n="form.phone">เบอร์ติดต่อ</span>
-            <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" required>
+            <input id="customerPhone" name="customerPhone" type="tel" autocomplete="tel" inputmode="tel" pattern="(?:\+66|0)[0-9]{8,9}" maxlength="12" required>
           </label>
           <label class="full">
             <span data-i18n="form.address">ที่อยู่จัดส่ง</span>
@@ -122,13 +122,15 @@
           </label>
           <label>
             <span data-i18n="form.postal">รหัสไปรษณีย์</span>
-            <input id="customerPostal" name="customerPostal" type="text" inputmode="numeric" autocomplete="postal-code" required>
+            <input id="customerPostal" name="customerPostal" type="text" inputmode="numeric" autocomplete="postal-code" pattern="[0-9]{5}" maxlength="5" required>
           </label>
           <label class="full">
             <span data-i18n="form.note">หมายเหตุ</span>
             <textarea id="customerNote" name="customerNote" rows="3"></textarea>
           </label>
         </div>
+        <label class="bot-field" aria-hidden="true">Website<input id="customerWebsite" name="website" type="text" tabindex="-1" autocomplete="off"></label>
+        <div id="captchaContainer"></div>
         <div class="order-summary-box">
           <h3 data-i18n="summary.title">สรุปออเดอร์</h3>
           <pre id="orderSummary" data-i18n="summary.empty">เลือกสินค้าในตะกร้าเพื่อสร้างสรุปออเดอร์</pre>
@@ -163,6 +165,28 @@
       </form>
     </section>
 
+    <section id="order-status" class="section status-section">
+      <p class="eyebrow">Order Status</p>
+      <h2>เช็กสถานะออเดอร์</h2>
+      <form id="orderStatusForm" class="status-form">
+        <label for="statusOrderId">Order ID</label>
+        <div class="status-form-row">
+          <input id="statusOrderId" type="text" placeholder="NUNAA-YYYYMMDD-HHMMSS-XXXX" required>
+          <button class="button primary" type="submit">ตรวจสอบ</button>
+        </div>
+      </form>
+      <p id="orderStatusResult" class="status-result" aria-live="polite"></p>
+    </section>
+
+    <section id="privacy" class="section privacy-section">
+      <p class="eyebrow">Privacy Policy</p>
+      <h2>นโยบายความเป็นส่วนตัว</h2>
+      <p>เราเก็บชื่อ เบอร์โทร ที่อยู่จัดส่ง รายการสินค้า และข้อมูลการชำระเงินที่ลูกค้าแจ้ง เพื่อดำเนินการออเดอร์ ติดต่อ และจัดส่งสินค้าเท่านั้น ข้อมูลถูกจัดเก็บในระบบของร้านและผู้ให้บริการที่จำเป็น เช่น Google Sheets และผู้ให้บริการโฮสติ้ง โดยไม่ขายข้อมูลให้บุคคลอื่น</p>
+      <p>ลูกค้าสามารถขอเข้าถึง แก้ไข หรือลบข้อมูลออเดอร์ได้ทาง Instagram <a href="https://www.instagram.com/Nunaa.collection" target="_blank" rel="noreferrer">@Nunaa.collection</a> ร้านจะเก็บข้อมูลเท่าที่จำเป็นต่อการให้บริการ การบัญชี และข้อกำหนดทางกฎหมาย</p>
+      <p>เว็บไซต์ใช้ local storage เพื่อจดจำภาษา ตะกร้า รหัสอุปกรณ์สำหรับจำกัดคำขอ และออเดอร์ที่กำลังดำเนินการ โดยข้อมูลส่วนนี้อยู่ในเบราว์เซอร์ของลูกค้า</p>
+      <small>ปรับปรุงล่าสุด: 12 กรกฎาคม 2026</small>
+    </section>
+
     <section id="contact" class="section contact-section">
       <p class="eyebrow" data-i18n="contact.eyebrow">Contact</p>
       <h2 data-i18n="contact.title">คุยกับร้าน</h2>
@@ -182,6 +206,7 @@
   <footer class="site-footer">
     <span>© Nunaa.Collection</span>
     <span data-i18n="footer.tagline">Everyday look, handmade piece by piece.</span>
+    <a href="#privacy">Privacy Policy</a>
   </footer>
 
   <script src="assets/js/config.js?v=20260711-new-sheets-url"></script>

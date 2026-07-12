@@ -5,6 +5,9 @@ const EMS_FLAT_RATE = 60;
 const EMS_FLAT_RATE_MAX_ITEMS = 10;
 const MAX_QUANTITY_PER_ITEM = 10;
 const MAX_ITEMS_PER_ORDER = 10;
+const RATE_LIMIT_WINDOW_SECONDS = 60;
+const RATE_LIMITS = { createOrder: 5, reportPayment: 10, orderStatus: 20 };
+const PAYMENT_REVIEW_HOURS = 24;
 const ORDERS_HEADERS = [
   'createdAt',
   'orderId',
@@ -65,6 +68,15 @@ const FLOWER_VARIANTS = [
 function doGet(event) {
   const action = event.parameter.action || 'products';
 
+  if (action === 'orderStatus') {
+    try {
+      enforceRateLimit('orderStatus', event.parameter.clientId);
+      return jsonResponse(getOrderStatus(event.parameter.orderId));
+    } catch (error) {
+      return jsonResponse({ ok: false, message: error.message });
+    }
+  }
+
   if (action === 'products') {
     const lock = LockService.getScriptLock();
     lock.waitLock(30000);
@@ -84,6 +96,10 @@ function doGet(event) {
 function doPost(event) {
   try {
     const payload = JSON.parse(event.postData.contents || '{}');
+    if (payload.website) throw new Error('ไม่สามารถส่งคำขอนี้ได้');
+    const action = payload.action === 'reportPayment' ? 'reportPayment' : 'createOrder';
+    enforceRateLimit(action, payload.clientId);
+    verifyCaptcha(payload.captchaToken);
     const result = payload.action === 'reportPayment'
       ? reportPayment(payload)
       : createOrder(payload);
@@ -91,6 +107,56 @@ function doPost(event) {
   } catch (error) {
     return jsonResponse({ ok: false, message: error.message }, 400);
   }
+}
+
+function enforceRateLimit(action, clientId) {
+  const id = String(clientId || '').trim();
+  if (!/^[a-zA-Z0-9_-]{16,80}$/.test(id)) throw new Error('Client ID ไม่ถูกต้อง กรุณารีเฟรชหน้าแล้วลองใหม่');
+  const cache = CacheService.getScriptCache();
+  const digest = Utilities.base64EncodeWebSafe(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, id)).slice(0, 32);
+  const key = `rate:${action}:${digest}`;
+  const count = Number(cache.get(key) || 0) + 1;
+  if (count > (RATE_LIMITS[action] || 5)) throw new Error('ส่งคำขอบ่อยเกินไป กรุณารอสักครู่แล้วลองใหม่');
+  cache.put(key, String(count), RATE_LIMIT_WINDOW_SECONDS);
+}
+
+function verifyCaptcha(token) {
+  const secret = PropertiesService.getScriptProperties().getProperty('TURNSTILE_SECRET_KEY');
+  if (!secret) return;
+  if (!token) throw new Error('กรุณายืนยัน CAPTCHA');
+  const response = UrlFetchApp.fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    method: 'post', payload: { secret, response: String(token) }, muteHttpExceptions: true
+  });
+  const result = JSON.parse(response.getContentText() || '{}');
+  if (!result.success) throw new Error('CAPTCHA ไม่ผ่าน กรุณาลองใหม่');
+}
+
+function getOrderStatus(value) {
+  const orderId = validateOrderId(value);
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    expirePendingOrders();
+    const order = findOrderById(getOrCreateOrdersSheet(), orderId);
+    if (!order) throw new Error(`ไม่พบออเดอร์ ${orderId}`);
+    return {
+      ok: true,
+      orderId,
+      status: String(order.status || 'pending').toLowerCase(),
+      createdAt: toIsoString(order.createdAt),
+      expiresAt: toIsoString(order.expiresAt),
+      paidAt: toIsoString(order.paidAt),
+      total: Number(order.total || 0)
+    };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function toIsoString(value) {
+  if (!value) return '';
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString();
 }
 
 function updateFlowerProductsToVariants() {
@@ -204,6 +270,7 @@ function getProducts() {
 
   const rows = getRows(sheet);
   const productMap = {};
+  const reservedQuantities = getReservedQuantities();
 
   rows.forEach(row => {
     const active = String(row.active || 'TRUE').toLowerCase();
@@ -220,10 +287,12 @@ function getProducts() {
       };
     }
 
+    const stock = Number(row.stock || 0);
+    const reservationKey = `${row.code}\u0000${row.colorName || row.color || 'ไม่ระบุสี'}`;
     productMap[row.code].colors.push({
       name: row.colorName || row.color || 'ไม่ระบุสี',
       value: row.colorValue || '#edf1ee',
-      stock: Number(row.stock || 0)
+      stock: Math.max(0, stock - Number(reservedQuantities[reservationKey] || 0))
     });
   });
 
@@ -273,19 +342,13 @@ function createOrder(payload) {
       summary
     };
 
-    reservation.commit();
-    try {
-      appendPendingOrder(ordersSheet, orderId, serverPayload, reservation.items, true, expiresAt);
-    } catch (error) {
-      reservation.rollback();
-      throw error;
-    }
+    appendPendingOrder(ordersSheet, orderId, serverPayload, reservation.items, false, expiresAt);
 
     return {
       ok: true,
       orderId,
       status: 'pending',
-      stockDeducted: true,
+      stockDeducted: false,
       subtotal: totals.subtotal,
       shippingFee: totals.shippingFee,
       total: totals.total,
@@ -314,6 +377,7 @@ function reportPayment(payload) {
     const statusIndex = headers.indexOf('status');
     const paymentReportedAtIndex = headers.indexOf('paymentReportedAt');
     const createdAtIndex = headers.indexOf('createdAt');
+    const expiresAtIndex = headers.indexOf('expiresAt');
 
     for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
       if (String(values[rowIndex][orderIdIndex]) !== orderId) continue;
@@ -330,6 +394,9 @@ function reportPayment(payload) {
       sheet.getRange(rowIndex + 1, statusIndex + 1).setValue('payment_reported');
       if (paymentReportedAtIndex >= 0) {
         sheet.getRange(rowIndex + 1, paymentReportedAtIndex + 1).setValue(new Date());
+      }
+      if (expiresAtIndex >= 0) {
+        sheet.getRange(rowIndex + 1, expiresAtIndex + 1).setValue(new Date(Date.now() + (PAYMENT_REVIEW_HOURS * 60 * 60 * 1000)));
       }
       return { ok: true, orderId, status: 'payment_reported', ...reviewInfo };
     }
@@ -413,7 +480,7 @@ function prepareStockReservation(requestedItems) {
     throw new Error('Products sheet มี column ไม่ครบสำหรับสร้างออเดอร์');
   }
 
-  const changes = [];
+  const reservedQuantities = getReservedQuantities();
   const items = Object.keys(aggregated).map(key => {
     const requested = aggregated[key];
     const rowIndex = findProductRow(values, codeIndex, colorIndex, requested.code, requested.colorName);
@@ -423,14 +490,15 @@ function prepareStockReservation(requestedItems) {
     if (!active) throw new Error(`สินค้า ${requested.code} สี${requested.colorName} ไม่เปิดจำหน่าย`);
     const currentStock = Number(values[rowIndex][stockIndex]);
     const price = Number(values[rowIndex][priceIndex]);
-    if (!Number.isFinite(currentStock) || currentStock < requested.quantity) {
-      throw new Error(`${requested.code} สี${requested.colorName} เหลือ ${Math.max(0, currentStock || 0)} ชิ้น`);
+    const reserved = Number(reservedQuantities[key] || 0);
+    const availableStock = Math.max(0, currentStock - reserved);
+    if (!Number.isFinite(currentStock) || availableStock < requested.quantity) {
+      throw new Error(`${requested.code} สี${requested.colorName} เหลือ ${availableStock} ชิ้น`);
     }
     if (!Number.isFinite(price) || price < 0) {
       throw new Error(`ราคาสินค้า ${requested.code} ไม่ถูกต้อง`);
     }
 
-    changes.push({ rowNumber: rowIndex + 1, oldStock: currentStock, newStock: currentStock - requested.quantity });
     return {
       code: String(values[rowIndex][codeIndex]),
       name: String(values[rowIndex][nameIndex] || requested.code),
@@ -440,24 +508,26 @@ function prepareStockReservation(requestedItems) {
     };
   });
 
-  let committed = false;
-  return {
-    items,
-    commit() {
-      try {
-        changes.forEach(change => sheet.getRange(change.rowNumber, stockIndex + 1).setValue(change.newStock));
-        committed = true;
-      } catch (error) {
-        changes.forEach(change => sheet.getRange(change.rowNumber, stockIndex + 1).setValue(change.oldStock));
-        throw error;
-      }
-    },
-    rollback() {
-      if (!committed) return;
-      changes.forEach(change => sheet.getRange(change.rowNumber, stockIndex + 1).setValue(change.oldStock));
-      committed = false;
-    }
-  };
+  return { items };
+}
+
+function getReservedQuantities() {
+  const sheet = getOrCreateOrdersSheet();
+  const rows = getRows(sheet);
+  const now = Date.now();
+  return rows.reduce((reserved, order) => {
+    const status = String(order.status || '').toLowerCase();
+    const expiresAt = order.expiresAt ? new Date(order.expiresAt).getTime() : 0;
+    const alreadyDeducted = String(order.stockDeducted || '').toLowerCase() === 'true';
+    if (!['pending', 'payment_reported'].includes(status) || alreadyDeducted || (expiresAt && expiresAt <= now)) return reserved;
+    let items = [];
+    try { items = JSON.parse(order.items || '[]'); } catch (error) { return reserved; }
+    items.forEach(item => {
+      const key = `${item.code}\u0000${item.colorName}`;
+      reserved[key] = Number(reserved[key] || 0) + validateQuantity(item.quantity, item.code);
+    });
+    return reserved;
+  }, {});
 }
 
 function validateOrderId(value) {
@@ -499,6 +569,14 @@ function normalizeCustomer(customer) {
   if (!normalized.name || !normalized.phone || !normalized.address || !normalized.province || !normalized.postal) {
     throw new Error('กรุณากรอกข้อมูลจัดส่งให้ครบถ้วน');
   }
+  const compactPhone = normalized.phone.replace(/[\s-]/g, '');
+  if (!/^(?:\+66\d{8,9}|0\d{8,9})$/.test(compactPhone)) {
+    throw new Error('เบอร์ติดต่อไม่ถูกต้อง กรุณากรอกเบอร์ไทย 9-10 หลัก');
+  }
+  if (!/^\d{5}$/.test(normalized.postal)) {
+    throw new Error('รหัสไปรษณีย์ต้องเป็นตัวเลข 5 หลัก');
+  }
+  normalized.phone = compactPhone;
   return normalized;
 }
 
@@ -685,7 +763,7 @@ function expirePendingOrders(sheet) {
       : 'false';
     const expiresAt = values[rowIndex][expiresAtIndex];
 
-    if (status === 'pending' && expiresAt && new Date(expiresAt) <= now) {
+    if ((status === 'pending' || status === 'payment_reported') && expiresAt && new Date(expiresAt) <= now) {
       if (stockDeducted === 'true') {
         const itemsIndex = headers.indexOf('items');
         const items = JSON.parse(values[rowIndex][itemsIndex] || '[]');

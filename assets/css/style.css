@@ -483,6 +483,14 @@ button.product-image:focus-visible::after {
 .checkout-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
 .button.light { border-color: rgba(255,250,242,.55); color: var(--paper); }
 .copy-status { min-height: 1.4em; margin: 12px 0 0; color: #d9c4ad; }
+.bot-field { position: absolute; left: -10000px; width: 1px; height: 1px; overflow: hidden; }
+#captchaContainer { margin-top: 18px; }
+.status-section, .privacy-section { max-width: 900px; margin: 0 auto; }
+.status-form { display: grid; gap: 10px; max-width: 680px; }
+.status-form-row { display: flex; gap: 10px; }
+.status-form input { flex: 1; min-width: 0; border: 1px solid var(--line); border-radius: 14px; padding: 13px 14px; font: inherit; text-transform: uppercase; }
+.status-result { min-height: 1.5em; font-weight: 700; }
+.privacy-section p { color: var(--muted); line-height: 1.8; }
 .contact-section { text-align: center; }
 .contact-section p { color: var(--muted); }
 .site-footer { display: flex; justify-content: space-between; gap: 16px; padding: 28px clamp(18px, 4vw, 56px); color: var(--muted); border-top: 1px solid var(--line); }

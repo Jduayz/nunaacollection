@@ -49,13 +49,13 @@ window.NUNAA_CONFIG = {
 
 - หน้าเว็บจะโหลดสินค้าและ stock จากชีต `Products`
 - ตอนลูกค้ายืนยันออเดอร์ เว็บจะส่ง order ไป Apps Script
-- Apps Script จะตรวจ stock, ลด stock ในชีต `Products` ทันที และบันทึก order ลงชีต `Orders` โดยตั้ง `status` เป็น `pending`
+- Apps Script จะตรวจ stock และยอดจองที่ยังไม่หมดอายุ แล้วบันทึก order เป็น `pending` โดยยังไม่หัก stock จริง
 - ราคา จำนวน ยอดรวม และเวลาหมดอายุจะถูกตรวจและคำนวณใหม่จากชีต `Products`/เวลาเซิร์ฟเวอร์ ไม่เชื่อค่าที่ส่งมาจาก browser
 - ระบบรับสูงสุด 10 ชิ้นต่อออเดอร์และปฏิเสธจำนวนที่ไม่ใช่จำนวนเต็มบวก
-- เมื่อลูกค้าส่งสลิปแล้วกดแจ้งชำระเงิน สถานะจะเปลี่ยนเป็น `payment_reported` และหยุดการหมดอายุระหว่างรอร้านตรวจสลิป
+- เมื่อลูกค้าส่งสลิปแล้วกดแจ้งชำระเงิน สถานะจะเปลี่ยนเป็น `payment_reported` และขยายเวลาจองสำหรับการตรวจสอบ 24 ชั่วโมง
 - ออเดอร์ที่สร้างตั้งแต่ 22:00 น. เป็นต้นไปและแจ้งชำระแล้ว จะแจ้งลูกค้าว่าร้านจะตรวจสอบภายใน 13:00 น. ของวันถัดไป โดย stock ยังถูกจองไว้
 - ถ้า order ยังเป็น `pending` จนครบ 15 นาที ระบบจะเปลี่ยนเป็น `expired` และคืน stock ให้อัตโนมัติเมื่อมีการเรียก Apps Script ครั้งถัดไป
-- หลังร้านตรวจสลิปแล้ว ให้เปลี่ยน `status` ของ order เป็น `paid` เพื่อบันทึกเวลา `paidAt` โดยระบบจะไม่ลด stock ซ้ำ
+- หลังร้านตรวจสลิปแล้ว ให้เปลี่ยน `status` เป็น `paid` ระบบจึงหัก stock จริงและบันทึก `paidAt`
 - ถ้าต้องยกเลิก order ให้เปลี่ยน `status` เป็น `cancelled` หรือ `expired` ระบบจะคืน stock ให้ถ้า order นั้นเคยหัก stock แล้ว
 - ถ้ายังไม่ใส่ `appsScriptUrl` เว็บจะใช้ข้อมูลสินค้าเดิมในไฟล์ `assets/js/app.js`
 
@@ -76,3 +76,9 @@ processPaidOrders
 หลัง deploy ครั้งแรก ให้กด Run ฟังก์ชัน `setupOrderEditTrigger` หนึ่งครั้งและอนุญาตสิทธิ์ เพื่อให้การเปลี่ยน `status` คืน/หัก stock ได้อัตโนมัติ หากมีออเดอร์ `cancelled` หรือ `expired` ที่ยังไม่คืน stock ให้กด Run ฟังก์ชัน `processCancelledOrders`
 
 สำหรับ order ที่หมดอายุ ให้เรียก action `products` จากหน้าเว็บหรือเปิดเว็บตามปกติ ระบบจะรัน `expirePendingOrders` ตอนสร้าง order ใหม่ หรือจะเพิ่ม time-driven trigger ให้รันฟังก์ชัน `expirePendingOrders` เป็นระยะก็ได้
+
+## Rate limit และ CAPTCHA
+
+- API จำกัดคำขอต่อ client ID แยกตาม create order, report payment และ order status
+- มี honeypot field สำหรับ bot อัตโนมัติ
+- หากใช้ Cloudflare Turnstile ให้ใส่ site key ใน `assets/js/config.js` และเพิ่ม Script Property ชื่อ `TURNSTILE_SECRET_KEY` ใน Apps Script จากนั้น deploy ทั้งเว็บและ Web App ใหม่

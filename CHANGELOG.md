@@ -32,3 +32,12 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 - N/A
+# 2026-07-12 — Checkout hardening and customer self-service
+
+- Persist active pending/payment-reported orders across refreshes.
+- Separate temporary reservations from physical stock; deduct only after `paid` confirmation.
+- Expire unreviewed payment reports after 24 hours instead of reserving indefinitely.
+- Add per-client API rate limits, bot honeypot, and optional Cloudflare Turnstile verification.
+- Validate Thai phone numbers and five-digit postal codes in the browser and Apps Script.
+- Add an Order ID status lookup and Privacy Policy section.
+- Document GitHub Pages HTTPS and CAPTCHA deployment steps.

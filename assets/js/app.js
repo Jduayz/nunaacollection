@@ -401,6 +401,8 @@ const EMS_FLAT_RATE = 60;
 const EMS_FLAT_RATE_MAX_ITEMS = 10;
 const PENDING_ORDER_EXPIRY_MINUTES = 15;
 const CART_STORAGE_KEY = 'nunaaCartV1';
+const ACTIVE_ORDER_STORAGE_KEY = 'nunaaActiveOrderV1';
+const CLIENT_ID_STORAGE_KEY = 'nunaaClientIdV1';
 let currentOrderId = '';
 let currentPendingExpiresAt = '';
 let submittedOrderSummary = '';
@@ -434,11 +436,34 @@ const customerAddress = document.querySelector('#customerAddress');
 const customerProvince = document.querySelector('#customerProvince');
 const customerPostal = document.querySelector('#customerPostal');
 const customerNote = document.querySelector('#customerNote');
+const customerWebsite = document.querySelector('#customerWebsite');
+const captchaContainer = document.querySelector('#captchaContainer');
+const orderStatusForm = document.querySelector('#orderStatusForm');
+const statusOrderId = document.querySelector('#statusOrderId');
+const orderStatusResult = document.querySelector('#orderStatusResult');
 const languageButtons = document.querySelectorAll('.language-button');
 const productModal = document.querySelector('#productModal');
 const productModalContent = document.querySelector('#productModalContent');
 const modalCloseControls = document.querySelectorAll('[data-modal-close]');
 let activeDetailProductId = null;
+let captchaWidgetId = null;
+
+function getClientId() {
+  try {
+    let id = localStorage.getItem(CLIENT_ID_STORAGE_KEY);
+    if (!id) {
+      const bytes = new Uint8Array(18);
+      crypto.getRandomValues(bytes);
+      id = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+      localStorage.setItem(CLIENT_ID_STORAGE_KEY, id);
+    }
+    return id;
+  } catch (error) {
+    return `session_${Math.random().toString(36).slice(2)}_${Date.now()}`;
+  }
+}
+
+const clientId = getClientId();
 
 const translations = {
   th: {
@@ -1371,6 +1396,9 @@ function buildOrderPayload() {
   }));
 
   return {
+    clientId,
+    website: customerWebsite?.value || '',
+    captchaToken: getCaptchaToken(),
     orderId: currentOrderId,
     customer: {
       name: customerName.value.trim(),
@@ -1419,6 +1447,8 @@ async function submitOrderToSheet() {
     renderOrderSummary();
   }
 
+  if (captchaWidgetId !== null && window.turnstile) window.turnstile.reset(captchaWidgetId);
+
   return data;
 }
 
@@ -1428,13 +1458,61 @@ async function reportPaymentToSheet(orderId) {
   const response = await fetch(appConfig.appsScriptUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ action: 'reportPayment', orderId })
+    body: JSON.stringify({ action: 'reportPayment', orderId, clientId, captchaToken: getCaptchaToken() })
   });
   const data = await response.json();
   if (!response.ok || !data.ok) {
     throw new Error(normalizeErrorMessage(data.message || t('error.saveOrder')));
   }
   return data;
+}
+
+function getCaptchaToken() {
+  if (captchaWidgetId === null || !window.turnstile) return '';
+  return window.turnstile.getResponse(captchaWidgetId) || '';
+}
+
+function setupCaptcha() {
+  if (!appConfig.turnstileSiteKey || !captchaContainer) return;
+  const script = document.createElement('script');
+  script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  script.async = true;
+  script.defer = true;
+  script.addEventListener('load', () => {
+    captchaWidgetId = window.turnstile.render(captchaContainer, { sitekey: appConfig.turnstileSiteKey });
+  });
+  document.head.appendChild(script);
+}
+
+function saveActiveOrder(status = 'pending') {
+  if (!submittedOrderId) return;
+  try {
+    localStorage.setItem(ACTIVE_ORDER_STORAGE_KEY, JSON.stringify({
+      orderId: submittedOrderId,
+      summary: submittedOrderSummary,
+      expiresAt: submittedOrderExpiresAt,
+      status
+    }));
+  } catch (error) {
+    // Checkout remains usable when storage is unavailable.
+  }
+}
+
+function restoreActiveOrder() {
+  let order;
+  try { order = JSON.parse(localStorage.getItem(ACTIVE_ORDER_STORAGE_KEY) || 'null'); } catch (error) { return; }
+  if (!order?.orderId || !order.summary) return;
+  showPaymentConfirmation(order.orderId, order.summary, order.expiresAt, false);
+  orderSummary.textContent = order.summary;
+  if (order.status === 'payment_reported') {
+    if (countdownTimer) window.clearInterval(countdownTimer);
+    countdownTimer = null;
+    confirmationCountdown.textContent = t('confirmation.paymentReported');
+    paymentConfirmation.classList.add('payment-reported');
+    sendInstagramButton.disabled = true;
+    saveActiveOrder('payment_reported');
+    reportPaymentButton.disabled = true;
+  }
 }
 
 function renderOrderSummary() {
@@ -1511,7 +1589,7 @@ function updateConfirmationCountdown() {
   confirmationCountdown.textContent = t('confirmation.timeLeft', { time: `${minutes}:${seconds}` });
 }
 
-function showPaymentConfirmation(orderId, summaryText, expiresAt) {
+function showPaymentConfirmation(orderId, summaryText, expiresAt, shouldScroll = true) {
   submittedOrderSummary = summaryText;
   submittedOrderId = orderId;
   submittedOrderExpiresAt = expiresAt;
@@ -1523,7 +1601,8 @@ function showPaymentConfirmation(orderId, summaryText, expiresAt) {
   if (countdownTimer) window.clearInterval(countdownTimer);
   updateConfirmationCountdown();
   countdownTimer = window.setInterval(updateConfirmationCountdown, 1000);
-  paymentConfirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  saveActiveOrder();
+  if (shouldScroll) paymentConfirmation.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 productGrid.addEventListener('click', event => {
@@ -1717,6 +1796,7 @@ reportPaymentButton.addEventListener('click', async () => {
       : t('confirmation.paymentReported');
     paymentConfirmation.classList.add('payment-reported');
     sendInstagramButton.disabled = true;
+    saveActiveOrder('payment_reported');
     copyStatus.textContent = t('status.paymentReported', { orderId: submittedOrderId });
     reportPaymentButton.textContent = t('form.reportPayment');
   } catch (error) {
@@ -1732,11 +1812,32 @@ copyOrderIdButton.addEventListener('click', async () => {
   copyStatus.textContent = copied ? t('status.orderIdCopied') : t('status.copyUnavailable');
 });
 
+orderStatusForm?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const orderId = statusOrderId.value.trim().toUpperCase();
+  orderStatusResult.textContent = 'กำลังตรวจสอบ…';
+  try {
+    const url = new URL(appConfig.appsScriptUrl);
+    url.searchParams.set('action', 'orderStatus');
+    url.searchParams.set('orderId', orderId);
+    url.searchParams.set('clientId', clientId);
+    const response = await fetch(url);
+    const data = await response.json();
+    if (!response.ok || !data.ok) throw new Error(data.message || 'ตรวจสอบสถานะไม่สำเร็จ');
+    const labels = { pending: 'รอชำระเงิน', payment_reported: 'แจ้งชำระแล้ว—รอตรวจสอบ', paid: 'ยืนยันชำระเงินแล้ว', expired: 'หมดอายุ', cancelled: 'ยกเลิก', payment_rejected: 'ไม่ผ่านการตรวจสอบการชำระเงิน' };
+    orderStatusResult.textContent = `${data.orderId}: ${labels[data.status] || data.status}${data.total ? ` • ยอดรวม ฿${data.total}` : ''}`;
+  } catch (error) {
+    orderStatusResult.textContent = error.message;
+  }
+});
+
 async function init() {
   if (!translations[currentLanguage]) currentLanguage = 'th';
+  setupCaptcha();
   await loadProductsFromSheet();
   restoreCart();
   applyTranslations();
+  restoreActiveOrder();
 }
 
 init();

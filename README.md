@@ -55,6 +55,8 @@ https://nunaacollection.com
 6. Configure DNS at domain provider
 7. Enable HTTPS
 
+หลัง DNS ถูกต้อง ให้เปิด `Enforce HTTPS` ใน Settings → Pages และตรวจว่าทั้ง `http://nunaacollection.com` และ `http://www.nunaacollection.com` redirect ไป HTTPS
+
 ## DNS for GitHub Pages
 
 ```txt

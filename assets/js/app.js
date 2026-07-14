@@ -49,12 +49,12 @@ const flowerColorOptions = [
   {
     key: 'flowerB',
     name: 'B',
-    value: "url('assets/images/patterns/flower-b.jpeg?v=20260711-fill') center / cover no-repeat"
+    value: "url('assets/images/patterns/flower-b-filled.jpeg?v=20260714-equal-scale') center / cover no-repeat"
   },
   {
     key: 'flowerC',
     name: 'C',
-    value: "url('assets/images/patterns/flower-c.jpeg?v=20260711-fill') center / cover no-repeat"
+    value: "url('assets/images/patterns/flower-c-filled.jpeg?v=20260714-equal-scale') center / cover no-repeat"
   },
   {
     key: 'flowerD',
@@ -1120,6 +1120,7 @@ function renderColorSwatches(product, context) {
       data-id="${product.id}"
       data-color-index="${index}"
       data-context="${context}"
+      style="--swatch-preview: ${color.value};"
       aria-label="${product.name} ${t('cart.colorPrefix')} ${getColorName(color)}"
       aria-pressed="${index === (selectedColors.get(product.id) || 0) ? 'true' : 'false'}"
       title="${getColorName(color)}"

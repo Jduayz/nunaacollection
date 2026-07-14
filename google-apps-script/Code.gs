@@ -60,8 +60,8 @@ const FLOWER_VARIANT_PRODUCTS = [
 
 const FLOWER_VARIANTS = [
   { name: 'A', value: "url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat" },
-  { name: 'B', value: "url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat" },
-  { name: 'C', value: "url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat" },
+  { name: 'B', value: "url('assets/images/patterns/flower-b-filled.jpeg') center / cover no-repeat" },
+  { name: 'C', value: "url('assets/images/patterns/flower-c-filled.jpeg') center / cover no-repeat" },
   { name: 'D', value: "url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat" }
 ];
 

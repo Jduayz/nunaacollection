@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NN-013 selector demo</title>
+  <style>
+    :root { --paper:#fffaf2; --ink:#2a211b; --muted:#786b61; --line:#ded1c3; --accent:#8a5a44; --soft:#f2e6d9; }
+    * { box-sizing: border-box; }
+    body { margin:0; background:#eee4d8; color:var(--ink); font:16px/1.55 system-ui,-apple-system,sans-serif; }
+    main { min-height:100vh; display:grid; place-items:center; padding:28px; }
+    .product { width:min(1040px,100%); display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,.85fr); gap:34px; background:var(--paper); border:1px solid var(--line); border-radius:28px; padding:20px; box-shadow:0 24px 70px rgba(60,42,31,.14); }
+    .photo { min-height:680px; overflow:hidden; border-radius:20px; background:#e9ddd0; }
+    .photo img { width:100%; height:100%; display:block; object-fit:cover; }
+    .info { padding:12px 12px 12px 0; }
+    .code { color:var(--accent); font-size:.8rem; font-weight:800; letter-spacing:.15em; text-transform:uppercase; }
+    h1 { margin:8px 0 4px; font:2.15rem/1.15 Georgia,serif; }
+    .price { display:block; margin:14px 0; font-size:1.35rem; }
+    .detail { color:var(--muted); margin-bottom:24px; }
+    .step { position:relative; margin:20px 0; padding:20px; border:1px solid var(--line); border-radius:18px; background:#fffdf9; }
+    .step-number { position:absolute; top:18px; right:18px; display:grid; place-items:center; width:28px; height:28px; border-radius:50%; background:var(--soft); color:var(--accent); font-weight:900; }
+    .step h2 { margin:0 36px 4px 0; font-size:1rem; }
+    .hint { margin:0 0 14px; color:var(--muted); font-size:.88rem; }
+    .patterns { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .choice { position:relative; border:1px solid var(--line); border-radius:14px; background:white; padding:5px; cursor:pointer; color:var(--ink); font:inherit; font-weight:800; }
+    .pattern-preview { display:block; width:100%; aspect-ratio:1; border-radius:10px; margin-bottom:5px; background-position:center; background-repeat:no-repeat; background-size:cover; }
+    .choice.selected { border-color:var(--accent); box-shadow:0 0 0 3px rgba(138,90,68,.18); }
+    .choice::after { content:''; position:absolute; z-index:10; left:50%; bottom:calc(100% + 10px); width:150px; height:150px; border:5px solid var(--paper); border-radius:18px; background:var(--choice-preview); box-shadow:0 14px 36px rgba(42,33,27,.26); opacity:0; pointer-events:none; transform:translate(-50%,8px) scale(.92); transition:.16s ease; }
+    .choice:hover::after, .choice:focus-visible::after { opacity:1; transform:translate(-50%,0) scale(1); }
+    .color.choice::after { width:110px; height:110px; border-radius:50%; }
+    .colors { display:flex; flex-wrap:wrap; gap:10px; }
+    .color { display:flex; align-items:center; gap:9px; padding:9px 13px; }
+    .dot { width:25px; height:25px; border:1px solid rgba(42,33,27,.18); border-radius:50%; }
+    .summary { min-height:80px; margin:20px 0 14px; padding:16px; border-radius:16px; background:var(--soft); }
+    .summary small { display:block; color:var(--muted); margin-bottom:5px; }
+    .summary strong { display:block; }
+    .stock { color:#47714a; font-size:.9rem; font-weight:800; }
+    .add { width:100%; border:0; border-radius:14px; background:var(--accent); color:white; padding:14px 18px; font:inherit; font-weight:900; cursor:pointer; }
+    .add:disabled { background:#b8aaa0; cursor:not-allowed; }
+    .notice { margin:10px 0 0; min-height:1.4em; text-align:center; color:var(--accent); font-weight:800; }
+    @media (max-width:800px) { main{padding:12px}.product{grid-template-columns:1fr;padding:13px}.photo{min-height:auto;aspect-ratio:4/5}.info{padding:8px}.patterns{gap:7px} }
+  </style>
+</head>
+<body>
+  <main>
+    <article class="product">
+      <div class="photo"><img src="assets/images/products/nn-013-smock-tube-flower.jpeg" alt="Smock tube top with straps"></div>
+      <div class="info">
+        <span class="code">NN-013</span>
+        <h1>Smock tube top with straps</h1>
+        <strong class="price">฿290</strong>
+        <p class="detail">Cotton + salou cotton • Chest 24&quot;–36&quot;</p>
+
+        <section class="step">
+          <span class="step-number">1</span>
+          <h2>เลือกลายเสื้อด้านบน</h2>
+          <p class="hint">แตะรูปเพื่อดูลายที่ต้องการ</p>
+          <div class="patterns" id="patterns"></div>
+        </section>
+
+        <section class="step">
+          <span class="step-number">2</span>
+          <h2>เลือกสีผ้าด้านล่าง</h2>
+          <p class="hint">เลือกสีที่ต้องการนำมาจับคู่กับลายด้านบน</p>
+          <div class="colors" id="colors"></div>
+        </section>
+
+        <div class="summary" id="summary">
+          <small>ตัวเลือกของคุณ</small>
+          <strong>กรุณาเลือกลายด้านบนและสีด้านล่าง</strong>
+        </div>
+        <button class="add" id="add" disabled>เลือกให้ครบ 2 ขั้นตอน</button>
+        <p class="notice" id="notice" aria-live="polite"></p>
+      </div>
+    </article>
+  </main>
+  <script>
+    const patterns = [
+      ['A','assets/images/patterns/flower-a.jpeg'],
+      ['B','assets/images/patterns/flower-b-filled.jpeg?v=20260714-edge-fill'],
+      ['C','assets/images/patterns/flower-c-filled.jpeg?v=20260714-edge-fill'],
+      ['D','assets/images/patterns/flower-d.jpeg']
+    ];
+    const colors = [['ขาว','#edf1ee'],['น้ำตาล','#a8744b'],['ฟ้าเทา','#6f7f90']];
+    let selectedPattern = '';
+    let selectedColor = '';
+    const patternBox = document.querySelector('#patterns');
+    const colorBox = document.querySelector('#colors');
+    const summary = document.querySelector('#summary');
+    const add = document.querySelector('#add');
+    const notice = document.querySelector('#notice');
+    patternBox.innerHTML = patterns.map(([name,image]) => `<button class="choice" data-pattern="${name}" aria-label="ลาย ${name}" style="--choice-preview:url('${image}') center / cover no-repeat"><span class="pattern-preview" style="background-image:url('${image}')"></span><span>${name}</span></button>`).join('');
+    colorBox.innerHTML = colors.map(([name,value]) => `<button class="choice color" data-color="${name}" style="--choice-preview:${value}"><span class="dot" style="background:${value}"></span>${name}</button>`).join('');
+    function update() {
+      patternBox.querySelectorAll('button').forEach(button => button.classList.toggle('selected', button.dataset.pattern === selectedPattern));
+      colorBox.querySelectorAll('button').forEach(button => button.classList.toggle('selected', button.dataset.color === selectedColor));
+      const complete = selectedPattern && selectedColor;
+      summary.innerHTML = complete
+        ? `<small>ตัวเลือกของคุณ</small><strong>ลายด้านบน ${selectedPattern} + สีด้านล่าง ${selectedColor}</strong><span class="stock">พร้อมสั่งซื้อ</span>`
+        : `<small>ตัวเลือกของคุณ</small><strong>${selectedPattern ? `ลายด้านบน ${selectedPattern}` : 'ยังไม่ได้เลือกลายด้านบน'} • ${selectedColor ? `สีด้านล่าง ${selectedColor}` : 'ยังไม่ได้เลือกสีด้านล่าง'}</strong>`;
+      add.disabled = !complete;
+      add.textContent = complete ? 'เพิ่มชุดนี้ลงตะกร้า' : 'เลือกให้ครบ 2 ขั้นตอน';
+      notice.textContent = '';
+    }
+    patternBox.addEventListener('click', event => { const button=event.target.closest('button'); if(button){selectedPattern=button.dataset.pattern;update();} });
+    colorBox.addEventListener('click', event => { const button=event.target.closest('button'); if(button){selectedColor=button.dataset.color;update();} });
+    add.addEventListener('click', () => { notice.textContent = `เพิ่ม NN-013 • ลาย ${selectedPattern} • สี ${selectedColor} ลงตะกร้าแล้ว`; });
+  </script>
+</body>
+</html>

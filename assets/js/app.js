@@ -78,6 +78,34 @@ function getFlowerColors(sourceColors = []) {
   });
 }
 
+const nn013BottomOptions = getColors(['white', 'brown', 'blueGray']);
+
+function getNn013Colors(sourceColors = []) {
+  const source = Array.isArray(sourceColors) ? sourceColors : [];
+
+  return flowerColorOptions.flatMap(pattern => nn013BottomOptions.map(bottom => {
+    const compositeName = `${pattern.name} / ${bottom.name}`;
+    const exactSource = source.find(item => (
+      (item.name || item.colorName) === compositeName
+    ));
+    const legacySource = source.find(item => (
+      (item.name || item.colorName) === bottom.name
+    ));
+    const rawStock = (exactSource || legacySource || {}).stock;
+
+    return {
+      key: `nn013-${pattern.name}-${bottom.key}`,
+      name: compositeName,
+      value: bottom.value,
+      patternName: pattern.name,
+      patternValue: pattern.value,
+      bottomName: bottom.name,
+      bottomValue: bottom.value,
+      stock: rawStock === undefined || rawStock === '' ? undefined : Number(rawStock)
+    };
+  }));
+}
+
 const linenColorOptions = [
   {
     key: 'linen23A',
@@ -109,6 +137,15 @@ function getLinenColors(sourceColors = []) {
       stock: rawStock === undefined || rawStock === '' ? undefined : Number(rawStock)
     };
   });
+}
+
+function getNn027Colors(sourceColors = []) {
+  const source = Array.isArray(sourceColors) ? sourceColors : [];
+  if (source.some(color => color.name === 'ฟ้าเทา' || color.colorName === 'ฟ้าเทา')) return source;
+  const blackIndex = source.findIndex(color => color.name === 'ดำ' || color.colorName === 'ดำ');
+  const blueGray = { key: 'blueGray', name: 'ฟ้าเทา', value: '#6f7f90', stock: 1 };
+  if (blackIndex < 0) return [...source, blueGray];
+  return [...source.slice(0, blackIndex), blueGray, ...source.slice(blackIndex)];
 }
 
 function getSelectedColor(product) {
@@ -230,7 +267,7 @@ let products = [
     name: 'Smock tube top with straps',
     price: 290,
     detail: 'Cotton + salou cotton • Chest 24"-36"',
-    colors: getColors(['white', 'brown', 'blueGray']),
+    colors: getNn013Colors(getColors(['white', 'brown', 'blueGray'])),
     image: 'assets/images/products/nn-013-smock-tube-flower.jpeg'
   },
   {
@@ -356,12 +393,15 @@ let products = [
     name: 'Nunaa cotton coat',
     price: 420,
     detail: 'Cotton • Chest 40"',
-    colors: getColors(['white', 'cream', 'black']),
+    colors: getColors(['white', 'cream', 'blueGray', 'black']),
     image: 'assets/images/products/nn-027-nunaa-cotton-coat.jpeg'
   }
 ];
 
 const productOverrides = {
+  'nn-013': {
+    colors: getNn013Colors
+  },
   'nn-019': {
     name: 'Spaghetti crop top (Flowers collection)',
     detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
@@ -391,6 +431,9 @@ const productOverrides = {
     detail: 'Linen • Chest 24"-36" • Length 15"',
     image: 'assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg',
     colors: getLinenColors
+  },
+  'nn-027': {
+    colors: getNn027Colors
   }
 };
 
@@ -445,6 +488,7 @@ const languageButtons = document.querySelectorAll('.language-button');
 const productModal = document.querySelector('#productModal');
 const productModalContent = document.querySelector('#productModalContent');
 const modalCloseControls = document.querySelectorAll('[data-modal-close]');
+const modalNavigationControls = document.querySelectorAll('[data-modal-direction]');
 let activeDetailProductId = null;
 let captchaWidgetId = null;
 
@@ -548,9 +592,15 @@ const translations = {
     'footer.tagline': 'Everyday look, handmade piece by piece.',
     'product.color': 'สี',
     'product.colorAria': 'เลือกสี',
+    'product.topPattern': '1. เลือกลายผ้าด้านบน',
+    'product.bottomColor': '2. เลือกสีผ้าด้านล่าง',
+    'product.pattern': 'ลาย',
+    'product.selectedCombination': 'แบบที่เลือก',
     'product.addCart': 'เพิ่มลงตะกร้า',
     'product.added': 'เพิ่มแล้ว',
     'product.viewDetails': 'ดูรายละเอียด',
+    'product.previous': 'สินค้าก่อนหน้า',
+    'product.next': 'สินค้าถัดไป',
     'product.details': 'รายละเอียดสินค้า',
     'product.soldOut': 'สินค้าหมด',
     'product.ready': 'พร้อมสั่งซื้อ',
@@ -670,9 +720,15 @@ const translations = {
     'footer.tagline': 'Everyday look, handmade piece by piece.',
     'product.color': 'Color',
     'product.colorAria': 'Choose color',
+    'product.topPattern': '1. Choose top pattern',
+    'product.bottomColor': '2. Choose bottom color',
+    'product.pattern': 'Pattern',
+    'product.selectedCombination': 'Selected combination',
     'product.addCart': 'Add to cart',
     'product.added': 'Added',
     'product.viewDetails': 'View details',
+    'product.previous': 'Previous product',
+    'product.next': 'Next product',
     'product.details': 'Product details',
     'product.soldOut': 'Sold out',
     'product.ready': 'Ready to order',
@@ -792,9 +848,15 @@ const translations = {
     'footer.tagline': '日常穿搭，一件一件手工制作。',
     'product.color': '颜色',
     'product.colorAria': '选择颜色',
+    'product.topPattern': '1. 选择上部图案',
+    'product.bottomColor': '2. 选择下部颜色',
+    'product.pattern': '图案',
+    'product.selectedCombination': '已选组合',
     'product.addCart': '加入购物车',
     'product.added': '已加入',
     'product.viewDetails': '查看详情',
+    'product.previous': '上一个商品',
+    'product.next': '下一个商品',
     'product.details': '商品详情',
     'product.soldOut': '售罄',
     'product.ready': '可订购',
@@ -1106,6 +1168,24 @@ function refreshProductStockDisplays() {
       swatch.disabled = !isColorAvailable(product, color);
     });
 
+    if (product.code === 'nn-013') {
+      const selectedColor = getSelectedColor(product);
+      card.querySelectorAll('[data-nn013-pattern]').forEach(button => {
+        const color = product.colors.find(item => (
+          item.patternName === button.dataset.nn013Pattern
+          && item.bottomName === selectedColor.bottomName
+        ));
+        button.disabled = !color || !isColorAvailable(product, color);
+      });
+      card.querySelectorAll('[data-nn013-bottom]').forEach(button => {
+        const color = product.colors.find(item => (
+          item.patternName === selectedColor.patternName
+          && item.bottomName === button.dataset.nn013Bottom
+        ));
+        button.disabled = !color || !isColorAvailable(product, color);
+      });
+    }
+
     const addButton = card.querySelector('.add-cart');
     if (addButton) addButton.disabled = !getProductAvailability(product);
     card.classList.toggle('sold-out', !getProductAvailability(product));
@@ -1129,6 +1209,94 @@ function renderColorSwatches(product, context) {
       <span style="background: ${color.value};"></span>
     </button>
   `).join('');
+}
+
+function renderNn013Selector(product, context) {
+  const selectedColor = getSelectedColor(product);
+  const selectedPattern = selectedColor?.patternName || flowerColorOptions[0].name;
+  const selectedBottom = selectedColor?.bottomName || nn013BottomOptions[0].name;
+  const combinationAvailable = (patternName, bottomName) => {
+    const combination = product.colors.find(color => (
+      color.patternName === patternName && color.bottomName === bottomName
+    ));
+    return combination && isColorAvailable(product, combination);
+  };
+
+  return `
+    <div class="nn013-selector" data-nn013-selector="${product.id}">
+      <div class="nn013-selector-group" role="group" aria-label="${t('product.topPattern')} ${product.name}">
+        <span>${t('product.topPattern')}</span>
+        <div class="nn013-options nn013-pattern-options">
+          ${flowerColorOptions.map(pattern => `
+            <button
+              class="nn013-option nn013-pattern-option${pattern.name === selectedPattern ? ' selected' : ''}"
+              type="button"
+              data-id="${product.id}"
+              data-context="${context}"
+              data-nn013-pattern="${pattern.name}"
+              style="--nn013-preview: ${pattern.value};"
+              aria-label="${t('product.pattern')} ${pattern.name}"
+              aria-pressed="${pattern.name === selectedPattern ? 'true' : 'false'}"
+              ${combinationAvailable(pattern.name, selectedBottom) ? '' : 'disabled'}
+            ><span class="nn013-pattern-preview"></span><b>${pattern.name}</b></button>
+          `).join('')}
+        </div>
+      </div>
+      <div class="nn013-selector-group" role="group" aria-label="${t('product.bottomColor')} ${product.name}">
+        <span>${t('product.bottomColor')}</span>
+        <div class="nn013-options">
+          ${nn013BottomOptions.map(bottom => `
+            <button
+              class="nn013-option nn013-bottom-option${bottom.name === selectedBottom ? ' selected' : ''}"
+              type="button"
+              data-id="${product.id}"
+              data-context="${context}"
+              data-nn013-bottom="${bottom.name}"
+              aria-label="${t('product.bottomColor')} ${bottom.name}"
+              aria-pressed="${bottom.name === selectedBottom ? 'true' : 'false'}"
+              ${combinationAvailable(selectedPattern, bottom.name) ? '' : 'disabled'}
+            ><span class="nn013-color-preview" style="background: ${bottom.value};"></span><b>${bottom.name}</b></button>
+          `).join('')}
+        </div>
+      </div>
+      <p class="nn013-selection">${t('product.selectedCombination')}: <strong>${t('product.pattern')} ${selectedPattern} • ${selectedBottom}</strong></p>
+    </div>
+  `;
+}
+
+function renderProductSelector(product, context) {
+  if (product.code === 'nn-013') return renderNn013Selector(product, context);
+
+  return `
+    <div class="color-picker" role="group" aria-label="${t('product.colorAria')} ${product.name}">
+      <span>${t('product.color')}</span>
+      <div class="color-options">
+        ${renderColorSwatches(product, context)}
+      </div>
+    </div>
+  `;
+}
+
+function selectNn013Variant(button) {
+  const productId = Number(button.dataset.id);
+  const product = products.find(item => item.id === productId);
+  if (!product || product.code !== 'nn-013') return;
+
+  const current = getSelectedColor(product);
+  const patternName = button.dataset.nn013Pattern || current?.patternName || flowerColorOptions[0].name;
+  const bottomName = button.dataset.nn013Bottom || current?.bottomName || nn013BottomOptions[0].name;
+  const nextIndex = product.colors.findIndex(color => (
+    color.patternName === patternName && color.bottomName === bottomName
+  ));
+  if (nextIndex < 0 || !isColorAvailable(product, product.colors[nextIndex])) return;
+
+  selectedColors.set(productId, nextIndex);
+  if (button.dataset.context === 'modal') {
+    renderProductDetail(product);
+    refreshProductStockDisplays();
+  } else {
+    renderProducts();
+  }
 }
 
 function addProductToCart(product, feedbackButton) {
@@ -1268,12 +1436,7 @@ function renderProducts() {
         <strong>${formatter.format(product.price)}</strong>
       </div>
       <p class="stock-status" data-stock-id="${product.id}">${formatStockText(product)}</p>
-      <div class="color-picker" role="group" aria-label="${t('product.colorAria')} ${product.name}">
-        <span>${t('product.color')}</span>
-        <div class="color-options">
-          ${renderColorSwatches(product, 'card')}
-        </div>
-      </div>
+      ${renderProductSelector(product, 'card')}
       <button class="button primary add-cart" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
     </article>
   `).join('');
@@ -1327,12 +1490,7 @@ function renderProductDetail(product) {
         <p class="stock-status" data-detail-stock-id="${product.id}">
           ${isStockManaged(selectedColor) ? formatStockText(product) : t('product.ready')}
         </p>
-        <div class="color-picker" role="group" aria-label="${t('product.colorAria')} ${product.name}">
-          <span>${t('product.color')}</span>
-          <div class="color-options">
-            ${renderColorSwatches(product, 'modal')}
-          </div>
-        </div>
+        ${renderProductSelector(product, 'modal')}
         <button class="button primary modal-add-cart" type="button" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
       </div>
     </article>
@@ -1345,6 +1503,15 @@ function openProductDetail(product) {
   productModal.classList.add('open');
   productModal.setAttribute('aria-hidden', 'false');
   productModal.querySelector('.modal-close')?.focus();
+}
+
+function navigateProductDetail(direction) {
+  if (!products.length || activeDetailProductId === null) return;
+  const currentIndex = products.findIndex(product => product.id === activeDetailProductId);
+  const nextIndex = (currentIndex + direction + products.length) % products.length;
+  const nextProduct = products[nextIndex];
+  activeDetailProductId = nextProduct.id;
+  renderProductDetail(nextProduct);
 }
 
 function closeProductDetail() {
@@ -1614,6 +1781,12 @@ productGrid.addEventListener('click', event => {
     return;
   }
 
+  const nn013Button = event.target.closest('[data-nn013-pattern], [data-nn013-bottom]');
+  if (nn013Button) {
+    selectNn013Variant(nn013Button);
+    return;
+  }
+
   const colorButton = event.target.closest('.color-swatch');
   if (colorButton) {
     const productId = Number(colorButton.dataset.id);
@@ -1645,6 +1818,12 @@ productModal.addEventListener('click', event => {
     return;
   }
 
+  const nn013Button = event.target.closest('[data-nn013-pattern], [data-nn013-bottom]');
+  if (nn013Button) {
+    selectNn013Variant(nn013Button);
+    return;
+  }
+
   const colorButton = event.target.closest('.color-swatch');
   if (colorButton) {
     const productId = Number(colorButton.dataset.id);
@@ -1666,9 +1845,22 @@ modalCloseControls.forEach(control => {
   control.addEventListener('click', closeProductDetail);
 });
 
+modalNavigationControls.forEach(control => {
+  control.addEventListener('click', () => {
+    navigateProductDetail(Number(control.dataset.modalDirection));
+  });
+});
+
 document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && productModal.classList.contains('open')) {
+  if (!productModal.classList.contains('open')) return;
+  if (event.key === 'Escape') {
     closeProductDetail();
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    navigateProductDetail(-1);
+  } else if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    navigateProductDetail(1);
   }
 });
 

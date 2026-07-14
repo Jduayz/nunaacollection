@@ -65,6 +65,12 @@ const FLOWER_VARIANTS = [
   { name: 'D', value: "url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat" }
 ];
 
+const NN013_BOTTOM_VARIANTS = [
+  { name: 'ขาว', value: '#edf1ee' },
+  { name: 'น้ำตาล', value: '#a8744b' },
+  { name: 'ฟ้าเทา', value: '#6f7f90' }
+];
+
 function doGet(event) {
   const action = event.parameter.action || 'products';
 
@@ -82,7 +88,9 @@ function doGet(event) {
     lock.waitLock(30000);
 
     try {
+      ensureNn013CombinationVariants();
       ensureFlowerProductsAreVariants();
+      ensureNn027BlueVariant();
       expirePendingOrders();
       return jsonResponse({ ok: true, products: getProducts() });
     } finally {
@@ -264,6 +272,87 @@ function ensureFlowerProductsAreVariants() {
   if (needsUpdate) updateFlowerProductsToVariants();
 }
 
+function ensureNn013CombinationVariants() {
+  const sheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
+  if (!sheet) throw new Error(`Missing sheet: ${PRODUCTS_SHEET}`);
+
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return;
+  const headers = values[0].map(String);
+  ensureProductHeaders(headers);
+  const codeIndex = headers.indexOf('code');
+  const colorNameIndex = headers.indexOf('colorName');
+  const stockIndex = headers.indexOf('stock');
+  const nn013Rows = values.slice(1).filter(row => String(row[codeIndex]) === 'nn-013');
+  if (!nn013Rows.length) return;
+
+  const expectedNames = FLOWER_VARIANTS.flatMap(pattern => (
+    NN013_BOTTOM_VARIANTS.map(bottom => `${pattern.name} / ${bottom.name}`)
+  ));
+  const existingNames = new Set(nn013Rows.map(row => String(row[colorNameIndex]).trim()));
+  if (expectedNames.every(name => existingNames.has(name)) && nn013Rows.length === expectedNames.length) return;
+
+  const exactStock = {};
+  const legacyStock = {};
+  nn013Rows.forEach(row => {
+    const colorName = String(row[colorNameIndex] || '').trim();
+    const stock = Number(row[stockIndex] || 0);
+    if (expectedNames.includes(colorName)) exactStock[colorName] = stock;
+    if (NN013_BOTTOM_VARIANTS.some(bottom => bottom.name === colorName)) legacyStock[colorName] = stock;
+  });
+
+  const source = headers.reduce((product, header, index) => {
+    product[header] = nn013Rows[0][index];
+    return product;
+  }, {});
+  const updatedRows = [values[0], ...values.slice(1).filter(row => String(row[codeIndex]) !== 'nn-013')];
+
+  FLOWER_VARIANTS.forEach(pattern => {
+    NN013_BOTTOM_VARIANTS.forEach(bottom => {
+      const colorName = `${pattern.name} / ${bottom.name}`;
+      updatedRows.push(buildProductRow(headers, {
+        ...source,
+        colorName,
+        colorValue: bottom.value,
+        stock: exactStock[colorName] ?? legacyStock[bottom.name] ?? 1,
+        active: true
+      }));
+    });
+  });
+
+  sheet.clearContents();
+  sheet.getRange(1, 1, updatedRows.length, headers.length).setValues(updatedRows);
+}
+
+function ensureNn027BlueVariant() {
+  const sheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
+  if (!sheet) throw new Error(`Missing sheet: ${PRODUCTS_SHEET}`);
+
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return;
+  const headers = values[0].map(String);
+  ensureProductHeaders(headers);
+  const codeIndex = headers.indexOf('code');
+  const colorNameIndex = headers.indexOf('colorName');
+  const sourceRow = values.slice(1).find(row => String(row[codeIndex]) === 'nn-027');
+  const alreadyExists = values.slice(1).some(row => (
+    String(row[codeIndex]) === 'nn-027' && String(row[colorNameIndex]).trim() === 'ฟ้าเทา'
+  ));
+  if (!sourceRow || alreadyExists) return;
+
+  const source = headers.reduce((product, header, index) => {
+    product[header] = sourceRow[index];
+    return product;
+  }, {});
+  sheet.appendRow(buildProductRow(headers, {
+    ...source,
+    colorName: 'ฟ้าเทา',
+    colorValue: '#6f7f90',
+    stock: 1,
+    active: true
+  }));
+}
+
 function getProducts() {
   const sheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
   if (!sheet) throw new Error(`Missing sheet: ${PRODUCTS_SHEET}`);
@@ -304,7 +393,9 @@ function createOrder(payload) {
   lock.waitLock(30000);
 
   try {
+    ensureNn013CombinationVariants();
     ensureFlowerProductsAreVariants();
+    ensureNn027BlueVariant();
     expirePendingOrders();
     const orderId = payload.orderId ? validateOrderId(payload.orderId) : createOrderId();
     const requestedItems = payload.items || [];

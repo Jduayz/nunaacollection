@@ -213,8 +213,9 @@ button.product-image:focus-visible::after {
   content: '';
   position: absolute;
   z-index: 20;
-  left: 50%;
-  bottom: calc(100% + 10px);
+  left: calc(100% + 10px);
+  top: 50%;
+  bottom: auto;
   width: 116px;
   height: 116px;
   border: 5px solid var(--paper);
@@ -223,13 +224,22 @@ button.product-image:focus-visible::after {
   box-shadow: 0 12px 32px rgba(42, 33, 27, .24);
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, 8px) scale(.92);
+  transform: translate(8px, -50%) scale(.92);
   transition: opacity .16s ease, transform .16s ease;
 }
 .color-swatch:hover::after,
 .color-swatch:focus-visible::after {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+  transform: translate(0, -50%) scale(1);
+}
+.color-swatch:nth-last-child(-n + 3)::after {
+  right: calc(100% + 10px);
+  left: auto;
+  transform: translate(-8px, -50%) scale(.92);
+}
+.color-swatch:nth-last-child(-n + 3):hover::after,
+.color-swatch:nth-last-child(-n + 3):focus-visible::after {
+  transform: translate(0, -50%) scale(1);
 }
 .color-swatch.pattern-swatch {
   width: 44px;
@@ -299,32 +309,78 @@ button.product-image:focus-visible::after {
   border: 1px solid rgba(42, 33, 27, .14);
   border-radius: 9px;
 }
-.nn013-pattern-preview { background: var(--nn013-preview); }
+.nn013-pattern-preview {
+  overflow: hidden;
+  background: #f3eee7;
+}
+.nn013-pattern-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 .nn013-pattern-option {
   position: relative;
-  --swatch-preview: var(--nn013-preview);
 }
-.nn013-pattern-option::after {
-  content: '';
+.nn013-hover-preview {
   position: absolute;
   z-index: 20;
-  left: 50%;
-  bottom: calc(100% + 10px);
+  left: calc(100% + 10px);
+  top: 50%;
+  bottom: auto;
   width: 140px;
   height: 140px;
   border: 5px solid var(--paper);
   border-radius: 18px;
-  background: var(--nn013-preview);
+  overflow: hidden;
+  background: #f3eee7;
   box-shadow: 0 12px 32px rgba(42, 33, 27, .24);
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, 8px) scale(.92);
+  transform: translate(8px, -50%) scale(.92);
   transition: opacity .16s ease, transform .16s ease;
 }
-.nn013-pattern-option:hover::after,
-.nn013-pattern-option:focus-visible::after {
+.nn013-hover-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.nn013-pattern-option:hover .nn013-hover-preview,
+.nn013-pattern-option:focus-visible .nn013-hover-preview {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
+  transform: translate(0, -50%) scale(1);
+}
+.nn013-pattern-option:nth-last-child(-n + 2) .nn013-hover-preview {
+  right: calc(100% + 10px);
+  left: auto;
+  transform: translate(-8px, -50%) scale(.92);
+}
+.nn013-pattern-option:nth-last-child(-n + 2):hover .nn013-hover-preview,
+.nn013-pattern-option:nth-last-child(-n + 2):focus-visible .nn013-hover-preview {
+  transform: translate(0, -50%) scale(1);
+}
+.nn015-size-option {
+  justify-content: center;
+  min-width: 58px;
+  padding: 8px 16px;
+}
+.nn015-color-option {
+  position: relative;
+}
+.nn015-color-option:hover .nn013-hover-preview,
+.nn015-color-option:focus-visible .nn013-hover-preview {
+  opacity: 1;
+  transform: translate(0, -50%) scale(1);
+}
+.nn015-color-option:nth-last-child(-n + 3) .nn013-hover-preview {
+  right: calc(100% + 10px);
+  left: auto;
+  transform: translate(-8px, -50%) scale(.92);
+}
+.nn015-color-option:nth-last-child(-n + 3):hover .nn013-hover-preview,
+.nn015-color-option:nth-last-child(-n + 3):focus-visible .nn013-hover-preview {
+  transform: translate(0, -50%) scale(1);
 }
 .nn013-selection {
   margin: 0;

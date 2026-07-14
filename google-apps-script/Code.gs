@@ -71,6 +71,16 @@ const NN013_BOTTOM_VARIANTS = [
   { name: 'ฟ้าเทา', value: '#6f7f90' }
 ];
 
+const NN015_SIZE_VARIANTS = ['S', 'M'];
+const NN015_COLOR_VARIANTS = [
+  { name: 'ขาว', value: '#edf1ee' },
+  { name: 'ครีม', value: '#e2d3b9' },
+  { name: 'น้ำตาล', value: '#a8744b' },
+  { name: 'เขียวมะกอก', value: '#4f5b2d' },
+  { name: 'เทาเบจ', value: '#8d867c' },
+  { name: 'น้ำตาลเข้ม', value: '#5a240d' }
+];
+
 function doGet(event) {
   const action = event.parameter.action || 'products';
 
@@ -89,6 +99,7 @@ function doGet(event) {
 
     try {
       ensureNn013CombinationVariants();
+      ensureNn015SizeVariants();
       ensureFlowerProductsAreVariants();
       ensureNn027BlueVariant();
       expirePendingOrders();
@@ -307,14 +318,76 @@ function ensureNn013CombinationVariants() {
   }, {});
   const updatedRows = [values[0], ...values.slice(1).filter(row => String(row[codeIndex]) !== 'nn-013')];
 
-  FLOWER_VARIANTS.forEach(pattern => {
+  FLOWER_VARIANTS.forEach((pattern, patternIndex) => {
     NN013_BOTTOM_VARIANTS.forEach(bottom => {
       const colorName = `${pattern.name} / ${bottom.name}`;
+      const legacyTotal = legacyStock[bottom.name];
+      const distributedStock = legacyTotal === undefined
+        ? 1
+        : Math.floor(legacyTotal / FLOWER_VARIANTS.length)
+          + (patternIndex < legacyTotal % FLOWER_VARIANTS.length ? 1 : 0);
       updatedRows.push(buildProductRow(headers, {
         ...source,
         colorName,
         colorValue: bottom.value,
-        stock: exactStock[colorName] ?? legacyStock[bottom.name] ?? 1,
+        stock: exactStock[colorName] ?? distributedStock,
+        active: true
+      }));
+    });
+  });
+
+  sheet.clearContents();
+  sheet.getRange(1, 1, updatedRows.length, headers.length).setValues(updatedRows);
+}
+
+function ensureNn015SizeVariants() {
+  const sheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
+  if (!sheet) throw new Error(`Missing sheet: ${PRODUCTS_SHEET}`);
+
+  const values = sheet.getDataRange().getValues();
+  if (values.length < 2) return;
+  const headers = values[0].map(String);
+  ensureProductHeaders(headers);
+  const codeIndex = headers.indexOf('code');
+  const colorNameIndex = headers.indexOf('colorName');
+  const stockIndex = headers.indexOf('stock');
+  const nn015Rows = values.slice(1).filter(row => String(row[codeIndex]) === 'nn-015');
+  if (!nn015Rows.length) return;
+
+  const expectedNames = NN015_SIZE_VARIANTS.flatMap(size => (
+    NN015_COLOR_VARIANTS.map(color => `${size} / ${color.name}`)
+  ));
+  const existingNames = new Set(nn015Rows.map(row => String(row[colorNameIndex]).trim()));
+  if (expectedNames.every(name => existingNames.has(name)) && nn015Rows.length === expectedNames.length) return;
+
+  const exactStock = {};
+  const legacyStock = {};
+  nn015Rows.forEach(row => {
+    const colorName = String(row[colorNameIndex] || '').trim();
+    const stock = Number(row[stockIndex] || 0);
+    if (expectedNames.includes(colorName)) exactStock[colorName] = stock;
+    if (NN015_COLOR_VARIANTS.some(color => color.name === colorName)) legacyStock[colorName] = stock;
+  });
+
+  const source = headers.reduce((product, header, index) => {
+    product[header] = nn015Rows[0][index];
+    return product;
+  }, {});
+  const updatedRows = [values[0], ...values.slice(1).filter(row => String(row[codeIndex]) !== 'nn-015')];
+
+  NN015_SIZE_VARIANTS.forEach((size, sizeIndex) => {
+    NN015_COLOR_VARIANTS.forEach(color => {
+      const colorName = `${size} / ${color.name}`;
+      const legacyTotal = legacyStock[color.name];
+      const distributedStock = legacyTotal === undefined
+        ? 1
+        : Math.floor(legacyTotal / NN015_SIZE_VARIANTS.length)
+          + (sizeIndex < legacyTotal % NN015_SIZE_VARIANTS.length ? 1 : 0);
+      updatedRows.push(buildProductRow(headers, {
+        ...source,
+        colorName,
+        colorValue: color.value,
+        stock: exactStock[colorName] ?? distributedStock,
         active: true
       }));
     });
@@ -394,6 +467,7 @@ function createOrder(payload) {
 
   try {
     ensureNn013CombinationVariants();
+    ensureNn015SizeVariants();
     ensureFlowerProductsAreVariants();
     ensureNn027BlueVariant();
     expirePendingOrders();

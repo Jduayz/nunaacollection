@@ -44,21 +44,25 @@ const flowerColorOptions = [
   {
     key: 'flowerA',
     name: 'A',
+    image: 'assets/images/patterns/flower-a.jpeg?v=20260714-nn013-hover-images',
     value: "url('assets/images/patterns/flower-a.jpeg?v=20260711-fill') center / cover no-repeat"
   },
   {
     key: 'flowerB',
     name: 'B',
+    image: 'assets/images/patterns/flower-b-filled.jpeg?v=20260714-nn013-hover-images',
     value: "url('assets/images/patterns/flower-b-filled.jpeg?v=20260714-equal-scale') center / cover no-repeat"
   },
   {
     key: 'flowerC',
     name: 'C',
+    image: 'assets/images/patterns/flower-c-filled.jpeg?v=20260714-nn013-hover-images',
     value: "url('assets/images/patterns/flower-c-filled.jpeg?v=20260714-equal-scale') center / cover no-repeat"
   },
   {
     key: 'flowerD',
     name: 'D',
+    image: 'assets/images/patterns/flower-d.jpeg?v=20260714-nn013-hover-images',
     value: "url('assets/images/patterns/flower-d.jpeg?v=20260711-fill-d2') center / cover no-repeat"
   }
 ];
@@ -101,6 +105,34 @@ function getNn013Colors(sourceColors = []) {
       patternValue: pattern.value,
       bottomName: bottom.name,
       bottomValue: bottom.value,
+      stock: rawStock === undefined || rawStock === '' ? undefined : Number(rawStock)
+    };
+  }));
+}
+
+const nn015SizeOptions = ['S', 'M'];
+const nn015ColorOptions = getColors(colorSets.shorts);
+
+function getNn015Colors(sourceColors = []) {
+  const source = Array.isArray(sourceColors) ? sourceColors : [];
+
+  return nn015SizeOptions.flatMap(size => nn015ColorOptions.map(shade => {
+    const compositeName = `${size} / ${shade.name}`;
+    const exactSource = source.find(item => (
+      (item.name || item.colorName) === compositeName
+    ));
+    const legacySource = source.find(item => (
+      (item.name || item.colorName) === shade.name
+    ));
+    const rawStock = (exactSource || legacySource || {}).stock;
+
+    return {
+      key: `nn015-${size}-${shade.key}`,
+      name: compositeName,
+      value: shade.value,
+      sizeName: size,
+      shadeName: shade.name,
+      shadeValue: shade.value,
       stock: rawStock === undefined || rawStock === '' ? undefined : Number(rawStock)
     };
   }));
@@ -285,7 +317,7 @@ let products = [
     name: 'Nunaa shorts',
     price: 290,
     detail: 'Cotton • S/M size',
-    colors: getColors(colorSets.shorts),
+    colors: getNn015Colors(getColors(colorSets.shorts)),
     image: 'assets/images/products/nn-015-nunaa-shorts.jpeg'
   },
   {
@@ -401,6 +433,9 @@ let products = [
 const productOverrides = {
   'nn-013': {
     colors: getNn013Colors
+  },
+  'nn-015': {
+    colors: getNn015Colors
   },
   'nn-019': {
     name: 'Spaghetti crop top (Flowers collection)',
@@ -596,6 +631,8 @@ const translations = {
     'product.bottomColor': '2. เลือกสีผ้าด้านล่าง',
     'product.pattern': 'ลาย',
     'product.selectedCombination': 'แบบที่เลือก',
+    'product.size': '1. เลือกไซส์',
+    'product.shortsColor': '2. เลือกสี',
     'product.addCart': 'เพิ่มลงตะกร้า',
     'product.added': 'เพิ่มแล้ว',
     'product.viewDetails': 'ดูรายละเอียด',
@@ -724,6 +761,8 @@ const translations = {
     'product.bottomColor': '2. Choose bottom color',
     'product.pattern': 'Pattern',
     'product.selectedCombination': 'Selected combination',
+    'product.size': '1. Choose size',
+    'product.shortsColor': '2. Choose color',
     'product.addCart': 'Add to cart',
     'product.added': 'Added',
     'product.viewDetails': 'View details',
@@ -852,6 +891,8 @@ const translations = {
     'product.bottomColor': '2. 选择下部颜色',
     'product.pattern': '图案',
     'product.selectedCombination': '已选组合',
+    'product.size': '1. 选择尺码',
+    'product.shortsColor': '2. 选择颜色',
     'product.addCart': '加入购物车',
     'product.added': '已加入',
     'product.viewDetails': '查看详情',
@@ -1186,6 +1227,24 @@ function refreshProductStockDisplays() {
       });
     }
 
+    if (product.code === 'nn-015') {
+      const selectedColor = getSelectedColor(product);
+      card.querySelectorAll('[data-nn015-size]').forEach(button => {
+        const color = product.colors.find(item => (
+          item.sizeName === button.dataset.nn015Size
+          && item.shadeName === selectedColor.shadeName
+        ));
+        button.disabled = !color || !isColorAvailable(product, color);
+      });
+      card.querySelectorAll('[data-nn015-color]').forEach(button => {
+        const color = product.colors.find(item => (
+          item.sizeName === selectedColor.sizeName
+          && item.shadeName === button.dataset.nn015Color
+        ));
+        button.disabled = !color || !isColorAvailable(product, color);
+      });
+    }
+
     const addButton = card.querySelector('.add-cart');
     if (addButton) addButton.disabled = !getProductAvailability(product);
     card.classList.toggle('sold-out', !getProductAvailability(product));
@@ -1238,7 +1297,7 @@ function renderNn013Selector(product, context) {
               aria-label="${t('product.pattern')} ${pattern.name}"
               aria-pressed="${pattern.name === selectedPattern ? 'true' : 'false'}"
               ${combinationAvailable(pattern.name, selectedBottom) ? '' : 'disabled'}
-            ><span class="nn013-pattern-preview"></span><b>${pattern.name}</b></button>
+            ><span class="nn013-pattern-preview"><img src="${pattern.image}" alt="${t('product.pattern')} ${pattern.name}"></span><b>${pattern.name}</b><span class="nn013-hover-preview" aria-hidden="true"><img src="${pattern.image}" alt=""></span></button>
           `).join('')}
         </div>
       </div>
@@ -1264,8 +1323,61 @@ function renderNn013Selector(product, context) {
   `;
 }
 
+function renderNn015Selector(product, context) {
+  const selectedColor = getSelectedColor(product);
+  const selectedSize = selectedColor?.sizeName || nn015SizeOptions[0];
+  const selectedShade = selectedColor?.shadeName || nn015ColorOptions[0].name;
+  const combinationAvailable = (sizeName, shadeName) => {
+    const combination = product.colors.find(color => (
+      color.sizeName === sizeName && color.shadeName === shadeName
+    ));
+    return combination && isColorAvailable(product, combination);
+  };
+
+  return `
+    <div class="nn013-selector nn015-selector" data-nn015-selector="${product.id}">
+      <div class="nn013-selector-group" role="group" aria-label="${t('product.size')} ${product.name}">
+        <span>${t('product.size')}</span>
+        <div class="nn013-options">
+          ${nn015SizeOptions.map(size => `
+            <button
+              class="nn013-option nn015-size-option${size === selectedSize ? ' selected' : ''}"
+              type="button"
+              data-id="${product.id}"
+              data-context="${context}"
+              data-nn015-size="${size}"
+              aria-label="${t('product.size')} ${size}"
+              aria-pressed="${size === selectedSize ? 'true' : 'false'}"
+              ${combinationAvailable(size, selectedShade) ? '' : 'disabled'}
+            ><b>${size}</b></button>
+          `).join('')}
+        </div>
+      </div>
+      <div class="nn013-selector-group" role="group" aria-label="${t('product.shortsColor')} ${product.name}">
+        <span>${t('product.shortsColor')}</span>
+        <div class="nn013-options">
+          ${nn015ColorOptions.map(shade => `
+            <button
+              class="nn013-option nn015-color-option${shade.name === selectedShade ? ' selected' : ''}"
+              type="button"
+              data-id="${product.id}"
+              data-context="${context}"
+              data-nn015-color="${shade.name}"
+              aria-label="${t('product.color')} ${shade.name}"
+              aria-pressed="${shade.name === selectedShade ? 'true' : 'false'}"
+              ${combinationAvailable(selectedSize, shade.name) ? '' : 'disabled'}
+            ><span class="nn013-color-preview" style="background: ${shade.value};"></span><b>${shade.name}</b><span class="nn013-hover-preview" style="background: ${shade.value};" aria-hidden="true"></span></button>
+          `).join('')}
+        </div>
+      </div>
+      <p class="nn013-selection">${t('product.selectedCombination')}: <strong>${selectedSize} • ${selectedShade}</strong></p>
+    </div>
+  `;
+}
+
 function renderProductSelector(product, context) {
   if (product.code === 'nn-013') return renderNn013Selector(product, context);
+  if (product.code === 'nn-015') return renderNn015Selector(product, context);
 
   return `
     <div class="color-picker" role="group" aria-label="${t('product.colorAria')} ${product.name}">
@@ -1287,6 +1399,28 @@ function selectNn013Variant(button) {
   const bottomName = button.dataset.nn013Bottom || current?.bottomName || nn013BottomOptions[0].name;
   const nextIndex = product.colors.findIndex(color => (
     color.patternName === patternName && color.bottomName === bottomName
+  ));
+  if (nextIndex < 0 || !isColorAvailable(product, product.colors[nextIndex])) return;
+
+  selectedColors.set(productId, nextIndex);
+  if (button.dataset.context === 'modal') {
+    renderProductDetail(product);
+    refreshProductStockDisplays();
+  } else {
+    renderProducts();
+  }
+}
+
+function selectNn015Variant(button) {
+  const productId = Number(button.dataset.id);
+  const product = products.find(item => item.id === productId);
+  if (!product || product.code !== 'nn-015') return;
+
+  const current = getSelectedColor(product);
+  const sizeName = button.dataset.nn015Size || current?.sizeName || nn015SizeOptions[0];
+  const shadeName = button.dataset.nn015Color || current?.shadeName || nn015ColorOptions[0].name;
+  const nextIndex = product.colors.findIndex(color => (
+    color.sizeName === sizeName && color.shadeName === shadeName
   ));
   if (nextIndex < 0 || !isColorAvailable(product, product.colors[nextIndex])) return;
 
@@ -1787,6 +1921,12 @@ productGrid.addEventListener('click', event => {
     return;
   }
 
+  const nn015Button = event.target.closest('[data-nn015-size], [data-nn015-color]');
+  if (nn015Button) {
+    selectNn015Variant(nn015Button);
+    return;
+  }
+
   const colorButton = event.target.closest('.color-swatch');
   if (colorButton) {
     const productId = Number(colorButton.dataset.id);
@@ -1821,6 +1961,12 @@ productModal.addEventListener('click', event => {
   const nn013Button = event.target.closest('[data-nn013-pattern], [data-nn013-bottom]');
   if (nn013Button) {
     selectNn013Variant(nn013Button);
+    return;
+  }
+
+  const nn015Button = event.target.closest('[data-nn015-size], [data-nn015-color]');
+  if (nn015Button) {
+    selectNn015Variant(nn015Button);
     return;
   }
 

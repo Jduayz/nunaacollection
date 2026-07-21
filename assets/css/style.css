@@ -241,6 +241,38 @@ button.product-image:focus-visible::after {
 .color-swatch:nth-last-child(-n + 3):focus-visible::after {
   transform: translate(0, -50%) scale(1);
 }
+.color-swatch.has-image-preview::after { display: none; }
+.swatch-image-preview {
+  position: absolute;
+  z-index: 20;
+  left: calc(100% + 10px);
+  top: 50%;
+  width: 116px;
+  height: 116px;
+  border: 5px solid var(--paper);
+  border-radius: 18px;
+  object-fit: cover;
+  background: #f3eee7;
+  box-shadow: 0 12px 32px rgba(42, 33, 27, .24);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(8px, -50%) scale(.92);
+  transition: opacity .16s ease, transform .16s ease;
+}
+.color-swatch:hover .swatch-image-preview,
+.color-swatch:focus-visible .swatch-image-preview {
+  opacity: 1;
+  transform: translate(0, -50%) scale(1);
+}
+.color-swatch:nth-last-child(-n + 3) .swatch-image-preview {
+  right: calc(100% + 10px);
+  left: auto;
+  transform: translate(-8px, -50%) scale(.92);
+}
+.color-swatch:nth-last-child(-n + 3):hover .swatch-image-preview,
+.color-swatch:nth-last-child(-n + 3):focus-visible .swatch-image-preview {
+  transform: translate(0, -50%) scale(1);
+}
 .color-swatch.pattern-swatch {
   width: 44px;
   height: 44px;

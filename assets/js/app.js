@@ -40,6 +40,32 @@ function getColors(keys) {
   return keys.map(key => ({ key, ...colorOptions[key] }));
 }
 
+const PRODUCT_IMAGE_VERSION = '20260721-4';
+
+function getProductImageUrl(image) {
+  const url = String(image || '');
+  if (!url) return '';
+  return `${url}${url.includes('?') ? '&' : '?'}v=${PRODUCT_IMAGE_VERSION}`;
+}
+
+const stoneWashColorOptions = [
+  {
+    key: 'stoneWashA',
+    name: 'A',
+    value: 'repeating-linear-gradient(90deg, #6685a3 0 6px, #9aafc2 6px 10px, #3f6486 10px 15px)'
+  },
+  {
+    key: 'stoneWashB',
+    name: 'B',
+    value: 'repeating-linear-gradient(0deg, #2f4f72 0 5px, #607c9b 5px 9px, #263f60 9px 14px)'
+  },
+  {
+    key: 'stoneWashC',
+    name: 'C',
+    value: 'repeating-linear-gradient(90deg, #6f8daa 0 5px, #b6c4d0 5px 9px, #4f708f 9px 13px)'
+  }
+];
+
 const flowerColorOptions = [
   {
     key: 'flowerA',
@@ -142,19 +168,70 @@ const linenColorOptions = [
   {
     key: 'linen23A',
     name: 'A',
+    image: 'assets/images/patterns/linen-a.jpeg?v=20260714-pattern-hover-images',
     value: "url('assets/images/patterns/linen-a.jpeg?v=20260711-linen') center / cover no-repeat"
   },
   {
     key: 'linen23B',
     name: 'B',
+    image: 'assets/images/patterns/linen-b.jpeg?v=20260714-pattern-hover-images',
     value: "url('assets/images/patterns/linen-b.jpeg?v=20260711-linen') center / cover no-repeat"
   },
   {
     key: 'linen23C',
     name: 'C',
+    image: 'assets/images/patterns/linen-c.jpeg?v=20260714-pattern-hover-images',
     value: "url('assets/images/patterns/linen-c.jpeg?v=20260711-linen') center / cover no-repeat"
   }
 ];
+
+const nn005LinenColorOptions = ['a', 'b', 'c', 'd'].map((suffix, index) => ({
+  key: `linen05${String.fromCharCode(65 + index)}`,
+  name: String.fromCharCode(65 + index),
+  image: `assets/images/patterns/linen-005-${suffix}.jpeg?v=20260721-linen-variants`,
+  value: `url('assets/images/patterns/linen-005-${suffix}.jpeg?v=20260721-linen-variants') center / cover no-repeat`
+}));
+
+const nn018LinenColorOptions = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map((suffix, index) => ({
+  key: `linen18${String.fromCharCode(65 + index)}`,
+  name: String.fromCharCode(65 + index),
+  image: `assets/images/patterns/linen-018-${suffix}.jpeg?v=20260721-linen-variants`,
+  value: `url('assets/images/patterns/linen-018-${suffix}.jpeg?v=20260721-linen-variants') center / cover no-repeat`
+}));
+
+const nn026LinenColorOptions = ['a', 'b', 'c', 'd'].map((suffix, index) => ({
+  key: `linen26${String.fromCharCode(65 + index)}`,
+  name: String.fromCharCode(65 + index),
+  image: `assets/images/patterns/linen-026-${suffix}.jpeg?v=20260721-linen-variants`,
+  value: `url('assets/images/patterns/linen-026-${suffix}.jpeg?v=20260721-linen-variants') center / cover no-repeat`
+}));
+
+function mergePatternStocks(options, sourceColors = []) {
+  const source = Array.isArray(sourceColors) ? sourceColors : [];
+
+  return options.map((color, index) => {
+    const sourceColor = source.find(item => item.name === color.name || item.colorName === color.name)
+      || (source.length === options.length ? source[index] : {});
+    const rawStock = sourceColor.stock;
+
+    return {
+      ...color,
+      stock: rawStock === undefined || rawStock === '' ? undefined : Number(rawStock)
+    };
+  });
+}
+
+function getNn005Colors(sourceColors = []) {
+  return mergePatternStocks(nn005LinenColorOptions, sourceColors);
+}
+
+function getNn018Colors(sourceColors = []) {
+  return mergePatternStocks(nn018LinenColorOptions, sourceColors);
+}
+
+function getNn026Colors(sourceColors = []) {
+  return mergePatternStocks(nn026LinenColorOptions, sourceColors);
+}
 
 function getLinenColors(sourceColors = []) {
   const source = Array.isArray(sourceColors) ? sourceColors : [];
@@ -227,8 +304,8 @@ let products = [
     name: 'Spaghetti crop top linen fabric',
     price: 290,
     detail: 'Linen • Chest 26"-36"',
-    colors: getColors(colorSets.linenPattern),
-    image: 'assets/images/products/nn-005-spaghetti-crop-top-linen.jpeg'
+    colors: getNn005Colors(),
+    image: 'assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg'
   },
   {
     id: 6,
@@ -309,7 +386,7 @@ let products = [
     price: 290,
     detail: 'Cotton • Waist 24"-36"',
     colors: getColors(['white', 'brown']),
-    image: 'assets/images/products/nn-014-nunaa-mini-skirt.jpeg'
+    image: 'assets/images/products/nn-014-nunaa-mini-skirt-v2.jpeg'
   },
   {
     id: 15,
@@ -344,8 +421,8 @@ let products = [
     name: 'Smock tube top with straps',
     price: 320,
     detail: 'Cotton with linen • Chest 24"-36"',
-    colors: getColors(colorSets.linenPattern),
-    image: 'assets/images/products/nn-018-smock-tube-basic-stripes.jpeg'
+    colors: getNn018Colors(),
+    image: 'assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg'
   },
   {
     id: 19,
@@ -416,7 +493,7 @@ let products = [
     name: 'Long sleeve crop top linen',
     price: 420,
     detail: 'Linen • Chest 24"-36"',
-    colors: getColors(colorSets.linenPattern),
+    colors: getNn026Colors(),
     image: 'assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg'
   },
   {
@@ -427,15 +504,53 @@ let products = [
     detail: 'Cotton • Chest 40"',
     colors: getColors(['white', 'cream', 'blueGray', 'black']),
     image: 'assets/images/products/nn-027-nunaa-cotton-coat.jpeg'
+  },
+  {
+    id: 28,
+    code: 'nn-028',
+    name: 'Mini dress',
+    price: 350,
+    detail: 'Cotton • Chest 28"-38" • Length 30"',
+    colors: getColors(['white', 'cream', 'green', 'black']),
+    image: 'assets/images/products/nn-028-mini-dress.jpeg'
+  },
+  {
+    id: 29,
+    code: 'nn-029',
+    name: 'Mini dress with button',
+    price: 350,
+    detail: 'Cotton • Chest 28"-38" • Length 30"',
+    colors: getColors(['white', 'black']),
+    image: 'assets/images/products/nn-029-mini-dress-button.jpeg'
+  },
+  {
+    id: 30,
+    code: 'nn-030',
+    name: 'Mini dress with button (Stone wash fabric)',
+    price: 450,
+    detail: 'Cotton • Chest 28"-38" • Length 30"',
+    colors: stoneWashColorOptions,
+    image: 'assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg'
   }
 ];
 
 const productOverrides = {
+  'nn-005': {
+    image: 'assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg',
+    colors: getNn005Colors
+  },
   'nn-013': {
     colors: getNn013Colors
   },
   'nn-015': {
     colors: getNn015Colors
+  },
+  'nn-018': {
+    image: 'assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg',
+    colors: getNn018Colors
+  },
+  'nn-026': {
+    colors: getNn026Colors
   },
   'nn-019': {
     name: 'Spaghetti crop top (Flowers collection)',
@@ -1254,7 +1369,7 @@ function refreshProductStockDisplays() {
 function renderColorSwatches(product, context) {
   return product.colors.map((color, index) => `
     <button
-      class="color-swatch${color.key?.startsWith('flower') || color.key?.startsWith('linen23') ? ' pattern-swatch' : ''}${index === (selectedColors.get(product.id) || 0) ? ' selected' : ''}"
+      class="color-swatch${color.key?.startsWith('flower') || color.key?.startsWith('linen23') || color.key?.startsWith('linen05') || color.key?.startsWith('linen18') || color.key?.startsWith('linen26') ? ' pattern-swatch' : ''}${color.image ? ' has-image-preview' : ''}${index === (selectedColors.get(product.id) || 0) ? ' selected' : ''}"
       type="button"
       data-id="${product.id}"
       data-color-index="${index}"
@@ -1266,6 +1381,7 @@ function renderColorSwatches(product, context) {
       ${isColorAvailable(product, color) ? '' : 'disabled'}
     >
       <span style="background: ${color.value};"></span>
+      ${color.image ? `<img class="swatch-image-preview" src="${color.image}" alt="" aria-hidden="true">` : ''}
     </button>
   `).join('');
 }
@@ -1559,7 +1675,7 @@ function renderProducts() {
   productGrid.innerHTML = products.map(product => `
     <article class="product-card${getProductAvailability(product) ? '' : ' sold-out'}" data-product-id="${product.id}">
       <button class="product-image product-detail-trigger" type="button" data-id="${product.id}" data-detail-label="${t('product.viewDetails')}" aria-label="${t('product.viewDetails')} ${product.name}">
-        <img src="${product.image}" alt="${product.name}" loading="lazy">
+        <img src="${getProductImageUrl(product.image)}" alt="${product.name}" loading="lazy">
       </button>
       <div class="product-meta">
         <div>
@@ -1614,7 +1730,7 @@ function renderProductDetail(product) {
   productModalContent.innerHTML = `
     <article class="product-detail" data-product-id="${product.id}">
       <div class="product-detail-image">
-        <img src="${product.image}" alt="${product.name}">
+        <img src="${getProductImageUrl(product.image)}" alt="${product.name}">
       </div>
       <div class="product-detail-info">
         <span class="product-code">${product.code}</span>

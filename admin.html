@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#6f4e37" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Nunaa Admin" />
+  <title>Nunaa.Collection Admin</title>
+  <meta name="description" content="หน้าแอดมินสำหรับจัดการออเดอร์และสต็อก Nunaa.Collection" />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/assets/icons/nunaa-app-icon.png" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260714-pattern-hover-images" />
+</head>
+<body>
+  <header class="site-header admin-header" id="adminHeader" hidden>
+    <a class="brand" href="index.html">Nunaa.Collection Admin</a>
+    <nav class="nav" aria-label="Admin navigation">
+      <span id="adminIdentity" class="admin-identity"></span>
+      <a href="index.html">กลับสู่เว็บ</a>
+      <button id="refreshAdminButton" class="button ghost" type="button">รีเฟรช</button>
+      <button id="adminSignOutButton" class="button ghost" type="button">ออกจากระบบ</button>
+    </nav>
+  </header>
+
+  <main class="admin-auth-shell" id="adminAuthPanel">
+    <section class="admin-auth-card" aria-labelledby="adminAuthTitle">
+      <p class="eyebrow">Nunaa Backoffice</p>
+      <h1 id="adminAuthTitle">เข้าสู่ระบบผู้ดูแล</h1>
+      <p>ใช้บัญชี Email/password ที่ได้รับอนุญาตเท่านั้น</p>
+      <form id="adminAuthForm" class="admin-auth-form">
+        <label>
+          อีเมล
+          <input id="adminAuthEmail" name="email" type="email" autocomplete="username" required />
+        </label>
+        <label>
+          รหัสผ่าน
+          <input id="adminAuthPassword" name="password" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="button primary" type="submit">เข้าสู่ระบบ</button>
+        <button id="adminResetPassword" class="button ghost" type="button">ลืมรหัสผ่าน</button>
+      </form>
+      <p id="adminAuthMessage" class="admin-auth-message" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <main class="admin-panel" id="adminApp" hidden>
+    <section class="section admin-summary-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Admin</p>
+          <h1>Dashboard</h1>
+        </div>
+      </div>
+      <div class="admin-summary" id="adminSummary">กำลังโหลดข้อมูล...</div>
+    </section>
+
+    <section class="section admin-orders-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Orders</p>
+          <h2>คำสั่งซื้อ</h2>
+        </div>
+      </div>
+      <div class="admin-controls">
+        <label>
+          ค้นหา Order ID หรือชื่อผู้สั่ง
+          <input id="orderSearchInput" type="text" placeholder="ค้นหา..." />
+        </label>
+        <label>
+          สถานะ
+          <select id="orderStatusFilter">
+            <option value="">ทั้งหมด</option>
+            <option value="pending">pending</option>
+            <option value="payment_reported">รอตรวจสลิป</option>
+            <option value="paid">ยืนยันยอดแล้ว</option>
+            <option value="cancelled">cancelled</option>
+            <option value="payment_rejected">payment_rejected</option>
+            <option value="expired">expired</option>
+          </select>
+        </label>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-orders-table" id="adminOrdersTable">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>ลูกค้า</th>
+              <th>สถานะ</th>
+              <th>ยอดรวม</th>
+              <th>วันที่</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminOrdersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="section admin-stock-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Stock</p>
+          <h2>ปรับสต็อกสินค้า</h2>
+        </div>
+      </div>
+      <div class="admin-stock-grid">
+        <div class="admin-stock-form-card">
+          <form id="stockUpdateForm" class="admin-stock-form">
+            <div class="form-heading">
+              <h3>อัปเดตสต็อก</h3>
+              <p>เลือกสินค้าและกรอกจำนวนสต็อกใหม่</p>
+            </div>
+            <div id="stockRows"></div>
+            <div class="stock-actions">
+              <button id="addStockRowButton" type="button" class="button ghost">เพิ่มรายการ</button>
+              <button type="submit" class="button primary">บันทึกสต็อก</button>
+            </div>
+          </form>
+        </div>
+        <div class="admin-stock-list-card">
+          <div class="form-heading">
+            <h3>สต็อกปัจจุบัน</h3>
+            <p>รายการสินค้าที่อ่านจากระบบล่าสุด</p>
+          </div>
+          <div class="stock-search">
+            <label for="stockSearchInput">ค้นหาสต็อก</label>
+            <div class="stock-search-row">
+              <input
+                id="stockSearchInput"
+                type="search"
+                placeholder="พิมพ์รหัสสินค้า ชื่อสินค้า หรือสี"
+                autocomplete="off"
+              />
+              <button id="clearStockSearchButton" class="button ghost" type="button">ล้าง</button>
+            </div>
+          </div>
+          <div class="admin-table-wrap admin-stock-list-wrap">
+            <table class="admin-stock-table" id="adminStockTable">
+              <thead>
+                <tr>
+                  <th>รหัส</th>
+                  <th>สินค้า</th>
+                  <th>สี</th>
+                  <th>สต็อก</th>
+                  <th>แก้ไข</th>
+                </tr>
+              </thead>
+              <tbody id="adminStockBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section admin-status-section">
+      <div id="adminStatusMessage" class="admin-status-message"> </div>
+    </section>
+  </main>
+
+  <script src="assets/js/config.js"></script>
+  <script type="module" src="assets/js/admin-auth.js?v=20260725-4"></script>
+</body>
+</html>

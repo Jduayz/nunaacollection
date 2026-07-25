@@ -1,0 +1,21 @@
+{
+  "id": "/admin",
+  "name": "Nunaa Admin",
+  "short_name": "Nunaa",
+  "description": "จัดการออเดอร์และสต็อกของ Nunaa Collection",
+  "lang": "th",
+  "start_url": "/admin",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fffaf2",
+  "theme_color": "#6f4e37",
+  "icons": [
+    {
+      "src": "/assets/icons/nunaa-app-icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

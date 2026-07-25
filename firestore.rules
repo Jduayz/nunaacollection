@@ -1,0 +1,21 @@
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// No Firestore collections are active yet. Orders, inventory, admin roles,
+// and payment-slip metadata will be introduced only with explicit schemas,
+// validator functions, ownership checks, and emulator tests.
+//
+// ===============================================================
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Secure bootstrap: the client SDK is connected, but no application data
+    // is readable or writable until the domain model and access rules exist.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

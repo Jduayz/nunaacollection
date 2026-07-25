@@ -8,6 +8,9 @@ const MAX_ITEMS_PER_ORDER = 10;
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const RATE_LIMITS = { createOrder: 5, reportPayment: 10, orderStatus: 20 };
 const PAYMENT_REVIEW_HOURS = 24;
+const FIREBASE_WEB_API_KEY = 'AIzaSyAnerxI4XATX9hombqmug67b1AZKJqfSOw';
+const FIREBASE_ADMIN_UIDS = ['gPorfKgdxKNiVKHUg4sMmkue2FU2'];
+const ADMIN_ACTIONS = ['adminOrders', 'updateOrderStatus', 'updateProductStock'];
 const ORDERS_HEADERS = [
   'createdAt',
   'orderId',
@@ -116,16 +119,64 @@ function doPost(event) {
   try {
     const payload = JSON.parse(event.postData.contents || '{}');
     if (payload.website) throw new Error('ไม่สามารถส่งคำขอนี้ได้');
-    const action = payload.action === 'reportPayment' ? 'reportPayment' : 'createOrder';
-    enforceRateLimit(action, payload.clientId);
-    verifyCaptcha(payload.captchaToken);
-    const result = payload.action === 'reportPayment'
-      ? reportPayment(payload)
-      : createOrder(payload);
+    const action = String(payload.action || 'createOrder');
+    const allowedActions = ['createOrder', 'reportPayment', ...ADMIN_ACTIONS];
+    if (!allowedActions.includes(action)) throw new Error('Unknown action');
+
+    if (action === 'createOrder' || action === 'reportPayment') {
+      enforceRateLimit(action, payload.clientId);
+      verifyCaptcha(payload.captchaToken);
+    }
+    if (ADMIN_ACTIONS.includes(action)) {
+      requireFirebaseAdmin(payload.idToken);
+    }
+
+    let result;
+    if (action === 'adminOrders') {
+      result = { ok: true, orders: getAdminOrders(), products: getProducts() };
+    } else if (action === 'reportPayment') {
+      result = reportPayment(payload);
+    } else if (action === 'updateOrderStatus') {
+      result = updateOrderStatus(payload);
+    } else if (action === 'updateProductStock') {
+      result = updateProductStock(payload);
+    } else {
+      result = createOrder(payload);
+    }
+
     return jsonResponse(result);
   } catch (error) {
     return jsonResponse({ ok: false, message: error.message }, 400);
   }
+}
+
+function requireFirebaseAdmin(value) {
+  const idToken = String(value || '').trim();
+  if (!/^[A-Za-z0-9._-]{100,4096}$/.test(idToken)) {
+    throw new Error('กรุณาเข้าสู่ระบบผู้ดูแลอีกครั้ง');
+  }
+
+  const response = UrlFetchApp.fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(FIREBASE_WEB_API_KEY)}`,
+    {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify({ idToken }),
+      muteHttpExceptions: true
+    }
+  );
+
+  if (response.getResponseCode() !== 200) {
+    throw new Error('เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่');
+  }
+
+  const result = JSON.parse(response.getContentText() || '{}');
+  const user = Array.isArray(result.users) ? result.users[0] : null;
+  if (!user || user.disabled || user.emailVerified !== true || !FIREBASE_ADMIN_UIDS.includes(String(user.localId || ''))) {
+    throw new Error('บัญชีนี้ไม่มีสิทธิ์ผู้ดูแล Nunaa');
+  }
+
+  return user;
 }
 
 function enforceRateLimit(action, clientId) {
@@ -583,6 +634,119 @@ function getPaymentReviewInfo(createdAt) {
   const nextDayAtOnePm = new Date(`${bangkokDate}T13:00:00+07:00`);
   nextDayAtOnePm.setTime(nextDayAtOnePm.getTime() + (24 * 60 * 60 * 1000));
   return { afterHours: true, reviewDueAt: nextDayAtOnePm.toISOString() };
+}
+
+function getAdminOrders() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    expirePendingOrders();
+    const ordersSheet = getOrCreateOrdersSheet();
+    const rows = getRows(ordersSheet);
+    return rows.map(order => ({
+      ...order,
+      status: String(order.status || 'pending').toLowerCase(),
+      createdAt: toIsoString(order.createdAt),
+      expiresAt: toIsoString(order.expiresAt),
+      paidAt: toIsoString(order.paidAt),
+      paymentReportedAt: toIsoString(order.paymentReportedAt),
+      total: Number(order.total || 0)
+    }));
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function updateOrderStatus(payload) {
+  const orderId = validateOrderId(payload.orderId);
+  const status = String(payload.status || '').trim().toLowerCase();
+  if (!['pending', 'payment_reported', 'paid', 'cancelled', 'payment_rejected', 'expired'].includes(status)) {
+    throw new Error('สถานะออเดอร์ไม่ถูกต้อง');
+  }
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const sheet = getOrCreateOrdersSheet();
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(String);
+    const orderIdIndex = headers.indexOf('orderId');
+    const statusIndex = headers.indexOf('status');
+
+    for (let rowIndex = 1; rowIndex < values.length; rowIndex += 1) {
+      if (String(values[rowIndex][orderIdIndex]) !== orderId) continue;
+      const currentStatus = String(values[rowIndex][statusIndex] || 'pending').toLowerCase();
+      if (!isAllowedOrderStatusTransition(currentStatus, status)) {
+        throw new Error(`ไม่สามารถเปลี่ยนสถานะจาก ${currentStatus} เป็น ${status}`);
+      }
+      sheet.getRange(rowIndex + 1, statusIndex + 1).setValue(status);
+
+      if (status === 'paid') {
+        deductStockForOrderRow(sheet, rowIndex + 1);
+      } else if (['cancelled', 'payment_rejected', 'expired'].includes(status)) {
+        restoreStockForOrderRow(sheet, rowIndex + 1);
+      }
+
+      return { ok: true, orderId, status };
+    }
+
+    throw new Error(`ไม่พบออเดอร์ ${orderId}`);
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function isAllowedOrderStatusTransition(currentStatus, nextStatus) {
+  if (currentStatus === nextStatus) return true;
+  const transitions = {
+    pending: ['payment_reported', 'paid', 'cancelled', 'expired'],
+    payment_reported: ['paid', 'payment_rejected', 'cancelled'],
+    paid: ['cancelled']
+  };
+  return (transitions[currentStatus] || []).includes(nextStatus);
+}
+
+function updateProductStock(payload) {
+  const items = Array.isArray(payload.items) ? payload.items : [];
+  if (!items.length) throw new Error('ไม่มีข้อมูลสต็อกสินค้า');
+  if (items.length > 100) throw new Error('อัปเดตสต็อกได้ไม่เกิน 100 รายการต่อครั้ง');
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const sheet = getSpreadsheet().getSheetByName(PRODUCTS_SHEET);
+    if (!sheet) throw new Error(`Missing sheet: ${PRODUCTS_SHEET}`);
+
+    const values = sheet.getDataRange().getValues();
+    const headers = values[0].map(String);
+    const codeIndex = headers.indexOf('code');
+    const colorIndex = headers.indexOf('colorName') >= 0 ? headers.indexOf('colorName') : headers.indexOf('color');
+    const stockIndex = headers.indexOf('stock');
+    if (codeIndex < 0 || colorIndex < 0 || stockIndex < 0) {
+      throw new Error('Products sheet ต้องมี column: code, colorName, stock');
+    }
+
+    items.forEach(item => {
+      const code = String(item.code || '').trim();
+      const colorName = String(item.colorName || '').trim();
+      const stock = Number(item.stock);
+      if (!code || !colorName) throw new Error('ข้อมูลสินค้าไม่ครบถ้วน');
+      if (code.length > 40 || colorName.length > 80) throw new Error('รหัสสินค้าหรือชื่อสียาวเกินกำหนด');
+      if (!Number.isInteger(stock) || stock < 0 || stock > 1000000) {
+        throw new Error('สต็อกต้องเป็นจำนวนเต็มระหว่าง 0 ถึง 1,000,000');
+      }
+
+      const rowIndex = findProductRow(values, codeIndex, colorIndex, code, colorName);
+      if (rowIndex < 1) throw new Error(`ไม่พบสินค้า ${code} สี${colorName}`);
+      sheet.getRange(rowIndex + 1, stockIndex + 1).setValue(stock);
+    });
+
+    return { ok: true, updated: items.length };
+  } finally {
+    lock.releaseLock();
+  }
 }
 
 function findOrderById(sheet, orderId) {

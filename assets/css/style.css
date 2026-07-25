@@ -710,7 +710,68 @@ button.product-image:focus-visible::after {
 .contact-section p { color: var(--muted); }
 .site-footer { display: flex; justify-content: space-between; gap: 16px; padding: 28px clamp(18px, 4vw, 56px); color: var(--muted); border-top: 1px solid var(--line); }
 
-@media (max-width: 850px) {
+.admin-header { justify-content: space-between; padding: 18px clamp(18px, 5vw, 72px); }
+.admin-panel { max-width: 1200px; margin: 0 auto 72px; padding: 0 clamp(18px, 5vw, 72px); }
+.admin-summary-section,
+.admin-orders-section,
+.admin-stock-section,
+.admin-status-section { margin-bottom: 42px; }
+.admin-summary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+.admin-summary-card { background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 20px; text-align: center; }
+.admin-summary-card strong { display: block; margin-bottom: 10px; font-size: .9rem; color: var(--accent); }
+.admin-summary-card span { font-size: 2rem; font-weight: 700; }
+.admin-controls { display: grid; grid-template-columns: 1fr 240px; gap: 16px; margin-bottom: 24px; }
+.admin-controls label { display: grid; gap: 8px; color: var(--text); }
+.admin-controls input,
+.admin-controls select { border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; background: #fffaf2; color: #2a2724; }
+.admin-table-wrap { overflow-x: auto; }
+.admin-orders-table,
+.admin-stock-table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.admin-orders-table th,
+.admin-orders-table td,
+.admin-stock-table th,
+.admin-stock-table td { border: 1px solid var(--line); padding: 14px 16px; text-align: left; }
+.admin-orders-table th,
+.admin-stock-table th { background: rgba(255,250,242,.8); }
+.admin-orders-table td button.order-action { margin-right: 8px; }
+.admin-stock-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.admin-stock-form-card,
+.admin-stock-list-card { background: var(--paper); border: 1px solid var(--line); border-radius: 28px; padding: 20px; }
+.admin-stock-form { display: grid; gap: 16px; }
+.admin-stock-row { display: grid; grid-template-columns: 1fr 1fr 120px auto; gap: 12px; align-items: end; }
+.admin-stock-row label { display: grid; gap: 8px; }
+.admin-stock-row input { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: #fffaf2; }
+.stock-search { display: grid; gap: 8px; margin: 18px 0; }
+.stock-search > label { font-weight: 700; }
+.stock-search-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
+.stock-search input,
+.stock-inline-input { border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: #fffaf2; color: #2a2724; }
+.stock-inline-input { width: 100px; }
+.stock-inline-save { white-space: nowrap; }
+.stock-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.admin-status-message { min-height: 1.8rem; margin-top: 12px; color: var(--text); font-weight: 700; }
+.admin-status-message.success { color: #1c6c4d; }
+.admin-status-message.error { color: #8b1a1a; }
+.admin-auth-shell { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.admin-auth-card { width: min(100%, 460px); background: var(--paper); border: 1px solid var(--line); border-radius: 28px; padding: clamp(24px, 5vw, 40px); box-shadow: var(--shadow); }
+.admin-auth-card h1 { margin-bottom: 8px; }
+.admin-auth-card > p:not(.eyebrow):not(.admin-auth-message) { color: var(--muted); }
+.admin-auth-form { display: grid; gap: 16px; margin-top: 24px; }
+.admin-auth-form label { display: grid; gap: 8px; }
+.admin-auth-form input { border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; background: #fffaf2; color: #2a2724; }
+.admin-auth-message { min-height: 1.5rem; margin-top: 16px; font-weight: 700; }
+.admin-auth-message.success { color: #1c6c4d; }
+.admin-auth-message.error { color: #8b1a1a; }
+.admin-identity { color: var(--muted); font-size: .9rem; }
+
+@media (max-width: 980px) {
+  .admin-controls { grid-template-columns: 1fr; }
+  .admin-stock-grid { grid-template-columns: 1fr; }
+  .admin-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-stock-row { grid-template-columns: 1fr; }
+  .stock-search-row { grid-template-columns: 1fr; }
+  .admin-orders-table,
+  .admin-stock-table { min-width: 100%; }
   .nav { display: none; }
   .nav.open { display: grid; position: absolute; top: 64px; left: 18px; right: 18px; padding: 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; box-shadow: var(--shadow); }
   .menu-button { display: block; }

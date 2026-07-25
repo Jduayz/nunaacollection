@@ -1,0 +1,5 @@
+{
+  "score": 5,
+  "summary": "Secure bootstrap rules: every Firestore mobile/web client read and write is denied. No collection or authority field exists yet, so there is no update bypass, privilege escalation path, unvalidated payload, ownership bypass, or resource-exhaustion write path.",
+  "findings": []
+}

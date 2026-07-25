@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Open Admin Page",
+			"type": "shell",
+			"command": "echo 'Open admin.html in browser or use Live Server extension'",
+			"isBackground": false
+		}
+	]
+}

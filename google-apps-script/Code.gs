@@ -8,7 +8,7 @@ const MAX_ITEMS_PER_ORDER = 10;
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const RATE_LIMITS = { createOrder: 5, reportPayment: 10, orderStatus: 20 };
 const PAYMENT_REVIEW_HOURS = 24;
-const FIREBASE_WEB_API_KEY = 'AIzaSyAnerxI4XATX9hombqmug67b1AZKJqfSOw';
+const FIREBASE_WEB_API_KEY_PROPERTY = 'FIREBASE_WEB_API_KEY';
 const FIREBASE_ADMIN_UIDS = ['gPorfKgdxKNiVKHUg4sMmkue2FU2'];
 const ADMIN_ACTIONS = ['adminOrders', 'updateOrderStatus', 'updateProductStock'];
 const ORDERS_HEADERS = [
@@ -156,8 +156,9 @@ function requireFirebaseAdmin(value) {
     throw new Error('กรุณาเข้าสู่ระบบผู้ดูแลอีกครั้ง');
   }
 
+  const firebaseWebApiKey = getFirebaseWebApiKey();
   const response = UrlFetchApp.fetch(
-    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(FIREBASE_WEB_API_KEY)}`,
+    `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${encodeURIComponent(firebaseWebApiKey)}`,
     {
       method: 'post',
       contentType: 'application/json',
@@ -177,6 +178,16 @@ function requireFirebaseAdmin(value) {
   }
 
   return user;
+}
+
+function getFirebaseWebApiKey() {
+  const value = String(
+    PropertiesService.getScriptProperties().getProperty(FIREBASE_WEB_API_KEY_PROPERTY) || ''
+  ).trim();
+  if (!/^AIza[0-9A-Za-z_-]{30,}$/.test(value)) {
+    throw new Error('ระบบผู้ดูแลยังตั้งค่า Firebase ไม่ครบ กรุณาติดต่อผู้ดูแลระบบ');
+  }
+  return value;
 }
 
 function enforceRateLimit(action, clientId) {

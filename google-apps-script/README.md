@@ -28,6 +28,14 @@ nn-001,Pumpkins crop top,250,Cotton • Chest 24"-36",assets/images/products/nn-
 
 ## 3. Deploy เป็น Web App
 
+ก่อน deploy ให้เปิด `Project Settings > Script Properties` แล้วเพิ่ม:
+
+```text
+FIREBASE_WEB_API_KEY = Firebase Web API key ของโปรเจกต์
+```
+
+ค่านี้ใช้เฉพาะฝั่ง Apps Script สำหรับตรวจ Firebase ID token และไม่ควรเขียนไว้ใน `Code.gs`
+
 1. กด `Deploy > New deployment`
 2. เลือก type เป็น `Web app`
 3. Execute as: `Me`

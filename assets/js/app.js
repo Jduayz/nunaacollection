@@ -596,6 +596,7 @@ const PENDING_ORDER_EXPIRY_MINUTES = 15;
 const CART_STORAGE_KEY = 'nunaaCartV1';
 const ACTIVE_ORDER_STORAGE_KEY = 'nunaaActiveOrderV1';
 const CLIENT_ID_STORAGE_KEY = 'nunaaClientIdV1';
+const PRODUCT_SORT_STORAGE_KEY = 'nunaaProductSortV1';
 let currentOrderId = '';
 let currentPendingExpiresAt = '';
 let submittedOrderSummary = '';
@@ -605,11 +606,16 @@ let isSubmittingOrder = false;
 let countdownTimer = null;
 
 const productGrid = document.querySelector('#productGrid');
+const productSortSelect = document.querySelector('#productSort');
 const cartItems = document.querySelector('#cartItems');
 const cartTotal = document.querySelector('#cartTotal');
 const cartShipping = document.querySelector('#cartShipping');
 const cartGrandTotal = document.querySelector('#cartGrandTotal');
 const cartCount = document.querySelector('#cartCount');
+const mobileCartBar = document.querySelector('#mobileCartBar');
+const mobileCartCount = document.querySelector('#mobileCartCount');
+const mobileCartTotal = document.querySelector('#mobileCartTotal');
+const backToTopButton = document.querySelector('#backToTopButton');
 const clearCartButton = document.querySelector('#clearCartButton');
 const menuButton = document.querySelector('.menu-button');
 const nav = document.querySelector('.nav');
@@ -641,6 +647,7 @@ const modalCloseControls = document.querySelectorAll('[data-modal-close]');
 const modalNavigationControls = document.querySelectorAll('[data-modal-direction]');
 let activeDetailProductId = null;
 let captchaWidgetId = null;
+let currentProductSort = localStorage.getItem(PRODUCT_SORT_STORAGE_KEY) || 'code';
 
 function getClientId() {
   try {
@@ -682,8 +689,12 @@ const translations = {
     'about.title': 'จุดเริ่มต้นจากงานฝีมือของคุณแม่และลูกสาว',
     'about.bodyOne': 'จุดเริ่มต้นเกิดจากคุณแม่ที่ชอบทำงานฝีมือและลูกสาวที่นำงานฝีมือของคุณแม่มาต่อยอดและสร้างสรรค์เป็นงาน ผ่านลวดลายบนกระเป๋าผ้าฝ้ายธรรมชาติที่ออกแบบร่วมกันกับคุณแม่ โดยเน้นไปที่รูปดอกไม้ต่าง ๆ โดยงานออกแบบทั้งหมดจะถูกวาดโดยไหมปักผ้า เส้นด้าย บนผืนผ้าสีขาว ทั้ง 2 มิติ และ 3 มิติ',
     'about.bodyTwo': 'งานเสื้อผ้าที่ออกแบบโดยลูกสาวและตัดเย็บทั้งหมดโดยคุณแม่ ทำควบคู่ไปกับกระเป๋าและเครื่องประดับคอเลกชันดอกไม้ เน้นไปที่ผ้าฝ้ายธรรมชาติ ผ้าลินิน เน้นงานออกแบบที่สวมใส่สบายและมีความน่ารัก โดยแนวคิดในการออกแบบคือ เสื้อผ้าสไตล์น่ารัก ๆ ที่คุณแม่อยากให้ลูกสาวได้ใส่',
-    'shop.eyebrow': 'New Collection',
     'shop.title': 'สินค้าพร้อมสั่งซื้อ',
+    'shop.sortLabel': 'เรียงสินค้า',
+    'shop.sortCode': 'รหัสสินค้า',
+    'shop.sortPriceAsc': 'ราคา: ถูกไปแพง',
+    'shop.sortPriceDesc': 'ราคา: แพงไปถูก',
+    'shop.sortAvailable': 'สินค้าที่มีในร้าน (สินค้าหมดอยู่หลังสุด)',
     'cart.eyebrow': 'Cart',
     'cart.title': 'ตะกร้าสินค้า',
     'cart.total': 'รวมค่าสินค้า',
@@ -762,6 +773,8 @@ const translations = {
     'cart.quantity': 'จำนวน',
     'cart.decrease': 'ลดจำนวน',
     'cart.increase': 'เพิ่มจำนวน',
+    'mobileCart.viewCart': 'ดูตะกร้า',
+    'utility.backToTop': 'กลับขึ้นด้านบน',
     'summary.orderIdPending': 'จะสร้างเมื่อยืนยันและจองสินค้า',
     'summary.items': 'รายการสินค้า',
     'summary.pendingExpires': 'ออเดอร์ pending หมดอายุ',
@@ -812,8 +825,12 @@ const translations = {
     'about.title': 'A mother and daughter story in handmade craft',
     'about.bodyOne': 'Nunaa.Collection began with a mother who loves handmade work and a daughter who helped turn that craft into thoughtful designs. Their early pieces focused on natural cotton bags decorated with floral embroidery, drawn with thread on white fabric in both two- and three-dimensional details.',
     'about.bodyTwo': 'Today the clothing is designed by the daughter and sewn by the mother, alongside bags and accessories from the floral collection. The pieces focus on natural cotton and linen, comfortable shapes, and a sweet feeling inspired by clothes a mother would love her daughter to wear.',
-    'shop.eyebrow': 'New Collection',
     'shop.title': 'Ready-to-order pieces',
+    'shop.sortLabel': 'Sort products',
+    'shop.sortCode': 'Product code',
+    'shop.sortPriceAsc': 'Price: low to high',
+    'shop.sortPriceDesc': 'Price: high to low',
+    'shop.sortAvailable': 'Available first (sold out last)',
     'cart.eyebrow': 'Cart',
     'cart.title': 'Shopping cart',
     'cart.total': 'Item total',
@@ -892,6 +909,8 @@ const translations = {
     'cart.quantity': 'Quantity',
     'cart.decrease': 'Decrease quantity',
     'cart.increase': 'Increase quantity',
+    'mobileCart.viewCart': 'View cart',
+    'utility.backToTop': 'Back to top',
     'summary.orderIdPending': 'created when you confirm and reserve items',
     'summary.items': 'Items',
     'summary.pendingExpires': 'Pending order expires',
@@ -942,8 +961,12 @@ const translations = {
     'about.title': '来自母女手作的开始',
     'about.bodyOne': 'Nunaa.Collection 的起点，是一位热爱手作的母亲，以及把妈妈的手艺延伸成设计的女儿。最初的作品以天然棉布包为主，并用刺绣线在白色布面上描绘花朵，呈现平面与立体的细节。',
     'about.bodyTwo': '现在，服装由女儿设计、母亲亲手缝制，同时也延续花朵系列的包款与配饰。作品以天然棉与亚麻为主，强调舒适版型和可爱的气质，灵感来自妈妈想让女儿穿上的温柔衣服。',
-    'shop.eyebrow': '新品系列',
     'shop.title': '可订购商品',
+    'shop.sortLabel': '商品排序',
+    'shop.sortCode': '商品编号',
+    'shop.sortPriceAsc': '价格：从低到高',
+    'shop.sortPriceDesc': '价格：从高到低',
+    'shop.sortAvailable': '有货优先（售罄置后）',
     'cart.eyebrow': '购物车',
     'cart.title': '购物车',
     'cart.total': '商品小计',
@@ -1022,6 +1045,8 @@ const translations = {
     'cart.quantity': '数量',
     'cart.decrease': '减少数量',
     'cart.increase': '增加数量',
+    'mobileCart.viewCart': '查看购物车',
+    'utility.backToTop': '返回顶部',
     'summary.orderIdPending': '确认并预留商品时生成',
     'summary.items': '商品列表',
     'summary.pendingExpires': '待确认订单过期时间',
@@ -1179,11 +1204,62 @@ function getProductAvailability(product) {
   return product.colors.some(color => isColorAvailable(product, color));
 }
 
-function formatStockText(product) {
+function getProductStockAvailability(product) {
+  return product.colors.some(color => !isStockManaged(color) || Number(color.stock) > 0);
+}
+
+function compareProductCodes(productA, productB) {
+  return String(productA.code).localeCompare(String(productB.code), 'en', {
+    numeric: true,
+    sensitivity: 'base'
+  });
+}
+
+function getSortedProducts() {
+  const sortedProducts = [...products];
+
+  if (currentProductSort === 'price-asc') {
+    return sortedProducts.sort((productA, productB) => (
+      Number(productA.price) - Number(productB.price) || compareProductCodes(productA, productB)
+    ));
+  }
+
+  if (currentProductSort === 'price-desc') {
+    return sortedProducts.sort((productA, productB) => (
+      Number(productB.price) - Number(productA.price) || compareProductCodes(productA, productB)
+    ));
+  }
+
+  if (currentProductSort === 'available') {
+    return sortedProducts.sort((productA, productB) => (
+      Number(getProductStockAvailability(productB)) - Number(getProductStockAvailability(productA))
+      || compareProductCodes(productA, productB)
+    ));
+  }
+
+  return sortedProducts.sort(compareProductCodes);
+}
+
+function getStockStatus(product) {
   const selectedColor = getSelectedColor(product);
-  if (!isStockManaged(selectedColor)) return t('product.ready');
+  if (!isStockManaged(selectedColor)) {
+    return { text: t('product.ready'), state: 'in-stock', remaining: null };
+  }
+
   const remaining = getRemainingStock(product, selectedColor);
-  return remaining > 0 ? t('product.remaining', { count: remaining }) : t('product.soldOut');
+  if (remaining <= 0) {
+    return { text: t('product.soldOut'), state: 'sold-out', remaining };
+  }
+
+  return {
+    text: t('product.remaining', { count: remaining }),
+    state: remaining <= 3 ? 'low-stock' : 'in-stock',
+    remaining
+  };
+}
+
+function formatStockText(product) {
+  return getStockStatus(product).text;
 }
 
 function findCartItem(code, colorName) {
@@ -1317,8 +1393,12 @@ function refreshProductStockDisplays() {
     if (!card) return;
 
     const stockStatus = card.querySelector('[data-stock-id]');
-    if (stockStatus) stockStatus.textContent = formatStockText(product);
-
+    const stockInfo = getStockStatus(product);
+    if (stockStatus) {
+      stockStatus.textContent = stockInfo.text;
+      stockStatus.className = `stock-status ${stockInfo.state}`;
+      stockStatus.dataset.stockState = stockInfo.state;
+    }
     card.querySelectorAll('.color-swatch').forEach(swatch => {
       const color = product.colors[Number(swatch.dataset.colorIndex)];
       swatch.disabled = !isColorAvailable(product, color);
@@ -1672,24 +1752,29 @@ async function loadProductsFromSheet() {
 }
 
 function renderProducts() {
-  productGrid.innerHTML = products.map(product => `
-    <article class="product-card${getProductAvailability(product) ? '' : ' sold-out'}" data-product-id="${product.id}">
-      <button class="product-image product-detail-trigger" type="button" data-id="${product.id}" data-detail-label="${t('product.viewDetails')}" aria-label="${t('product.viewDetails')} ${product.name}">
-        <img src="${getProductImageUrl(product.image)}" alt="${product.name}" loading="lazy">
-      </button>
-      <div class="product-meta">
-        <div>
-          <span class="product-code">${product.code}</span>
-          <h3>${product.name}</h3>
-          <p>${product.detail}</p>
+  productGrid.innerHTML = getSortedProducts().map(product => {
+    const stockInfo = getStockStatus(product);
+    return `
+      <article class="product-card${getProductAvailability(product) ? '' : ' sold-out'}" data-product-id="${product.id}">
+        <button class="product-image product-detail-trigger" type="button" data-id="${product.id}" data-detail-label="${t('product.viewDetails')}" aria-label="${t('product.viewDetails')} ${product.name}">
+          <img src="${getProductImageUrl(product.image)}" alt="${product.name}" loading="lazy">
+        </button>
+        <div class="product-meta">
+          <div>
+            <span class="product-code">${product.code}</span>
+            <h3>${product.name}</h3>
+            <p>${product.detail}</p>
+          </div>
+          <strong>${formatter.format(product.price)}</strong>
         </div>
-        <strong>${formatter.format(product.price)}</strong>
-      </div>
-      <p class="stock-status" data-stock-id="${product.id}">${formatStockText(product)}</p>
-      ${renderProductSelector(product, 'card')}
-      <button class="button primary add-cart" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
-    </article>
-  `).join('');
+        <div class="stock-meta">
+          <p class="stock-status ${stockInfo.state}" data-stock-id="${product.id}" data-stock-state="${stockInfo.state}">${stockInfo.text}</p>
+        </div>
+        ${renderProductSelector(product, 'card')}
+        <button class="button primary add-cart" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
+      </article>
+    `;
+  }).join('');
 }
 
 function renderCart() {
@@ -1718,6 +1803,14 @@ function renderCart() {
   cartShipping.textContent = shippingInfo.label;
   cartGrandTotal.textContent = shippingInfo.grandTotalLabel;
   cartCount.textContent = itemCount;
+  if (mobileCartBar && mobileCartCount && mobileCartTotal) {
+    const hasItems = itemCount > 0;
+    mobileCartCount.textContent = itemCount;
+    mobileCartTotal.textContent = formatter.format(subtotal);
+    mobileCartBar.hidden = !hasItems;
+    mobileCartBar.classList.toggle('has-items', hasItems);
+    document.body.classList.toggle('mobile-cart-active', hasItems);
+  }
   clearCartButton.disabled = cart.length === 0;
   saveCart();
   renderOrderSummary();
@@ -1726,7 +1819,7 @@ function renderCart() {
 function renderProductDetail(product) {
   if (!productModalContent) return;
 
-  const selectedColor = getSelectedColor(product);
+  const stockInfo = getStockStatus(product);
   productModalContent.innerHTML = `
     <article class="product-detail" data-product-id="${product.id}">
       <div class="product-detail-image">
@@ -1737,9 +1830,11 @@ function renderProductDetail(product) {
         <h3 id="productModalTitle">${product.name}</h3>
         <strong class="product-detail-price">${formatter.format(product.price)}</strong>
         <p>${product.detail}</p>
-        <p class="stock-status" data-detail-stock-id="${product.id}">
-          ${isStockManaged(selectedColor) ? formatStockText(product) : t('product.ready')}
-        </p>
+        <div class="stock-meta detail-stock-meta">
+          <p class="stock-status ${stockInfo.state}" data-detail-stock-id="${product.id}" data-stock-state="${stockInfo.state}">
+            ${stockInfo.text}
+          </p>
+        </div>
         ${renderProductSelector(product, 'modal')}
         <button class="button primary modal-add-cart" type="button" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
       </div>
@@ -1757,9 +1852,10 @@ function openProductDetail(product) {
 
 function navigateProductDetail(direction) {
   if (!products.length || activeDetailProductId === null) return;
-  const currentIndex = products.findIndex(product => product.id === activeDetailProductId);
-  const nextIndex = (currentIndex + direction + products.length) % products.length;
-  const nextProduct = products[nextIndex];
+  const sortedProducts = getSortedProducts();
+  const currentIndex = sortedProducts.findIndex(product => product.id === activeDetailProductId);
+  const nextIndex = (currentIndex + direction + sortedProducts.length) % sortedProducts.length;
+  const nextProduct = sortedProducts[nextIndex];
   activeDetailProductId = nextProduct.id;
   renderProductDetail(nextProduct);
 }
@@ -2177,6 +2273,12 @@ languageButtons.forEach(button => {
   });
 });
 
+productSortSelect?.addEventListener('change', () => {
+  currentProductSort = productSortSelect.value;
+  localStorage.setItem(PRODUCT_SORT_STORAGE_KEY, currentProductSort);
+  renderProducts();
+});
+
 checkoutForm.addEventListener('input', () => {
   resetPendingOrderDraft();
   copyStatus.textContent = '';
@@ -2267,6 +2369,18 @@ copyOrderIdButton.addEventListener('click', async () => {
   copyStatus.textContent = copied ? t('status.orderIdCopied') : t('status.copyUnavailable');
 });
 
+function updateBackToTopVisibility() {
+  if (!backToTopButton) return;
+  backToTopButton.classList.toggle('visible', window.scrollY > 520);
+}
+
+backToTopButton?.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+window.addEventListener('scroll', updateBackToTopVisibility, { passive: true });
+updateBackToTopVisibility();
+
 orderStatusForm?.addEventListener('submit', async event => {
   event.preventDefault();
   const orderId = statusOrderId.value.trim().toUpperCase();
@@ -2288,6 +2402,10 @@ orderStatusForm?.addEventListener('submit', async event => {
 
 async function init() {
   if (!translations[currentLanguage]) currentLanguage = 'th';
+  if (!['code', 'price-asc', 'price-desc', 'available'].includes(currentProductSort)) {
+    currentProductSort = 'code';
+  }
+  if (productSortSelect) productSortSelect.value = currentProductSort;
   setupCaptcha();
   await loadProductsFromSheet();
   restoreCart();

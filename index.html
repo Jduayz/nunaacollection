@@ -10,7 +10,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nunaacollection.com" />
   <link rel="canonical" href="https://nunaacollection.com" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20260721-products" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260726-mobile-nav" />
 </head>
 <body>
   <header class="site-header">
@@ -57,8 +57,16 @@
 
     <section id="shop" class="section">
       <div class="section-heading">
-        <p class="eyebrow" data-i18n="shop.eyebrow">New Collection</p>
         <h2 data-i18n="shop.title">สินค้าพร้อมสั่งซื้อ</h2>
+      </div>
+      <div class="shop-toolbar">
+        <label for="productSort" data-i18n="shop.sortLabel">เรียงสินค้า</label>
+        <select id="productSort">
+          <option value="code" data-i18n="shop.sortCode">รหัสสินค้า</option>
+          <option value="price-asc" data-i18n="shop.sortPriceAsc">ราคา: ถูกไปแพง</option>
+          <option value="price-desc" data-i18n="shop.sortPriceDesc">ราคา: แพงไปถูก</option>
+          <option value="available" data-i18n="shop.sortAvailable">สินค้าที่มีในร้าน (สินค้าหมดอยู่หลังสุด)</option>
+        </select>
       </div>
       <div class="product-grid" id="productGrid"></div>
     </section>
@@ -195,6 +203,23 @@
     </section>
   </main>
 
+  <a class="mobile-cart-bar" id="mobileCartBar" href="#cart" hidden>
+    <span class="mobile-cart-summary">
+      <span data-i18n="mobileCart.viewCart">ดูตะกร้า</span>
+      <span id="mobileCartCount" class="mobile-cart-count">0</span>
+    </span>
+    <strong id="mobileCartTotal">฿0</strong>
+  </a>
+
+  <button
+    class="back-to-top"
+    id="backToTopButton"
+    type="button"
+    data-i18n-aria="utility.backToTop"
+    aria-label="กลับขึ้นด้านบน"
+    title="กลับขึ้นด้านบน"
+  >↑</button>
+
   <div class="product-modal" id="productModal" aria-hidden="true">
     <div class="product-modal-backdrop" data-modal-close></div>
     <div class="product-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="productModalTitle">
@@ -212,6 +237,6 @@
   </footer>
 
   <script src="assets/js/config.js?v=20260711-new-sheets-url"></script>
-  <script src="assets/js/app.js?v=20260721-products-4"></script>
+  <script src="assets/js/app.js?v=20260726-mobile-nav"></script>
 </body>
 </html>

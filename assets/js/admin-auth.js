@@ -4,7 +4,7 @@ import {
   signInAdmin,
   signOutAdmin,
   verifyAdminEmail
-} from './firebase-client.js?v=20260725-4';
+} from './firebase-client.js?v=20260726-1';
 
 const adminConfig = window.NUNAA_CONFIG || {};
 const allowedAdminUids = Array.isArray(adminConfig.firebaseAdminUids)
@@ -45,7 +45,7 @@ async function showSignedInState(user) {
 
   if (!adminAppLoaded) {
     adminAppLoaded = true;
-    await import('./admin.js?v=20260725-4');
+    await import('./admin.js?v=20260726-1');
   }
 }
 

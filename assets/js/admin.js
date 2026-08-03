@@ -1,4 +1,4 @@
-import { getAdminIdToken } from './firebase-client.js?v=20260725-4';
+import { getAdminIdToken } from './firebase-client.js?v=20260726-1';
 
 const adminConfig = window.NUNAA_CONFIG || {};
 const adminSummary = document.getElementById('adminSummary');
@@ -6,6 +6,14 @@ const refreshAdminButton = document.getElementById('refreshAdminButton');
 const orderSearchInput = document.getElementById('orderSearchInput');
 const orderStatusFilter = document.getElementById('orderStatusFilter');
 const adminOrdersBody = document.getElementById('adminOrdersBody');
+const posOrderForm = document.getElementById('posOrderForm');
+const posOrderRows = document.getElementById('posOrderRows');
+const addPosOrderRowButton = document.getElementById('addPosOrderRowButton');
+const posCustomerName = document.getElementById('posCustomerName');
+const posPaymentMethod = document.getElementById('posPaymentMethod');
+const posOrderNote = document.getElementById('posOrderNote');
+const posOrderTotal = document.getElementById('posOrderTotal');
+const submitPosOrderButton = document.getElementById('submitPosOrderButton');
 const adminStockBody = document.getElementById('adminStockBody');
 const stockSearchInput = document.getElementById('stockSearchInput');
 const clearStockSearchButton = document.getElementById('clearStockSearchButton');
@@ -16,6 +24,7 @@ const adminStatusMessage = document.getElementById('adminStatusMessage');
 
 let adminOrders = [];
 let adminProducts = [];
+let currentPosOrderId = '';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -65,6 +74,122 @@ function showAdminMessage(message, type = 'info') {
   }
 }
 
+function formatMoney(value) {
+  return new Intl.NumberFormat('th-TH', {
+    style: 'currency',
+    currency: 'THB',
+    maximumFractionDigits: 0
+  }).format(Number(value || 0));
+}
+
+function createAdminOrderId() {
+  const now = new Date();
+  const pad = value => String(value).padStart(2, '0');
+  const date = [
+    now.getFullYear(),
+    pad(now.getMonth() + 1),
+    pad(now.getDate())
+  ].join('');
+  const time = [pad(now.getHours()), pad(now.getMinutes()), pad(now.getSeconds())].join('');
+  const random = Math.random().toString(36).slice(2, 6).toUpperCase().padEnd(4, '0');
+  return `NUNAA-${date}-${time}-${random}`;
+}
+
+function updatePosOrderTotal() {
+  const total = Array.from(posOrderRows.querySelectorAll('.pos-order-row')).reduce((sum, row) => {
+    const product = adminProducts.find(item => item.code === row.querySelector('[name="posCode"]').value);
+    const quantity = Number(row.querySelector('[name="posQuantity"]').value || 0);
+    return sum + (Number(product?.price || 0) * quantity);
+  }, 0);
+  posOrderTotal.textContent = formatMoney(total);
+}
+
+function updatePosColorOptions(row) {
+  const productSelect = row.querySelector('[name="posCode"]');
+  const colorSelect = row.querySelector('[name="posColor"]');
+  const product = adminProducts.find(item => item.code === productSelect.value);
+  const previousColor = colorSelect.value;
+  colorSelect.innerHTML = '';
+
+  (product?.colors || []).forEach(color => {
+    const option = document.createElement('option');
+    const stock = Number(color.stock || 0);
+    option.value = color.name;
+    option.textContent = `${color.name} (เหลือ ${stock})`;
+    option.disabled = stock < 1;
+    colorSelect.appendChild(option);
+  });
+
+  const availableColor = (product?.colors || []).find(color => (
+    color.name === previousColor && Number(color.stock || 0) > 0
+  ))
+    || (product?.colors || []).find(color => Number(color.stock || 0) > 0);
+  if (availableColor) colorSelect.value = availableColor.name;
+  updatePosQuantityLimit(row);
+}
+
+function updatePosQuantityLimit(row) {
+  const productSelect = row.querySelector('[name="posCode"]');
+  const colorSelect = row.querySelector('[name="posColor"]');
+  const quantityInput = row.querySelector('[name="posQuantity"]');
+  const product = adminProducts.find(item => item.code === productSelect.value);
+  const availableColor = (product?.colors || []).find(color => color.name === colorSelect.value);
+  const stock = Number(availableColor?.stock || 0);
+  quantityInput.max = String(Math.min(10, stock));
+  if (Number(quantityInput.value) > stock) quantityInput.value = stock ? '1' : '0';
+  updatePosOrderTotal();
+}
+
+function createPosOrderRow() {
+  const row = document.createElement('div');
+  row.className = 'pos-order-row';
+  row.innerHTML = `
+    <label>
+      สินค้า
+      <select name="posCode" required></select>
+    </label>
+    <label>
+      สี
+      <select name="posColor" required></select>
+    </label>
+    <label>
+      จำนวน
+      <input name="posQuantity" type="number" min="1" max="10" value="1" required />
+    </label>
+    <button class="button ghost remove-pos-row" type="button">ลบ</button>
+  `;
+
+  const productSelect = row.querySelector('[name="posCode"]');
+  adminProducts.forEach(product => {
+    const option = document.createElement('option');
+    option.value = product.code;
+    option.textContent = `${product.code} — ${product.name} (${formatMoney(product.price)})`;
+    productSelect.appendChild(option);
+  });
+
+  productSelect.addEventListener('change', () => updatePosColorOptions(row));
+  row.querySelector('[name="posColor"]').addEventListener('change', () => updatePosQuantityLimit(row));
+  row.querySelector('[name="posQuantity"]').addEventListener('input', updatePosOrderTotal);
+  row.querySelector('.remove-pos-row').addEventListener('click', () => {
+    row.remove();
+    if (!posOrderRows.children.length) createPosOrderRow();
+    updatePosOrderTotal();
+  });
+
+  posOrderRows.appendChild(row);
+  updatePosColorOptions(row);
+}
+
+function resetPosOrderForm() {
+  posOrderRows.innerHTML = '';
+  posCustomerName.value = '';
+  posOrderNote.value = '';
+  posPaymentMethod.value = 'cash';
+  currentPosOrderId = '';
+  createPosOrderRow();
+  updatePosOrderTotal();
+}
+
 function createStockRow(item = {}) {
   const row = document.createElement('div');
   row.className = 'admin-stock-row';
@@ -110,7 +235,10 @@ function renderOrders() {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHtml(order.orderId)}</td>
-      <td>${escapeHtml(order.customerName || '-')}<br><small>${escapeHtml(order.phone || '')}</small></td>
+      <td>
+        ${escapeHtml(order.customerName || '-')}
+        ${order.orderSource === 'pos' ? '<br><small>ขายหน้าร้าน</small>' : `<br><small>${escapeHtml(order.phone || '')}</small>`}
+      </td>
       <td>${escapeHtml(order.status)}</td>
       <td>฿${escapeHtml(order.total)}</td>
       <td>${formatDateTime(order.createdAt)}</td>
@@ -265,8 +393,45 @@ clearStockSearchButton.addEventListener('click', () => {
   renderStockList();
   stockSearchInput.focus();
 });
+addPosOrderRowButton.addEventListener('click', createPosOrderRow);
 refreshAdminButton.addEventListener('click', () => fetchAdminData().catch(error => showAdminMessage(error.message, 'error')));
 addStockRowButton.addEventListener('click', () => createStockRow());
+
+posOrderForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  const rows = Array.from(posOrderRows.querySelectorAll('.pos-order-row'));
+  const items = rows.map(row => ({
+    code: row.querySelector('[name="posCode"]').value,
+    colorName: row.querySelector('[name="posColor"]').value,
+    quantity: Number(row.querySelector('[name="posQuantity"]').value)
+  }));
+
+  if (items.some(item => !item.code || !item.colorName || !Number.isInteger(item.quantity) || item.quantity < 1)) {
+    showAdminMessage('กรุณาเลือกสินค้า สี และจำนวนให้ครบถ้วน', 'error');
+    return;
+  }
+
+  if (!currentPosOrderId) currentPosOrderId = createAdminOrderId();
+  submitPosOrderButton.disabled = true;
+  submitPosOrderButton.textContent = 'กำลังบันทึก...';
+  try {
+    const result = await adminRequest('createPosOrder', {
+      orderId: currentPosOrderId,
+      customerName: posCustomerName.value.trim(),
+      paymentMethod: posPaymentMethod.value,
+      note: posOrderNote.value.trim(),
+      items
+    });
+    showAdminMessage(`บันทึกออเดอร์หน้าร้าน ${result.orderId} ยอด ${formatMoney(result.total)} และตัดสต็อกแล้ว`, 'success');
+    await fetchAdminData();
+    resetPosOrderForm();
+  } catch (error) {
+    showAdminMessage(error.message || 'สร้างออเดอร์หน้าร้านไม่สำเร็จ', 'error');
+  } finally {
+    submitPosOrderButton.disabled = false;
+    submitPosOrderButton.textContent = 'บันทึกการขายและตัดสต็อก';
+  }
+});
 
 stockUpdateForm.addEventListener('submit', async event => {
   event.preventDefault();
@@ -291,6 +456,7 @@ stockUpdateForm.addEventListener('submit', async event => {
 async function initAdmin() {
   createStockRow();
   await fetchAdminData();
+  createPosOrderRow();
 }
 
 initAdmin().catch(error => {

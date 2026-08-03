@@ -57,6 +57,45 @@
       <div class="admin-summary" id="adminSummary">กำลังโหลดข้อมูล...</div>
     </section>
 
+    <section class="section admin-pos-section">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Point of Sale</p>
+          <h2>ขายหน้าร้าน</h2>
+        </div>
+      </div>
+      <form id="posOrderForm" class="admin-pos-card">
+        <div class="form-heading">
+          <h3>สร้างออเดอร์หน้าร้าน</h3>
+          <p>ออเดอร์จะถูกบันทึกเป็นชำระแล้วและตัดสต็อกทันที</p>
+        </div>
+        <div id="posOrderRows" class="pos-order-rows"></div>
+        <button id="addPosOrderRowButton" class="button ghost" type="button">เพิ่มสินค้า</button>
+        <div class="pos-order-details">
+          <label>
+            ชื่อลูกค้า (ไม่จำเป็น)
+            <input id="posCustomerName" type="text" maxlength="120" placeholder="ลูกค้าหน้าร้าน" />
+          </label>
+          <label>
+            ช่องทางชำระเงิน
+            <select id="posPaymentMethod" required>
+              <option value="cash">เงินสด</option>
+              <option value="transfer">โอนเงิน</option>
+              <option value="other">อื่น ๆ</option>
+            </select>
+          </label>
+          <label>
+            หมายเหตุ (ไม่จำเป็น)
+            <input id="posOrderNote" type="text" maxlength="500" placeholder="เช่น พนักงานขาย หรือรายละเอียดเพิ่มเติม" />
+          </label>
+        </div>
+        <div class="pos-order-footer">
+          <strong>ยอดรวม <span id="posOrderTotal">฿0</span></strong>
+          <button id="submitPosOrderButton" class="button primary" type="submit">บันทึกการขายและตัดสต็อก</button>
+        </div>
+      </form>
+    </section>
+
     <section class="section admin-orders-section">
       <div class="section-heading">
         <div>
@@ -161,6 +200,6 @@
   </main>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/admin-auth.js?v=20260725-4"></script>
+  <script type="module" src="assets/js/admin-auth.js?v=20260726-1"></script>
 </body>
 </html>

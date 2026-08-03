@@ -10,7 +10,7 @@ const RATE_LIMITS = { createOrder: 5, reportPayment: 10, orderStatus: 20 };
 const PAYMENT_REVIEW_HOURS = 24;
 const FIREBASE_WEB_API_KEY_PROPERTY = 'FIREBASE_WEB_API_KEY';
 const FIREBASE_ADMIN_UIDS = ['gPorfKgdxKNiVKHUg4sMmkue2FU2'];
-const ADMIN_ACTIONS = ['adminOrders', 'updateOrderStatus', 'updateProductStock'];
+const ADMIN_ACTIONS = ['adminOrders', 'createPosOrder', 'updateOrderStatus', 'updateProductStock'];
 const ORDERS_HEADERS = [
   'createdAt',
   'orderId',
@@ -27,7 +27,9 @@ const ORDERS_HEADERS = [
   'note',
   'items',
   'total',
-  'summary'
+  'summary',
+  'orderSource',
+  'paymentMethod'
 ];
 
 const FLOWER_VARIANT_PRODUCTS = [
@@ -134,6 +136,8 @@ function doPost(event) {
     let result;
     if (action === 'adminOrders') {
       result = { ok: true, orders: getAdminOrders(), products: getProducts() };
+    } else if (action === 'createPosOrder') {
+      result = createPosOrder(payload);
     } else if (action === 'reportPayment') {
       result = reportPayment(payload);
     } else if (action === 'updateOrderStatus') {
@@ -586,6 +590,122 @@ function createOrder(payload) {
   } finally {
     lock.releaseLock();
   }
+}
+
+function createPosOrder(payload) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    ensureNn013CombinationVariants();
+    ensureNn015SizeVariants();
+    ensureFlowerProductsAreVariants();
+    ensureNn027BlueVariant();
+    expirePendingOrders();
+
+    const orderId = payload.orderId ? validateOrderId(payload.orderId) : createOrderId();
+    const ordersSheet = getOrCreateOrdersSheet();
+    const existingOrder = findOrderById(ordersSheet, orderId);
+    if (existingOrder) {
+      if (String(existingOrder.orderSource || '').toLowerCase() !== 'pos') {
+        throw new Error(`Order ID ${orderId} ถูกใช้งานแล้ว`);
+      }
+      return {
+        ok: true,
+        orderId,
+        status: String(existingOrder.status || 'paid').toLowerCase(),
+        duplicate: true,
+        total: Number(existingOrder.total || 0),
+        products: getProducts()
+      };
+    }
+
+    const reservation = prepareStockReservation(payload.items || []);
+    const subtotal = reservation.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const customerName = String(payload.customerName || '').trim().slice(0, 120) || 'ลูกค้าหน้าร้าน';
+    const note = String(payload.note || '').trim().slice(0, 500);
+    const paymentMethod = normalizePosPaymentMethod(payload.paymentMethod);
+    const summary = buildPosOrderSummary(orderId, customerName, reservation.items, subtotal, paymentMethod, note);
+
+    reduceStock(reservation.items);
+    try {
+      appendPaidPosOrder(ordersSheet, {
+        orderId,
+        customerName,
+        note,
+        items: reservation.items,
+        total: subtotal,
+        summary,
+        paymentMethod
+      });
+    } catch (error) {
+      restoreStock(reservation.items);
+      throw error;
+    }
+
+    return {
+      ok: true,
+      orderId,
+      status: 'paid',
+      subtotal,
+      total: subtotal,
+      products: getProducts()
+    };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function normalizePosPaymentMethod(value) {
+  const paymentMethod = String(value || '').trim().toLowerCase();
+  if (!['cash', 'transfer', 'other'].includes(paymentMethod)) {
+    throw new Error('กรุณาเลือกช่องทางชำระเงิน');
+  }
+  return paymentMethod;
+}
+
+function buildPosOrderSummary(orderId, customerName, items, total, paymentMethod, note) {
+  const paymentLabels = { cash: 'เงินสด', transfer: 'โอนเงิน', other: 'อื่น ๆ' };
+  const itemLines = items.map((item, index) => (
+    `${index + 1}. ${item.code} • ${item.name} • สี ${item.colorName} x ${item.quantity} - ฿${item.price * item.quantity}`
+  ));
+  return [
+    'Nunaa.Collection POS Order',
+    `Order ID: ${orderId}`,
+    '',
+    'รายการสินค้า',
+    ...itemLines,
+    `ยอดรวมสุทธิ: ฿${total}`,
+    `ชำระด้วย: ${paymentLabels[paymentMethod]}`,
+    `ลูกค้า: ${customerName}`,
+    `หมายเหตุ: ${note || '-'}`
+  ].join('\n');
+}
+
+function appendPaidPosOrder(sheet, order) {
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0].map(String);
+  const now = new Date();
+  const values = {
+    createdAt: now,
+    orderId: order.orderId,
+    status: 'paid',
+    expiresAt: '',
+    stockDeducted: true,
+    paidAt: now,
+    paymentReportedAt: '',
+    customerName: sanitizeSheetText(order.customerName),
+    phone: '',
+    address: '',
+    province: '',
+    postal: '',
+    note: sanitizeSheetText(order.note),
+    items: JSON.stringify(order.items),
+    total: Number(order.total || 0),
+    summary: order.summary || '',
+    orderSource: 'pos',
+    paymentMethod: order.paymentMethod
+  };
+  sheet.appendRow(headers.map(header => values[header] === undefined ? '' : values[header]));
 }
 
 function reportPayment(payload) {

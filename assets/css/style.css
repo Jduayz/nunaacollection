@@ -802,6 +802,7 @@ button.product-image:focus-visible::after {
 .admin-header { justify-content: space-between; padding: 18px clamp(18px, 5vw, 72px); }
 .admin-panel { max-width: 1200px; margin: 0 auto 72px; padding: 0 clamp(18px, 5vw, 72px); }
 .admin-summary-section,
+.admin-pos-section,
 .admin-orders-section,
 .admin-stock-section,
 .admin-status-section { margin-bottom: 42px; }
@@ -809,6 +810,18 @@ button.product-image:focus-visible::after {
 .admin-summary-card { background: var(--paper); border: 1px solid var(--line); border-radius: 20px; padding: 20px; text-align: center; }
 .admin-summary-card strong { display: block; margin-bottom: 10px; font-size: .9rem; color: var(--accent); }
 .admin-summary-card span { font-size: 2rem; font-weight: 700; }
+.admin-pos-card { display: grid; gap: 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 28px; padding: 20px; }
+.pos-order-rows { display: grid; gap: 12px; }
+.pos-order-row { display: grid; grid-template-columns: minmax(220px, 2fr) minmax(150px, 1fr) 100px auto; gap: 12px; align-items: end; }
+.pos-order-row label,
+.pos-order-details label { display: grid; gap: 8px; }
+.pos-order-row input,
+.pos-order-row select,
+.pos-order-details input,
+.pos-order-details select { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: #fffaf2; color: #2a2724; }
+.pos-order-details { display: grid; grid-template-columns: 1fr 220px 1fr; gap: 12px; }
+.pos-order-footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 4px; }
+.pos-order-footer strong { font-size: 1.25rem; }
 .admin-controls { display: grid; grid-template-columns: 1fr 240px; gap: 16px; margin-bottom: 24px; }
 .admin-controls label { display: grid; gap: 8px; color: var(--text); }
 .admin-controls input,
@@ -907,6 +920,8 @@ button.product-image:focus-visible::after {
   .admin-stock-grid { grid-template-columns: 1fr; }
   .admin-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-stock-row { grid-template-columns: 1fr; }
+  .pos-order-row,
+  .pos-order-details { grid-template-columns: 1fr; }
   .stock-search-row { grid-template-columns: 1fr; }
   .admin-orders-table,
   .admin-stock-table { min-width: 100%; }

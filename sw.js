@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nunaa-admin-v3';
+const CACHE_NAME = 'nunaa-admin-v4';
 const APP_SHELL = [
   '/admin',
   '/manifest.webmanifest',

@@ -643,9 +643,14 @@ const orderStatusResult = document.querySelector('#orderStatusResult');
 const languageButtons = document.querySelectorAll('.language-button');
 const productModal = document.querySelector('#productModal');
 const productModalContent = document.querySelector('#productModalContent');
+const productModalDialog = document.querySelector('.product-modal-dialog');
+const modalSwipeHint = document.querySelector('#modalSwipeHint');
 const modalCloseControls = document.querySelectorAll('[data-modal-close]');
 const modalNavigationControls = document.querySelectorAll('[data-modal-direction]');
 let activeDetailProductId = null;
+let productTouchStart = null;
+let swipeHintShown = false;
+let swipeHintTimer = null;
 let captchaWidgetId = null;
 let currentProductSort = localStorage.getItem(PRODUCT_SORT_STORAGE_KEY) || 'code';
 
@@ -765,6 +770,7 @@ const translations = {
     'product.previous': 'สินค้าก่อนหน้า',
     'product.next': 'สินค้าถัดไป',
     'product.details': 'รายละเอียดสินค้า',
+    'product.swipeHint': '↔ ปัดซ้าย–ขวาเพื่อดูสินค้าอื่น',
     'product.soldOut': 'สินค้าหมด',
     'product.ready': 'พร้อมสั่งซื้อ',
     'product.remaining': 'เหลือ {count} ชิ้น',
@@ -901,6 +907,7 @@ const translations = {
     'product.previous': 'Previous product',
     'product.next': 'Next product',
     'product.details': 'Product details',
+    'product.swipeHint': '↔ Swipe left or right for more products',
     'product.soldOut': 'Sold out',
     'product.ready': 'Ready to order',
     'product.remaining': '{count} left',
@@ -1037,6 +1044,7 @@ const translations = {
     'product.previous': '上一个商品',
     'product.next': '下一个商品',
     'product.details': '商品详情',
+    'product.swipeHint': '↔ 左右滑动查看更多商品',
     'product.soldOut': '售罄',
     'product.ready': '可订购',
     'product.remaining': '剩余 {count} 件',
@@ -1847,6 +1855,11 @@ function openProductDetail(product) {
   renderProductDetail(product);
   productModal.classList.add('open');
   productModal.setAttribute('aria-hidden', 'false');
+  if (!swipeHintShown && window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+    swipeHintShown = true;
+    modalSwipeHint?.classList.add('visible');
+    swipeHintTimer = window.setTimeout(() => modalSwipeHint?.classList.remove('visible'), 3200);
+  }
   productModal.querySelector('.modal-close')?.focus();
 }
 
@@ -1858,6 +1871,10 @@ function navigateProductDetail(direction) {
   const nextProduct = sortedProducts[nextIndex];
   activeDetailProductId = nextProduct.id;
   renderProductDetail(nextProduct);
+  productModalDialog?.scrollTo({ top: 0 });
+  productModalContent.classList.remove('swipe-next', 'swipe-previous');
+  void productModalContent.offsetWidth;
+  productModalContent.classList.add(direction > 0 ? 'swipe-next' : 'swipe-previous');
 }
 
 function closeProductDetail() {
@@ -1865,6 +1882,10 @@ function closeProductDetail() {
   productModal.classList.remove('open');
   productModal.setAttribute('aria-hidden', 'true');
   productModalContent.innerHTML = '';
+  productTouchStart = null;
+  if (swipeHintTimer) window.clearTimeout(swipeHintTimer);
+  swipeHintTimer = null;
+  modalSwipeHint?.classList.remove('visible');
 }
 
 function buildOrderSummary() {
@@ -2198,6 +2219,44 @@ productModal.addEventListener('click', event => {
   const product = products.find(item => item.id === Number(addButton.dataset.id));
   if (product) addProductToCart(product, addButton);
 });
+
+productModalContent.addEventListener('touchstart', event => {
+  const target = event.target instanceof Element ? event.target : null;
+  const isInteractive = target?.closest('button, a, input, select, textarea, label');
+  if (event.touches.length !== 1 || isInteractive) {
+    productTouchStart = null;
+    return;
+  }
+
+  const touch = event.touches[0];
+  productTouchStart = {
+    x: touch.clientX,
+    y: touch.clientY,
+    startedAt: Date.now()
+  };
+}, { passive: true });
+
+productModalContent.addEventListener('touchend', event => {
+  if (!productTouchStart || event.changedTouches.length !== 1) {
+    productTouchStart = null;
+    return;
+  }
+
+  const touch = event.changedTouches[0];
+  const deltaX = touch.clientX - productTouchStart.x;
+  const deltaY = touch.clientY - productTouchStart.y;
+  const duration = Date.now() - productTouchStart.startedAt;
+  productTouchStart = null;
+
+  const isHorizontalSwipe = Math.abs(deltaX) >= 56 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25;
+  if (!isHorizontalSwipe || duration > 900 || !productModal.classList.contains('open')) return;
+
+  navigateProductDetail(deltaX < 0 ? 1 : -1);
+}, { passive: true });
+
+productModalContent.addEventListener('touchcancel', () => {
+  productTouchStart = null;
+}, { passive: true });
 
 modalCloseControls.forEach(control => {
   control.addEventListener('click', closeProductDetail);

@@ -536,6 +536,7 @@ button.product-image:focus-visible::after {
   width: min(960px, 100%);
   max-height: min(760px, calc(100vh - 32px));
   overflow: auto;
+  overflow-x: hidden;
   border: 1px solid var(--line);
   border-radius: 24px;
   background: var(--paper);
@@ -582,6 +583,49 @@ button.product-image:focus-visible::after {
 .modal-nav:focus-visible { background: #fff; transform: translateY(-50%) scale(1.06); }
 .modal-prev { left: 12px; }
 .modal-next { right: 12px; }
+.modal-swipe-hint {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  z-index: 4;
+  display: none;
+  margin: 0;
+  padding: 8px 13px;
+  border: 1px solid rgba(255, 250, 242, .42);
+  border-radius: 999px;
+  background: rgba(42, 33, 27, .82);
+  color: #fffaf2;
+  box-shadow: 0 8px 24px rgba(42, 33, 27, .18);
+  font-size: .76rem;
+  font-weight: 800;
+  line-height: 1.2;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -8px);
+  transition: opacity .2s ease, transform .2s ease;
+  white-space: nowrap;
+}
+.modal-swipe-hint.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+#productModalContent.swipe-next {
+  animation: productSwipeNext .22s ease-out;
+}
+#productModalContent {
+  touch-action: pan-y pinch-zoom;
+}
+#productModalContent.swipe-previous {
+  animation: productSwipePrevious .22s ease-out;
+}
+@keyframes productSwipeNext {
+  from { opacity: .35; transform: translateX(28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes productSwipePrevious {
+  from { opacity: .35; transform: translateX(-28px); }
+  to { opacity: 1; transform: translateX(0); }
+}
 .product-detail {
   display: grid;
   grid-template-columns: minmax(0, .95fr) minmax(280px, 1fr);
@@ -949,7 +993,13 @@ button.product-image:focus-visible::after {
   .site-footer { flex-direction: column; }
 }
 
+@media (max-width: 980px) and (hover: none) and (pointer: coarse) {
+  .modal-swipe-hint.visible { display: block; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .back-to-top { transition: none; }
+  #productModalContent.swipe-next,
+  #productModalContent.swipe-previous { animation: none; }
 }

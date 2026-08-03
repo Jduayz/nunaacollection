@@ -614,6 +614,12 @@ button.product-image:focus-visible::after {
 }
 #productModalContent {
   touch-action: pan-y pinch-zoom;
+  will-change: transform, opacity;
+}
+#productModalContent.is-dragging {
+  opacity: var(--swipe-drag-opacity, 1);
+  transform: translateX(var(--swipe-drag-x, 0));
+  transition: none;
 }
 #productModalContent.swipe-previous {
   animation: productSwipePrevious .22s ease-out;

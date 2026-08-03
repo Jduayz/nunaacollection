@@ -593,6 +593,11 @@ const formatter = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 
 const EMS_FLAT_RATE = 60;
 const EMS_FLAT_RATE_MAX_ITEMS = 10;
 const PENDING_ORDER_EXPIRY_MINUTES = 15;
+const PRODUCT_SWIPE_MIN_DISTANCE = 32;
+const PRODUCT_SWIPE_FLICK_DISTANCE = 20;
+const PRODUCT_SWIPE_MAX_DURATION = 1600;
+const PRODUCT_SWIPE_FLICK_DURATION = 380;
+const PRODUCT_SWIPE_DIRECTION_RATIO = 1.08;
 const CART_STORAGE_KEY = 'nunaaCartV1';
 const ACTIVE_ORDER_STORAGE_KEY = 'nunaaActiveOrderV1';
 const CLIENT_ID_STORAGE_KEY = 'nunaaClientIdV1';
@@ -770,7 +775,7 @@ const translations = {
     'product.previous': 'สินค้าก่อนหน้า',
     'product.next': 'สินค้าถัดไป',
     'product.details': 'รายละเอียดสินค้า',
-    'product.swipeHint': '↔ ปัดซ้าย–ขวาเพื่อดูสินค้าอื่น',
+    'product.swipeHint': '↔ ปัดเบา ๆ บนรูปเพื่อดูสินค้าอื่น',
     'product.soldOut': 'สินค้าหมด',
     'product.ready': 'พร้อมสั่งซื้อ',
     'product.remaining': 'เหลือ {count} ชิ้น',
@@ -907,7 +912,7 @@ const translations = {
     'product.previous': 'Previous product',
     'product.next': 'Next product',
     'product.details': 'Product details',
-    'product.swipeHint': '↔ Swipe left or right for more products',
+    'product.swipeHint': '↔ Gently swipe the image for more products',
     'product.soldOut': 'Sold out',
     'product.ready': 'Ready to order',
     'product.remaining': '{count} left',
@@ -1044,7 +1049,7 @@ const translations = {
     'product.previous': '上一个商品',
     'product.next': '下一个商品',
     'product.details': '商品详情',
-    'product.swipeHint': '↔ 左右滑动查看更多商品',
+    'product.swipeHint': '↔ 在图片上轻轻左右滑动查看更多商品',
     'product.soldOut': '售罄',
     'product.ready': '可订购',
     'product.remaining': '剩余 {count} 件',
@@ -2236,9 +2241,34 @@ productModalContent.addEventListener('touchstart', event => {
   };
 }, { passive: true });
 
+function resetProductSwipeDrag() {
+  productModalContent.classList.remove('is-dragging');
+  productModalContent.style.removeProperty('--swipe-drag-x');
+  productModalContent.style.removeProperty('--swipe-drag-opacity');
+}
+
+productModalContent.addEventListener('touchmove', event => {
+  if (!productTouchStart || event.touches.length !== 1) return;
+
+  const touch = event.touches[0];
+  const deltaX = touch.clientX - productTouchStart.x;
+  const deltaY = touch.clientY - productTouchStart.y;
+  if (Math.abs(deltaX) < 8 || Math.abs(deltaX) <= Math.abs(deltaY)) {
+    resetProductSwipeDrag();
+    return;
+  }
+
+  const dragX = Math.max(-54, Math.min(54, deltaX * .42));
+  const dragOpacity = Math.max(.72, 1 - (Math.abs(dragX) / 220));
+  productModalContent.style.setProperty('--swipe-drag-x', `${dragX}px`);
+  productModalContent.style.setProperty('--swipe-drag-opacity', String(dragOpacity));
+  productModalContent.classList.add('is-dragging');
+}, { passive: true });
+
 productModalContent.addEventListener('touchend', event => {
   if (!productTouchStart || event.changedTouches.length !== 1) {
     productTouchStart = null;
+    resetProductSwipeDrag();
     return;
   }
 
@@ -2247,15 +2277,24 @@ productModalContent.addEventListener('touchend', event => {
   const deltaY = touch.clientY - productTouchStart.y;
   const duration = Date.now() - productTouchStart.startedAt;
   productTouchStart = null;
+  resetProductSwipeDrag();
 
-  const isHorizontalSwipe = Math.abs(deltaX) >= 56 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25;
-  if (!isHorizontalSwipe || duration > 900 || !productModal.classList.contains('open')) return;
+  const isHorizontalMovement = Math.abs(deltaX) > Math.abs(deltaY) * PRODUCT_SWIPE_DIRECTION_RATIO;
+  const hasEnoughDistance = Math.abs(deltaX) >= PRODUCT_SWIPE_MIN_DISTANCE;
+  const isQuickFlick = Math.abs(deltaX) >= PRODUCT_SWIPE_FLICK_DISTANCE && duration <= PRODUCT_SWIPE_FLICK_DURATION;
+  if (
+    !isHorizontalMovement
+    || (!hasEnoughDistance && !isQuickFlick)
+    || duration > PRODUCT_SWIPE_MAX_DURATION
+    || !productModal.classList.contains('open')
+  ) return;
 
   navigateProductDetail(deltaX < 0 ? 1 : -1);
 }, { passive: true });
 
 productModalContent.addEventListener('touchcancel', () => {
   productTouchStart = null;
+  resetProductSwipeDrag();
 }, { passive: true });
 
 modalCloseControls.forEach(control => {

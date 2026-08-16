@@ -872,6 +872,12 @@ button.product-image:focus-visible::after {
 .pos-order-details { display: grid; grid-template-columns: 1fr 220px 1fr; gap: 12px; }
 .pos-order-footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 4px; }
 .pos-order-footer strong { font-size: 1.25rem; }
+.pos-total-summary { display: grid; grid-template-columns: auto minmax(180px, 220px); align-items: end; gap: 6px 16px; }
+.pos-total-summary > span { align-self: center; }
+.pos-total-summary label { display: grid; gap: 6px; font-weight: 700; }
+.pos-total-summary input { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; background: #fffaf2; color: #2a2724; font: inherit; font-weight: 700; }
+.pos-total-summary small { grid-column: 2; color: var(--muted); }
+.pos-total-summary small strong { font-size: inherit; color: var(--accent); }
 .admin-controls { display: grid; grid-template-columns: 1fr 240px; gap: 16px; margin-bottom: 24px; }
 .admin-controls label { display: grid; gap: 8px; color: var(--text); }
 .admin-controls input,
@@ -972,6 +978,9 @@ button.product-image:focus-visible::after {
   .admin-stock-row { grid-template-columns: 1fr; }
   .pos-order-row,
   .pos-order-details { grid-template-columns: 1fr; }
+  .pos-order-footer { align-items: stretch; }
+  .pos-total-summary { grid-template-columns: 1fr; width: 100%; }
+  .pos-total-summary small { grid-column: 1; }
   .stock-search-row { grid-template-columns: 1fr; }
   .admin-orders-table,
   .admin-stock-table { min-width: 100%; }

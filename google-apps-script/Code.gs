@@ -622,10 +622,11 @@ function createPosOrder(payload) {
 
     const reservation = prepareStockReservation(payload.items || []);
     const subtotal = reservation.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const total = normalizePosAdjustedTotal(payload.adjustedTotal, subtotal);
     const customerName = String(payload.customerName || '').trim().slice(0, 120) || 'ลูกค้าหน้าร้าน';
     const note = String(payload.note || '').trim().slice(0, 500);
     const paymentMethod = normalizePosPaymentMethod(payload.paymentMethod);
-    const summary = buildPosOrderSummary(orderId, customerName, reservation.items, subtotal, paymentMethod, note);
+    const summary = buildPosOrderSummary(orderId, customerName, reservation.items, subtotal, total, paymentMethod, note);
 
     reduceStock(reservation.items);
     try {
@@ -634,7 +635,7 @@ function createPosOrder(payload) {
         customerName,
         note,
         items: reservation.items,
-        total: subtotal,
+        total,
         summary,
         paymentMethod
       });
@@ -648,7 +649,8 @@ function createPosOrder(payload) {
       orderId,
       status: 'paid',
       subtotal,
-      total: subtotal,
+      discount: subtotal - total,
+      total,
       products: getProducts()
     };
   } finally {
@@ -664,8 +666,18 @@ function normalizePosPaymentMethod(value) {
   return paymentMethod;
 }
 
-function buildPosOrderSummary(orderId, customerName, items, total, paymentMethod, note) {
+function normalizePosAdjustedTotal(value, subtotal) {
+  if (value === undefined || value === null || value === '') return subtotal;
+  const total = Number(value);
+  if (!Number.isInteger(total) || total < 0 || total > subtotal) {
+    throw new Error(`ยอดขายสุทธิต้องเป็นจำนวนเต็มตั้งแต่ 0 ถึง ${subtotal} บาท`);
+  }
+  return total;
+}
+
+function buildPosOrderSummary(orderId, customerName, items, subtotal, total, paymentMethod, note) {
   const paymentLabels = { cash: 'เงินสด', transfer: 'โอนเงิน', other: 'อื่น ๆ' };
+  const discount = subtotal - total;
   const itemLines = items.map((item, index) => (
     `${index + 1}. ${item.code} • ${item.name} • สี ${item.colorName} x ${item.quantity} - ฿${item.price * item.quantity}`
   ));
@@ -675,6 +687,8 @@ function buildPosOrderSummary(orderId, customerName, items, total, paymentMethod
     '',
     'รายการสินค้า',
     ...itemLines,
+    `ราคาปกติ: ฿${subtotal}`,
+    ...(discount > 0 ? [`ส่วนลด: ฿${discount}`] : []),
     `ยอดรวมสุทธิ: ฿${total}`,
     `ชำระด้วย: ${paymentLabels[paymentMethod]}`,
     `ลูกค้า: ${customerName}`,

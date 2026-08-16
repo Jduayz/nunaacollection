@@ -12,7 +12,7 @@
   <meta name="robots" content="noindex,nofollow" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/assets/icons/nunaa-app-icon.png" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20260714-pattern-hover-images" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260816-pos-discount" />
 </head>
 <body>
   <header class="site-header admin-header" id="adminHeader" hidden>
@@ -67,7 +67,7 @@
       <form id="posOrderForm" class="admin-pos-card">
         <div class="form-heading">
           <h3>สร้างออเดอร์หน้าร้าน</h3>
-          <p>ออเดอร์จะถูกบันทึกเป็นชำระแล้วและตัดสต็อกทันที</p>
+          <p>ออเดอร์จะถูกบันทึกเป็นชำระแล้วและตัดสต็อกทันที สามารถปรับลดราคาที่สรุปยอดก่อนบันทึกได้</p>
         </div>
         <div id="posOrderRows" class="pos-order-rows"></div>
         <button id="addPosOrderRowButton" class="button ghost" type="button">เพิ่มสินค้า</button>
@@ -90,7 +90,14 @@
           </label>
         </div>
         <div class="pos-order-footer">
-          <strong>ยอดรวม <span id="posOrderTotal">฿0</span></strong>
+          <div class="pos-total-summary">
+            <span>ราคาปกติ <strong id="posOrderSubtotal">฿0</strong></span>
+            <label>
+              ยอดขายสุทธิ (ปรับลดได้)
+              <input id="posAdjustedTotal" type="number" min="0" step="1" value="0" inputmode="numeric" required />
+            </label>
+            <small>ส่วนลด <strong id="posOrderDiscount">฿0</strong></small>
+          </div>
           <button id="submitPosOrderButton" class="button primary" type="submit">บันทึกการขายและตัดสต็อก</button>
         </div>
       </form>
@@ -200,6 +207,6 @@
   </main>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/admin-auth.js?v=20260726-1"></script>
+  <script type="module" src="assets/js/admin-auth.js?v=20260816-pos-discount"></script>
 </body>
 </html>

@@ -12,7 +12,9 @@ const addPosOrderRowButton = document.getElementById('addPosOrderRowButton');
 const posCustomerName = document.getElementById('posCustomerName');
 const posPaymentMethod = document.getElementById('posPaymentMethod');
 const posOrderNote = document.getElementById('posOrderNote');
-const posOrderTotal = document.getElementById('posOrderTotal');
+const posOrderSubtotal = document.getElementById('posOrderSubtotal');
+const posAdjustedTotal = document.getElementById('posAdjustedTotal');
+const posOrderDiscount = document.getElementById('posOrderDiscount');
 const submitPosOrderButton = document.getElementById('submitPosOrderButton');
 const adminStockBody = document.getElementById('adminStockBody');
 const stockSearchInput = document.getElementById('stockSearchInput');
@@ -96,12 +98,28 @@ function createAdminOrderId() {
 }
 
 function updatePosOrderTotal() {
-  const total = Array.from(posOrderRows.querySelectorAll('.pos-order-row')).reduce((sum, row) => {
+  const subtotal = Array.from(posOrderRows.querySelectorAll('.pos-order-row')).reduce((sum, row) => {
     const product = adminProducts.find(item => item.code === row.querySelector('[name="posCode"]').value);
     const quantity = Number(row.querySelector('[name="posQuantity"]').value || 0);
     return sum + (Number(product?.price || 0) * quantity);
   }, 0);
-  posOrderTotal.textContent = formatMoney(total);
+  posOrderSubtotal.textContent = formatMoney(subtotal);
+  posAdjustedTotal.max = String(subtotal);
+  posAdjustedTotal.value = String(subtotal);
+  posOrderDiscount.textContent = formatMoney(0);
+}
+
+function updatePosOrderDiscount() {
+  const subtotal = Array.from(posOrderRows.querySelectorAll('.pos-order-row')).reduce((sum, row) => {
+    const product = adminProducts.find(item => item.code === row.querySelector('[name="posCode"]').value);
+    const quantity = Number(row.querySelector('[name="posQuantity"]').value || 0);
+    return sum + (Number(product?.price || 0) * quantity);
+  }, 0);
+  const adjustedTotal = Number(posAdjustedTotal.value);
+  const discount = Number.isInteger(adjustedTotal) && adjustedTotal >= 0 && adjustedTotal <= subtotal
+    ? subtotal - adjustedTotal
+    : 0;
+  posOrderDiscount.textContent = formatMoney(discount);
 }
 
 function updatePosColorOptions(row) {
@@ -394,6 +412,7 @@ clearStockSearchButton.addEventListener('click', () => {
   stockSearchInput.focus();
 });
 addPosOrderRowButton.addEventListener('click', createPosOrderRow);
+posAdjustedTotal.addEventListener('input', updatePosOrderDiscount);
 refreshAdminButton.addEventListener('click', () => fetchAdminData().catch(error => showAdminMessage(error.message, 'error')));
 addStockRowButton.addEventListener('click', () => createStockRow());
 
@@ -405,9 +424,20 @@ posOrderForm.addEventListener('submit', async event => {
     colorName: row.querySelector('[name="posColor"]').value,
     quantity: Number(row.querySelector('[name="posQuantity"]').value)
   }));
+  const subtotal = rows.reduce((sum, row) => {
+    const product = adminProducts.find(item => item.code === row.querySelector('[name="posCode"]').value);
+    const quantity = Number(row.querySelector('[name="posQuantity"]').value || 0);
+    return sum + (Number(product?.price || 0) * quantity);
+  }, 0);
+  const adjustedTotal = Number(posAdjustedTotal.value);
 
   if (items.some(item => !item.code || !item.colorName || !Number.isInteger(item.quantity) || item.quantity < 1)) {
     showAdminMessage('กรุณาเลือกสินค้า สี และจำนวนให้ครบถ้วน', 'error');
+    return;
+  }
+  if (!Number.isInteger(adjustedTotal) || adjustedTotal < 0 || adjustedTotal > subtotal) {
+    showAdminMessage(`ยอดขายสุทธิต้องเป็นจำนวนเต็มตั้งแต่ 0 ถึง ${formatMoney(subtotal)}`, 'error');
+    posAdjustedTotal.focus();
     return;
   }
 
@@ -420,6 +450,7 @@ posOrderForm.addEventListener('submit', async event => {
       customerName: posCustomerName.value.trim(),
       paymentMethod: posPaymentMethod.value,
       note: posOrderNote.value.trim(),
+      adjustedTotal,
       items
     });
     showAdminMessage(`บันทึกออเดอร์หน้าร้าน ${result.orderId} ยอด ${formatMoney(result.total)} และตัดสต็อกแล้ว`, 'success');

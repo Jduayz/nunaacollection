@@ -1166,10 +1166,31 @@ function t(key, values = {}) {
   ), template);
 }
 
-function getColorName(color) {
+function getSimpleColorName(color) {
   if (currentLanguage === 'th') return color.name;
   if (color[`name${currentLanguage.toUpperCase()}`]) return color[`name${currentLanguage.toUpperCase()}`];
   return colorTranslations[color.key]?.[currentLanguage] || color.name;
+}
+
+function getNn013BottomName(bottomName) {
+  const bottom = nn013BottomOptions.find(option => option.name === bottomName);
+  return bottom ? getSimpleColorName(bottom) : bottomName;
+}
+
+function getNn015ShadeName(shadeName) {
+  const shade = nn015ColorOptions.find(option => option.name === shadeName);
+  return shade ? getSimpleColorName(shade) : shadeName;
+}
+
+function getColorName(color) {
+  if (currentLanguage === 'th') return color.name;
+  if (color.patternName && color.bottomName) {
+    return `${color.patternName} / ${getNn013BottomName(color.bottomName)}`;
+  }
+  if (color.sizeName && color.shadeName) {
+    return `${color.sizeName} / ${getNn015ShadeName(color.shadeName)}`;
+  }
+  return getSimpleColorName(color);
 }
 
 function updateLanguageButtons() {
@@ -1489,6 +1510,7 @@ function renderNn013Selector(product, context) {
   const selectedColor = getSelectedColor(product);
   const selectedPattern = selectedColor?.patternName || flowerColorOptions[0].name;
   const selectedBottom = selectedColor?.bottomName || nn013BottomOptions[0].name;
+  const selectedBottomLabel = getNn013BottomName(selectedBottom);
   const combinationAvailable = (patternName, bottomName) => {
     const combination = product.colors.find(color => (
       color.patternName === patternName && color.bottomName === bottomName
@@ -1526,14 +1548,14 @@ function renderNn013Selector(product, context) {
               data-id="${product.id}"
               data-context="${context}"
               data-nn013-bottom="${bottom.name}"
-              aria-label="${t('product.bottomColor')} ${bottom.name}"
+              aria-label="${t('product.bottomColor')} ${getSimpleColorName(bottom)}"
               aria-pressed="${bottom.name === selectedBottom ? 'true' : 'false'}"
               ${combinationAvailable(selectedPattern, bottom.name) ? '' : 'disabled'}
-            ><span class="nn013-color-preview" style="background: ${bottom.value};"></span><b>${bottom.name}</b></button>
+            ><span class="nn013-color-preview" style="background: ${bottom.value};"></span><b>${getSimpleColorName(bottom)}</b></button>
           `).join('')}
         </div>
       </div>
-      <p class="nn013-selection">${t('product.selectedCombination')}: <strong>${t('product.pattern')} ${selectedPattern} • ${selectedBottom}</strong></p>
+      <p class="nn013-selection">${t('product.selectedCombination')}: <strong>${t('product.pattern')} ${selectedPattern} • ${selectedBottomLabel}</strong></p>
     </div>
   `;
 }
@@ -1542,6 +1564,7 @@ function renderNn015Selector(product, context) {
   const selectedColor = getSelectedColor(product);
   const selectedSize = selectedColor?.sizeName || nn015SizeOptions[0];
   const selectedShade = selectedColor?.shadeName || nn015ColorOptions[0].name;
+  const selectedShadeLabel = getNn015ShadeName(selectedShade);
   const combinationAvailable = (sizeName, shadeName) => {
     const combination = product.colors.find(color => (
       color.sizeName === sizeName && color.shadeName === shadeName
@@ -1578,14 +1601,14 @@ function renderNn015Selector(product, context) {
               data-id="${product.id}"
               data-context="${context}"
               data-nn015-color="${shade.name}"
-              aria-label="${t('product.color')} ${shade.name}"
+              aria-label="${t('product.color')} ${getSimpleColorName(shade)}"
               aria-pressed="${shade.name === selectedShade ? 'true' : 'false'}"
               ${combinationAvailable(selectedSize, shade.name) ? '' : 'disabled'}
-            ><span class="nn013-color-preview" style="background: ${shade.value};"></span><b>${shade.name}</b><span class="nn013-hover-preview" style="background: ${shade.value};" aria-hidden="true"></span></button>
+            ><span class="nn013-color-preview" style="background: ${shade.value};"></span><b>${getSimpleColorName(shade)}</b><span class="nn013-hover-preview" style="background: ${shade.value};" aria-hidden="true"></span></button>
           `).join('')}
         </div>
       </div>
-      <p class="nn013-selection">${t('product.selectedCombination')}: <strong>${selectedSize} • ${selectedShade}</strong></p>
+      <p class="nn013-selection">${t('product.selectedCombination')}: <strong>${selectedSize} • ${selectedShadeLabel}</strong></p>
     </div>
   `;
 }

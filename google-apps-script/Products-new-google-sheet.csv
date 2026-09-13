@@ -1,152 +1,152 @@
 code,name,price,detail,image,colorName,colorValue,stock,active
-nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
-nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
-nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
-nn-001,Pumpkins crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ดำ,#101010,1,TRUE
-nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
-nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,คอรัล,#d66960,1,TRUE
-nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
-nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
-nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,เทาเบจ,#8d867c,1,TRUE
-nn-002,Nunaa crop top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ดำ,#101010,1,TRUE
-nn-003,Spaghetti strap top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-003,Spaghetti strap top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
-nn-003,Spaghetti strap top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ชมพูกะปิ,#de9298,1,TRUE
-nn-003,Spaghetti strap top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,คอรัล,#d66960,1,TRUE
-nn-003,Spaghetti strap top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
-nn-003,Spaghetti strap top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
-nn-003,Spaghetti strap top,250,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ดำ,#101010,1,TRUE
-nn-004,Spaghetti crop top,250,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-004,Spaghetti crop top,250,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
-nn-004,Spaghetti crop top,250,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ชมพูกะปิ,#de9298,1,TRUE
-nn-004,Spaghetti crop top,250,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
-nn-004,Spaghetti crop top,250,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
-nn-004,Spaghetti crop top,250,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
-nn-004,Spaghetti crop top,250,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ดำ,#101010,1,TRUE
-nn-005,Spaghetti crop top linen fabric,290,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,A,"url('assets/images/patterns/linen-005-a.jpeg') center / cover no-repeat",0,TRUE
-nn-005,Spaghetti crop top linen fabric,290,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,B,"url('assets/images/patterns/linen-005-b.jpeg') center / cover no-repeat",0,TRUE
-nn-005,Spaghetti crop top linen fabric,290,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,C,"url('assets/images/patterns/linen-005-c.jpeg') center / cover no-repeat",0,TRUE
-nn-005,Spaghetti crop top linen fabric,290,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,D,"url('assets/images/patterns/linen-005-d.jpeg') center / cover no-repeat",0,TRUE
-nn-006,Nunaa crop top with ribbon,290,"Cotton • Chest 24""-36""",assets/images/products/nn-006-ribbon-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-006,Nunaa crop top with ribbon,290,"Cotton • Chest 24""-36""",assets/images/products/nn-006-ribbon-crop-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
-nn-006,Nunaa crop top with ribbon,290,"Cotton • Chest 24""-36""",assets/images/products/nn-006-ribbon-crop-top.jpeg,ดำ,#101010,1,TRUE
-nn-007,Smock tube top with straps,290,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-007,Smock tube top with straps,290,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,เขียว,#94bd78,1,TRUE
-nn-007,Smock tube top with straps,290,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
-nn-007,Smock tube top with straps,290,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,กรม,#454b63,1,TRUE
-nn-007,Smock tube top with straps,290,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,เทาเบจ,#8d867c,1,TRUE
-nn-007,Smock tube top with straps,290,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,น้ำตาลเข้ม,#5a240d,1,TRUE
-nn-008,Pretzel top,290,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-008,Pretzel top,290,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ครีม,#e2d3b9,1,TRUE
-nn-008,Pretzel top,290,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,มัสตาร์ด,#e7b65d,1,TRUE
-nn-008,Pretzel top,290,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
-nn-008,Pretzel top,290,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,เทาเบจ,#8d867c,1,TRUE
-nn-008,Pretzel top,290,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ดำ,#101010,1,TRUE
-nn-009,Pretzel top,290,"Cotton • Chest 26""-36""",assets/images/products/nn-009-pretzel-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-009,Pretzel top,290,"Cotton • Chest 26""-36""",assets/images/products/nn-009-pretzel-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
-nn-009,Pretzel top,290,"Cotton • Chest 26""-36""",assets/images/products/nn-009-pretzel-top.jpeg,น้ำตาล,#a8744b,1,TRUE
-nn-010,Chinese collar shirt,290,"Cotton • Chest 26""-36""",assets/images/products/nn-010-chinese-collar-shirt.jpeg,ขาว,#edf1ee,1,TRUE
-nn-010,Chinese collar shirt,290,"Cotton • Chest 26""-36""",assets/images/products/nn-010-chinese-collar-shirt.jpeg,คอรัล,#d66960,1,TRUE
-nn-010,Chinese collar shirt,290,"Cotton • Chest 26""-36""",assets/images/products/nn-010-chinese-collar-shirt.jpeg,แดงไวน์,#9e1c36,1,TRUE
-nn-011,Cupcake top,290,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-011,Cupcake top,290,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
-nn-011,Cupcake top,290,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ชมพูกะปิ,#de9298,1,TRUE
-nn-011,Cupcake top,290,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ครีม,#e2d3b9,1,TRUE
-nn-011,Cupcake top,290,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,เขียว,#94bd78,1,TRUE
-nn-011,Cupcake top,290,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
-nn-012,Puff Sleeve,290,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,ขาว,#edf1ee,1,TRUE
-nn-012,Puff Sleeve,290,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,ครีม,#e2d3b9,1,TRUE
-nn-012,Puff Sleeve,290,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,เทาเบจ,#8d867c,1,TRUE
-nn-012,Puff Sleeve,290,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,เขียว,#94bd78,1,TRUE
-nn-012,Puff Sleeve,290,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,A / ขาว,#edf1ee,1,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,A / น้ำตาล,#a8744b,0,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,A / ฟ้าเทา,#6f7f90,0,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,B / ขาว,#edf1ee,1,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,B / น้ำตาล,#a8744b,0,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,B / ฟ้าเทา,#6f7f90,0,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,C / ขาว,#edf1ee,1,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,C / น้ำตาล,#a8744b,0,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,C / ฟ้าเทา,#6f7f90,0,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,D / ขาว,#edf1ee,1,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,D / น้ำตาล,#a8744b,0,TRUE
-nn-013,Smock tube top with straps,290,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,D / ฟ้าเทา,#6f7f90,0,TRUE
-nn-014,Nunaa mini skirt,290,"Cotton • Waist 24""-36""",assets/images/products/nn-014-nunaa-mini-skirt-v2.jpeg,ขาว,#edf1ee,1,TRUE
-nn-014,Nunaa mini skirt,290,"Cotton • Waist 24""-36""",assets/images/products/nn-014-nunaa-mini-skirt-v2.jpeg,น้ำตาล,#a8744b,1,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / ขาว,#edf1ee,3,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / ครีม,#e2d3b9,3,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / น้ำตาล,#a8744b,3,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / เขียวมะกอก,#4f5b2d,0,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / เทาเบจ,#8d867c,0,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / น้ำตาลเข้ม,#5a240d,1,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / ขาว,#edf1ee,3,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / ครีม,#e2d3b9,3,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / น้ำตาล,#a8744b,3,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / เขียวมะกอก,#4f5b2d,0,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / เทาเบจ,#8d867c,0,TRUE
-nn-015,Nunaa shorts,290,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / น้ำตาลเข้ม,#5a240d,0,TRUE
-nn-016,Button crop top,320,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
-nn-016,Button crop top,320,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,ครีม,#e2d3b9,1,TRUE
-nn-016,Button crop top,320,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,มัสตาร์ด,#e7b65d,1,TRUE
-nn-016,Button crop top,320,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,เขียว,#94bd78,1,TRUE
-nn-016,Button crop top,320,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,น้ำตาล,#a8744b,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ขาว,#edf1ee,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ชมพูกะปิ,#de9298,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,แดงไวน์,#9e1c36,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,น้ำตาล,#a8744b,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,น้ำตาลเข้ม,#5a240d,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ดำ,#101010,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
-nn-017,Nunaa vest,320,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,เขียว,#94bd78,1,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,A,"url('assets/images/patterns/linen-018-a.jpeg') center / cover no-repeat",0,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,B,"url('assets/images/patterns/linen-018-b.jpeg') center / cover no-repeat",0,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,C,"url('assets/images/patterns/linen-018-c.jpeg') center / cover no-repeat",0,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,D,"url('assets/images/patterns/linen-018-d.jpeg') center / cover no-repeat",0,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,E,"url('assets/images/patterns/linen-018-e.jpeg') center / cover no-repeat",0,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,F,"url('assets/images/patterns/linen-018-f.jpeg') center / cover no-repeat",0,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,G,"url('assets/images/patterns/linen-018-g.jpeg') center / cover no-repeat",0,TRUE
-nn-018,Smock tube top with straps,320,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,H,"url('assets/images/patterns/linen-018-h.jpeg') center / cover no-repeat",0,TRUE
-nn-019,Spaghetti crop top (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
-nn-019,Spaghetti crop top (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
-nn-019,Spaghetti crop top (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
-nn-019,Spaghetti crop top (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
-nn-020,Nunaa Shorts (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
-nn-020,Nunaa Shorts (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
-nn-020,Nunaa Shorts (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
-nn-020,Nunaa Shorts (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
-nn-021,Puff Sleeve (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
-nn-021,Puff Sleeve (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
-nn-021,Puff Sleeve (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
-nn-021,Puff Sleeve (Flowers collection),290,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
-nn-022,Skirt (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
-nn-022,Skirt (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
-nn-022,Skirt (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
-nn-022,Skirt (Flowers collection),350,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
-nn-023,Cupcake top linen fabric,350,"Linen • Chest 24""-36"" • Length 15""",assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg,A,"url('assets/images/patterns/linen-a.jpeg') center / cover no-repeat",1,TRUE
-nn-023,Cupcake top linen fabric,350,"Linen • Chest 24""-36"" • Length 15""",assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg,B,"url('assets/images/patterns/linen-b.jpeg') center / cover no-repeat",1,TRUE
-nn-023,Cupcake top linen fabric,350,"Linen • Chest 24""-36"" • Length 15""",assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg,C,"url('assets/images/patterns/linen-c.jpeg') center / cover no-repeat",1,TRUE
-nn-024,Long sleeve candy collection,350,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,ขาว,#edf1ee,1,TRUE
-nn-024,Long sleeve candy collection,350,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,มัสตาร์ด,#e7b65d,1,TRUE
-nn-024,Long sleeve candy collection,350,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,ดำ,#101010,1,TRUE
-nn-025,Long sleeve crop top cotton,350,"Cotton • Chest 24""-36""",assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg,ขาว,#edf1ee,1,TRUE
-nn-025,Long sleeve crop top cotton,350,"Cotton • Chest 24""-36""",assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg,ครีม,#e2d3b9,1,TRUE
-nn-025,Long sleeve crop top cotton,350,"Cotton • Chest 24""-36""",assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg,น้ำตาล,#a8744b,1,TRUE
-nn-026,Long sleeve crop top linen,420,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,A,"url('assets/images/patterns/linen-026-a.jpeg') center / cover no-repeat",1,TRUE
-nn-026,Long sleeve crop top linen,420,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,B,"url('assets/images/patterns/linen-026-b.jpeg') center / cover no-repeat",0,TRUE
-nn-026,Long sleeve crop top linen,420,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,C,"url('assets/images/patterns/linen-026-c.jpeg') center / cover no-repeat",0,TRUE
-nn-026,Long sleeve crop top linen,420,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,D,"url('assets/images/patterns/linen-026-d.jpeg') center / cover no-repeat",0,TRUE
-nn-027,Nunaa cotton coat,420,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ขาว,#edf1ee,1,TRUE
-nn-027,Nunaa cotton coat,420,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ครีม,#e2d3b9,1,TRUE
-nn-027,Nunaa cotton coat,420,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
-nn-027,Nunaa cotton coat,420,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ดำ,#101010,1,TRUE
-nn-028,Mini dress,350,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,ขาว,#edf1ee,1,TRUE
-nn-028,Mini dress,350,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,ครีม,#e2d3b9,1,TRUE
-nn-028,Mini dress,350,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,เขียว,#94bd78,1,TRUE
-nn-028,Mini dress,350,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,ดำ,#101010,1,TRUE
-nn-029,Mini dress with button,350,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-029-mini-dress-button.jpeg,ขาว,#edf1ee,1,TRUE
-nn-029,Mini dress with button,350,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-029-mini-dress-button.jpeg,ดำ,#101010,1,TRUE
-nn-030,Mini dress with button (Stone wash fabric),450,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg,A,"repeating-linear-gradient(90deg, #6685a3 0 6px, #9aafc2 6px 10px, #3f6486 10px 15px)",1,TRUE
-nn-030,Mini dress with button (Stone wash fabric),450,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg,B,"repeating-linear-gradient(0deg, #2f4f72 0 5px, #607c9b 5px 9px, #263f60 9px 14px)",1,TRUE
-nn-030,Mini dress with button (Stone wash fabric),450,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg,C,"repeating-linear-gradient(90deg, #6f8daa 0 5px, #b6c4d0 5px 9px, #4f708f 9px 13px)",1,TRUE
+nn-001,Pumpkins crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-001,Pumpkins crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
+nn-001,Pumpkins crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
+nn-001,Pumpkins crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
+nn-001,Pumpkins crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ดำ,#101010,1,TRUE
+nn-002,Nunaa crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-002,Nunaa crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
+nn-002,Nunaa crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,คอรัล,#d66960,1,TRUE
+nn-002,Nunaa crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
+nn-002,Nunaa crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
+nn-002,Nunaa crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,เทาเบจ,#8d867c,1,TRUE
+nn-002,Nunaa crop top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-002-nunaa-crop-top.jpeg,ดำ,#101010,1,TRUE
+nn-003,Spaghetti strap top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-003,Spaghetti strap top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
+nn-003,Spaghetti strap top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ชมพูกะปิ,#de9298,1,TRUE
+nn-003,Spaghetti strap top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,คอรัล,#d66960,1,TRUE
+nn-003,Spaghetti strap top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
+nn-003,Spaghetti strap top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
+nn-003,Spaghetti strap top,350,"Cotton • Chest 24""-36""",assets/images/products/nn-003-spaghetti-strap-top.jpeg,ดำ,#101010,1,TRUE
+nn-004,Spaghetti crop top,350,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-004,Spaghetti crop top,350,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
+nn-004,Spaghetti crop top,350,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ชมพูกะปิ,#de9298,1,TRUE
+nn-004,Spaghetti crop top,350,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
+nn-004,Spaghetti crop top,350,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,แดงไวน์,#9e1c36,1,TRUE
+nn-004,Spaghetti crop top,350,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
+nn-004,Spaghetti crop top,350,"Cotton • Chest 26""-36""",assets/images/products/nn-004-spaghetti-crop-top.jpeg,ดำ,#101010,1,TRUE
+nn-005,Spaghetti crop top linen fabric,390,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,A,"url('assets/images/patterns/linen-005-a.jpeg') center / cover no-repeat",0,TRUE
+nn-005,Spaghetti crop top linen fabric,390,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,B,"url('assets/images/patterns/linen-005-b.jpeg') center / cover no-repeat",0,TRUE
+nn-005,Spaghetti crop top linen fabric,390,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,C,"url('assets/images/patterns/linen-005-c.jpeg') center / cover no-repeat",0,TRUE
+nn-005,Spaghetti crop top linen fabric,390,"Linen • Chest 26""-36""",assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg,D,"url('assets/images/patterns/linen-005-d.jpeg') center / cover no-repeat",0,TRUE
+nn-006,Nunaa crop top with ribbon,390,"Cotton • Chest 24""-36""",assets/images/products/nn-006-ribbon-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-006,Nunaa crop top with ribbon,390,"Cotton • Chest 24""-36""",assets/images/products/nn-006-ribbon-crop-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
+nn-006,Nunaa crop top with ribbon,390,"Cotton • Chest 24""-36""",assets/images/products/nn-006-ribbon-crop-top.jpeg,ดำ,#101010,1,TRUE
+nn-007,Smock tube top with straps,390,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-007,Smock tube top with straps,390,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,เขียว,#94bd78,1,TRUE
+nn-007,Smock tube top with straps,390,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
+nn-007,Smock tube top with straps,390,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,กรม,#454b63,1,TRUE
+nn-007,Smock tube top with straps,390,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,เทาเบจ,#8d867c,1,TRUE
+nn-007,Smock tube top with straps,390,"Cotton • Chest 24""-36""",assets/images/products/nn-007-smock-tube-top.jpeg,น้ำตาลเข้ม,#5a240d,1,TRUE
+nn-008,Pretzel top,390,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-008,Pretzel top,390,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ครีม,#e2d3b9,1,TRUE
+nn-008,Pretzel top,390,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,มัสตาร์ด,#e7b65d,1,TRUE
+nn-008,Pretzel top,390,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ส้มอิฐ,#bb4a33,1,TRUE
+nn-008,Pretzel top,390,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,เทาเบจ,#8d867c,1,TRUE
+nn-008,Pretzel top,390,"Cotton • Chest 24""-36""",assets/images/products/nn-008-pretzel-top.jpeg,ดำ,#101010,1,TRUE
+nn-009,Pretzel top,450,"Cotton • Chest 26""-36""",assets/images/products/nn-009-pretzel-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-009,Pretzel top,450,"Cotton • Chest 26""-36""",assets/images/products/nn-009-pretzel-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
+nn-009,Pretzel top,450,"Cotton • Chest 26""-36""",assets/images/products/nn-009-pretzel-top.jpeg,น้ำตาล,#a8744b,1,TRUE
+nn-010,Chinese collar shirt,450,"Cotton • Chest 26""-36""",assets/images/products/nn-010-chinese-collar-shirt.jpeg,ขาว,#edf1ee,1,TRUE
+nn-010,Chinese collar shirt,450,"Cotton • Chest 26""-36""",assets/images/products/nn-010-chinese-collar-shirt.jpeg,คอรัล,#d66960,1,TRUE
+nn-010,Chinese collar shirt,450,"Cotton • Chest 26""-36""",assets/images/products/nn-010-chinese-collar-shirt.jpeg,แดงไวน์,#9e1c36,1,TRUE
+nn-011,Cupcake top,450,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-011,Cupcake top,450,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ชมพูอ่อน,#e9bdc0,1,TRUE
+nn-011,Cupcake top,450,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ชมพูกะปิ,#de9298,1,TRUE
+nn-011,Cupcake top,450,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ครีม,#e2d3b9,1,TRUE
+nn-011,Cupcake top,450,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,เขียว,#94bd78,1,TRUE
+nn-011,Cupcake top,450,"Cotton • Chest 28""-36""",assets/images/products/nn-011-cupcake-top.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
+nn-012,Puff Sleeve,420,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,ขาว,#edf1ee,1,TRUE
+nn-012,Puff Sleeve,420,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,ครีม,#e2d3b9,1,TRUE
+nn-012,Puff Sleeve,420,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,เทาเบจ,#8d867c,1,TRUE
+nn-012,Puff Sleeve,420,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,เขียว,#94bd78,1,TRUE
+nn-012,Puff Sleeve,420,"Cotton • Chest 26""-36""",assets/images/products/nn-012-puff-sleeve.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,A / ขาว,#edf1ee,1,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,A / น้ำตาล,#a8744b,0,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,A / ฟ้าเทา,#6f7f90,0,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,B / ขาว,#edf1ee,1,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,B / น้ำตาล,#a8744b,0,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,B / ฟ้าเทา,#6f7f90,0,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,C / ขาว,#edf1ee,1,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,C / น้ำตาล,#a8744b,0,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,C / ฟ้าเทา,#6f7f90,0,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,D / ขาว,#edf1ee,1,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,D / น้ำตาล,#a8744b,0,TRUE
+nn-013,Smock tube top with straps,490,"Cotton + salou cotton • Chest 24""-36""",assets/images/products/nn-013-smock-tube-flower.jpeg,D / ฟ้าเทา,#6f7f90,0,TRUE
+nn-014,Nunaa mini skirt,490,"Cotton • Waist 24""-36""",assets/images/products/nn-014-nunaa-mini-skirt-v2.jpeg,ขาว,#edf1ee,1,TRUE
+nn-014,Nunaa mini skirt,490,"Cotton • Waist 24""-36""",assets/images/products/nn-014-nunaa-mini-skirt-v2.jpeg,น้ำตาล,#a8744b,1,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / ขาว,#edf1ee,3,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / ครีม,#e2d3b9,3,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / น้ำตาล,#a8744b,3,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / เขียวมะกอก,#4f5b2d,0,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / เทาเบจ,#8d867c,0,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,S / น้ำตาลเข้ม,#5a240d,1,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / ขาว,#edf1ee,3,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / ครีม,#e2d3b9,3,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / น้ำตาล,#a8744b,3,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / เขียวมะกอก,#4f5b2d,0,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / เทาเบจ,#8d867c,0,TRUE
+nn-015,Nunaa shorts,490,Cotton • S/M size,assets/images/products/nn-015-nunaa-shorts.jpeg,M / น้ำตาลเข้ม,#5a240d,0,TRUE
+nn-016,Button crop top,490,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,ขาว,#edf1ee,1,TRUE
+nn-016,Button crop top,490,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,ครีม,#e2d3b9,1,TRUE
+nn-016,Button crop top,490,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,มัสตาร์ด,#e7b65d,1,TRUE
+nn-016,Button crop top,490,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,เขียว,#94bd78,1,TRUE
+nn-016,Button crop top,490,"Cotton • Chest 24""-36""",assets/images/products/nn-016-button-crop-top.jpeg,น้ำตาล,#a8744b,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ขาว,#edf1ee,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ชมพูกะปิ,#de9298,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,แดงไวน์,#9e1c36,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,น้ำตาล,#a8744b,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,น้ำตาลเข้ม,#5a240d,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ดำ,#101010,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
+nn-017,Nunaa vest,490,"Cotton • Chest 36""",assets/images/products/nn-017-nunaa-vest.jpeg,เขียว,#94bd78,1,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,A,"url('assets/images/patterns/linen-018-a.jpeg') center / cover no-repeat",0,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,B,"url('assets/images/patterns/linen-018-b.jpeg') center / cover no-repeat",0,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,C,"url('assets/images/patterns/linen-018-c.jpeg') center / cover no-repeat",0,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,D,"url('assets/images/patterns/linen-018-d.jpeg') center / cover no-repeat",0,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,E,"url('assets/images/patterns/linen-018-e.jpeg') center / cover no-repeat",0,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,F,"url('assets/images/patterns/linen-018-f.jpeg') center / cover no-repeat",0,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,G,"url('assets/images/patterns/linen-018-g.jpeg') center / cover no-repeat",0,TRUE
+nn-018,Smock tube top with straps,490,"Cotton with linen • Chest 24""-36""",assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg,H,"url('assets/images/patterns/linen-018-h.jpeg') center / cover no-repeat",0,TRUE
+nn-019,Spaghetti crop top (Flowers collection),390,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
+nn-019,Spaghetti crop top (Flowers collection),390,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
+nn-019,Spaghetti crop top (Flowers collection),390,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
+nn-019,Spaghetti crop top (Flowers collection),390,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
+nn-020,Nunaa Shorts (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
+nn-020,Nunaa Shorts (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
+nn-020,Nunaa Shorts (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
+nn-020,Nunaa Shorts (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Hips 40"" • Length 14""",assets/images/products/nn-020-nunaa-shorts-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
+nn-021,Puff Sleeve (Flowers collection),420,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
+nn-021,Puff Sleeve (Flowers collection),420,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
+nn-021,Puff Sleeve (Flowers collection),420,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
+nn-021,Puff Sleeve (Flowers collection),420,"Salou cotton • Chest 26""-36"" • Length 13"" (excluding straps)",assets/images/products/nn-021-puff-sleeve-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
+nn-022,Skirt (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,A,"url('assets/images/patterns/flower-a.jpeg') center / cover no-repeat",1,TRUE
+nn-022,Skirt (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,B,"url('assets/images/patterns/flower-b.jpeg') center / cover no-repeat",1,TRUE
+nn-022,Skirt (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,C,"url('assets/images/patterns/flower-c.jpeg') center / cover no-repeat",1,TRUE
+nn-022,Skirt (Flowers collection),490,"Salou cotton • Waist 24""-36"" • Length 15""",assets/images/products/nn-022-skirt-flowers.jpeg,D,"url('assets/images/patterns/flower-d.jpeg') center / cover no-repeat",1,TRUE
+nn-023,Cupcake top linen fabric,590,"Linen • Chest 24""-36"" • Length 15""",assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg,A,"url('assets/images/patterns/linen-a.jpeg') center / cover no-repeat",1,TRUE
+nn-023,Cupcake top linen fabric,590,"Linen • Chest 24""-36"" • Length 15""",assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg,B,"url('assets/images/patterns/linen-b.jpeg') center / cover no-repeat",1,TRUE
+nn-023,Cupcake top linen fabric,590,"Linen • Chest 24""-36"" • Length 15""",assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg,C,"url('assets/images/patterns/linen-c.jpeg') center / cover no-repeat",1,TRUE
+nn-024,Long sleeve candy collection,590,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,ขาว,#edf1ee,1,TRUE
+nn-024,Long sleeve candy collection,590,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,มัสตาร์ด,#e7b65d,1,TRUE
+nn-024,Long sleeve candy collection,590,"Cotton • Chest 24""-36""",assets/images/products/nn-024-long-sleeve-candy.jpeg,ดำ,#101010,1,TRUE
+nn-025,Long sleeve crop top cotton,590,"Cotton • Chest 24""-36""",assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg,ขาว,#edf1ee,1,TRUE
+nn-025,Long sleeve crop top cotton,590,"Cotton • Chest 24""-36""",assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg,ครีม,#e2d3b9,1,TRUE
+nn-025,Long sleeve crop top cotton,590,"Cotton • Chest 24""-36""",assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg,น้ำตาล,#a8744b,1,TRUE
+nn-026,Long sleeve crop top linen,690,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,A,"url('assets/images/patterns/linen-026-a.jpeg') center / cover no-repeat",1,TRUE
+nn-026,Long sleeve crop top linen,690,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,B,"url('assets/images/patterns/linen-026-b.jpeg') center / cover no-repeat",0,TRUE
+nn-026,Long sleeve crop top linen,690,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,C,"url('assets/images/patterns/linen-026-c.jpeg') center / cover no-repeat",0,TRUE
+nn-026,Long sleeve crop top linen,690,"Linen • Chest 24""-36""",assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg,D,"url('assets/images/patterns/linen-026-d.jpeg') center / cover no-repeat",0,TRUE
+nn-027,Nunaa cotton coat,690,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ขาว,#edf1ee,1,TRUE
+nn-027,Nunaa cotton coat,690,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ครีม,#e2d3b9,1,TRUE
+nn-027,Nunaa cotton coat,690,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ฟ้าเทา,#6f7f90,1,TRUE
+nn-027,Nunaa cotton coat,690,"Cotton • Chest 40""",assets/images/products/nn-027-nunaa-cotton-coat.jpeg,ดำ,#101010,1,TRUE
+nn-028,Mini dress,490,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,ขาว,#edf1ee,1,TRUE
+nn-028,Mini dress,490,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,ครีม,#e2d3b9,1,TRUE
+nn-028,Mini dress,490,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,เขียว,#94bd78,1,TRUE
+nn-028,Mini dress,490,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-028-mini-dress.jpeg,ดำ,#101010,1,TRUE
+nn-029,Mini dress with button,490,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-029-mini-dress-button.jpeg,ขาว,#edf1ee,1,TRUE
+nn-029,Mini dress with button,490,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-029-mini-dress-button.jpeg,ดำ,#101010,1,TRUE
+nn-030,Mini dress with button (Stone wash fabric),590,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg,A,"repeating-linear-gradient(90deg, #6685a3 0 6px, #9aafc2 6px 10px, #3f6486 10px 15px)",1,TRUE
+nn-030,Mini dress with button (Stone wash fabric),590,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg,B,"repeating-linear-gradient(0deg, #2f4f72 0 5px, #607c9b 5px 9px, #263f60 9px 14px)",1,TRUE
+nn-030,Mini dress with button (Stone wash fabric),590,"Cotton • Chest 28""-38"" • Length 30""",assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg,C,"repeating-linear-gradient(90deg, #6f8daa 0 5px, #b6c4d0 5px 9px, #4f708f 9px 13px)",1,TRUE

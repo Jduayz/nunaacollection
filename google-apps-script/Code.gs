@@ -36,28 +36,28 @@ const FLOWER_VARIANT_PRODUCTS = [
   {
     code: 'nn-019',
     name: 'Spaghetti crop top (Flowers collection)',
-    price: 290,
+    price: 390,
     detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
     image: 'assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg'
   },
   {
     code: 'nn-020',
     name: 'Nunaa Shorts (Flowers collection)',
-    price: 350,
+    price: 490,
     detail: 'Salou cotton • Waist 24"-36" • Hips 40" • Length 14"',
     image: 'assets/images/products/nn-020-nunaa-shorts-flowers.jpeg'
   },
   {
     code: 'nn-021',
     name: 'Puff Sleeve (Flowers collection)',
-    price: 290,
+    price: 420,
     detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
     image: 'assets/images/products/nn-021-puff-sleeve-flowers.jpeg'
   },
   {
     code: 'nn-022',
     name: 'Skirt (Flowers collection)',
-    price: 350,
+    price: 490,
     detail: 'Salou cotton • Waist 24"-36" • Length 15"',
     image: 'assets/images/products/nn-022-skirt-flowers.jpeg'
   }

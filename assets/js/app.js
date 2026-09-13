@@ -266,7 +266,7 @@ let products = [
     id: 1,
     code: 'nn-001',
     name: 'Pumpkins crop top',
-    price: 250,
+    price: 350,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(['white', 'pink', 'rust', 'burgundy', 'black']),
     image: 'assets/images/products/nn-001-pumpkins-crop-top.jpeg'
@@ -275,7 +275,7 @@ let products = [
     id: 2,
     code: 'nn-002',
     name: 'Nunaa crop top',
-    price: 250,
+    price: 350,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(['white', 'pink', 'coral', 'rust', 'burgundy', 'taupe', 'black']),
     image: 'assets/images/products/nn-002-nunaa-crop-top.jpeg'
@@ -284,7 +284,7 @@ let products = [
     id: 3,
     code: 'nn-003',
     name: 'Spaghetti strap top',
-    price: 250,
+    price: 350,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(colorSets.cropTop),
     image: 'assets/images/products/nn-003-spaghetti-strap-top.jpeg'
@@ -293,7 +293,7 @@ let products = [
     id: 4,
     code: 'nn-004',
     name: 'Spaghetti crop top',
-    price: 250,
+    price: 350,
     detail: 'Cotton • Chest 26"-36"',
     colors: getColors(colorSets.softWarm),
     image: 'assets/images/products/nn-004-spaghetti-crop-top.jpeg'
@@ -302,7 +302,7 @@ let products = [
     id: 5,
     code: 'nn-005',
     name: 'Spaghetti crop top linen fabric',
-    price: 290,
+    price: 390,
     detail: 'Linen • Chest 26"-36"',
     colors: getNn005Colors(),
     image: 'assets/images/products/nn-005-spaghetti-crop-top-linen-v2.jpeg'
@@ -311,7 +311,7 @@ let products = [
     id: 6,
     code: 'nn-006',
     name: 'Nunaa crop top with ribbon',
-    price: 290,
+    price: 390,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(colorSets.ribbon),
     image: 'assets/images/products/nn-006-ribbon-crop-top.jpeg'
@@ -320,7 +320,7 @@ let products = [
     id: 7,
     code: 'nn-007',
     name: 'Smock tube top with straps',
-    price: 290,
+    price: 390,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(colorSets.smock),
     image: 'assets/images/products/nn-007-smock-tube-top.jpeg'
@@ -329,7 +329,7 @@ let products = [
     id: 8,
     code: 'nn-008',
     name: 'Pretzel top',
-    price: 290,
+    price: 390,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(colorSets.pretzel),
     image: 'assets/images/products/nn-008-pretzel-top.jpeg'
@@ -338,7 +338,7 @@ let products = [
     id: 9,
     code: 'nn-009',
     name: 'Pretzel top',
-    price: 290,
+    price: 450,
     detail: 'Cotton • Chest 26"-36"',
     colors: getColors(['white', 'pink', 'brown']),
     image: 'assets/images/products/nn-009-pretzel-top.jpeg'
@@ -347,7 +347,7 @@ let products = [
     id: 10,
     code: 'nn-010',
     name: 'Chinese collar shirt',
-    price: 290,
+    price: 450,
     detail: 'Cotton • Chest 26"-36"',
     colors: getColors(['white', 'coral', 'burgundy']),
     image: 'assets/images/products/nn-010-chinese-collar-shirt.jpeg'
@@ -356,7 +356,7 @@ let products = [
     id: 11,
     code: 'nn-011',
     name: 'Cupcake top',
-    price: 290,
+    price: 450,
     detail: 'Cotton • Chest 28"-36"',
     colors: getColors(['white', 'pink', 'dustyPink', 'cream', 'green', 'blueGray']),
     image: 'assets/images/products/nn-011-cupcake-top.jpeg'
@@ -365,7 +365,7 @@ let products = [
     id: 12,
     code: 'nn-012',
     name: 'Puff Sleeve',
-    price: 290,
+    price: 420,
     detail: 'Cotton • Chest 26"-36"',
     colors: getColors(['white', 'cream', 'taupe', 'green', 'blueGray']),
     image: 'assets/images/products/nn-012-puff-sleeve.jpeg'
@@ -374,7 +374,7 @@ let products = [
     id: 13,
     code: 'nn-013',
     name: 'Smock tube top with straps',
-    price: 290,
+    price: 490,
     detail: 'Cotton + salou cotton • Chest 24"-36"',
     colors: getNn013Colors(getColors(['white', 'brown', 'blueGray'])),
     image: 'assets/images/products/nn-013-smock-tube-flower.jpeg'
@@ -383,7 +383,7 @@ let products = [
     id: 14,
     code: 'nn-014',
     name: 'Nunaa mini skirt',
-    price: 290,
+    price: 490,
     detail: 'Cotton • Waist 24"-36"',
     colors: getColors(['white', 'brown']),
     image: 'assets/images/products/nn-014-nunaa-mini-skirt-v2.jpeg'
@@ -392,7 +392,7 @@ let products = [
     id: 15,
     code: 'nn-015',
     name: 'Nunaa shorts',
-    price: 290,
+    price: 490,
     detail: 'Cotton • S/M size',
     colors: getNn015Colors(getColors(colorSets.shorts)),
     image: 'assets/images/products/nn-015-nunaa-shorts.jpeg'
@@ -401,7 +401,7 @@ let products = [
     id: 16,
     code: 'nn-016',
     name: 'Button crop top',
-    price: 320,
+    price: 490,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(['white', 'cream', 'mustard', 'green', 'brown']),
     image: 'assets/images/products/nn-016-button-crop-top.jpeg'
@@ -410,7 +410,7 @@ let products = [
     id: 17,
     code: 'nn-017',
     name: 'Nunaa vest',
-    price: 320,
+    price: 490,
     detail: 'Cotton • Chest 36"',
     colors: getColors(colorSets.vest),
     image: 'assets/images/products/nn-017-nunaa-vest.jpeg'
@@ -419,7 +419,7 @@ let products = [
     id: 18,
     code: 'nn-018',
     name: 'Smock tube top with straps',
-    price: 320,
+    price: 490,
     detail: 'Cotton with linen • Chest 24"-36"',
     colors: getNn018Colors(),
     image: 'assets/images/products/nn-018-smock-tube-basic-stripes-v2.jpeg'
@@ -428,7 +428,7 @@ let products = [
     id: 19,
     code: 'nn-019',
     name: 'Spaghetti crop top (Flowers collection)',
-    price: 290,
+    price: 390,
     detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
     colors: getFlowerColors(),
     image: 'assets/images/products/nn-019-spaghetti-crop-top-flowers.jpeg'
@@ -437,7 +437,7 @@ let products = [
     id: 20,
     code: 'nn-020',
     name: 'Nunaa Shorts (Flowers collection)',
-    price: 350,
+    price: 490,
     detail: 'Salou cotton • Waist 24"-36" • Hips 40" • Length 14"',
     colors: getFlowerColors(),
     image: 'assets/images/products/nn-020-nunaa-shorts-flowers.jpeg'
@@ -446,7 +446,7 @@ let products = [
     id: 21,
     code: 'nn-021',
     name: 'Puff Sleeve (Flowers collection)',
-    price: 290,
+    price: 420,
     detail: 'Salou cotton • Chest 26"-36" • Length 13" (excluding straps)',
     colors: getFlowerColors(),
     image: 'assets/images/products/nn-021-puff-sleeve-flowers.jpeg'
@@ -455,7 +455,7 @@ let products = [
     id: 22,
     code: 'nn-022',
     name: 'Skirt (Flowers collection)',
-    price: 350,
+    price: 490,
     detail: 'Salou cotton • Waist 24"-36" • Length 15"',
     colors: getFlowerColors(),
     image: 'assets/images/products/nn-022-skirt-flowers.jpeg'
@@ -464,7 +464,7 @@ let products = [
     id: 23,
     code: 'nn-023',
     name: 'Cupcake top linen fabric',
-    price: 350,
+    price: 590,
     detail: 'Linen • Chest 24"-36" • Length 15"',
     colors: getLinenColors(),
     image: 'assets/images/products/nn-023-cupcake-top-linen-fabric.jpeg'
@@ -473,7 +473,7 @@ let products = [
     id: 24,
     code: 'nn-024',
     name: 'Long sleeve candy collection',
-    price: 350,
+    price: 590,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(colorSets.candy),
     image: 'assets/images/products/nn-024-long-sleeve-candy.jpeg'
@@ -482,7 +482,7 @@ let products = [
     id: 25,
     code: 'nn-025',
     name: 'Long sleeve crop top cotton',
-    price: 350,
+    price: 590,
     detail: 'Cotton • Chest 24"-36"',
     colors: getColors(['white', 'cream', 'brown']),
     image: 'assets/images/products/nn-025-long-sleeve-crop-top-cotton.jpeg'
@@ -491,7 +491,7 @@ let products = [
     id: 26,
     code: 'nn-026',
     name: 'Long sleeve crop top linen',
-    price: 420,
+    price: 690,
     detail: 'Linen • Chest 24"-36"',
     colors: getNn026Colors(),
     image: 'assets/images/products/nn-026-long-sleeve-crop-top-linen.jpeg'
@@ -500,7 +500,7 @@ let products = [
     id: 27,
     code: 'nn-027',
     name: 'Nunaa cotton coat',
-    price: 420,
+    price: 690,
     detail: 'Cotton • Chest 40"',
     colors: getColors(['white', 'cream', 'blueGray', 'black']),
     image: 'assets/images/products/nn-027-nunaa-cotton-coat.jpeg'
@@ -509,7 +509,7 @@ let products = [
     id: 28,
     code: 'nn-028',
     name: 'Mini dress',
-    price: 350,
+    price: 490,
     detail: 'Cotton • Chest 28"-38" • Length 30"',
     colors: getColors(['white', 'cream', 'green', 'black']),
     image: 'assets/images/products/nn-028-mini-dress.jpeg'
@@ -518,7 +518,7 @@ let products = [
     id: 29,
     code: 'nn-029',
     name: 'Mini dress with button',
-    price: 350,
+    price: 490,
     detail: 'Cotton • Chest 28"-38" • Length 30"',
     colors: getColors(['white', 'black']),
     image: 'assets/images/products/nn-029-mini-dress-button.jpeg'
@@ -527,7 +527,7 @@ let products = [
     id: 30,
     code: 'nn-030',
     name: 'Mini dress with button (Stone wash fabric)',
-    price: 450,
+    price: 590,
     detail: 'Cotton • Chest 28"-38" • Length 30"',
     colors: stoneWashColorOptions,
     image: 'assets/images/products/nn-030-mini-dress-button-stone-wash.jpeg'

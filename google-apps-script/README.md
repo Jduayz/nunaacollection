@@ -13,8 +13,8 @@ code,name,price,detail,image,colorName,colorValue,stock,active
 ตัวอย่าง 1 สีต่อ 1 แถว:
 
 ```text
-nn-001,Pumpkins crop top,250,Cotton • Chest 24"-36",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ขาว,#edf1ee,3,TRUE
-nn-001,Pumpkins crop top,250,Cotton • Chest 24"-36",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ส้มอิฐ,#bb4a33,2,TRUE
+nn-001,Pumpkins crop top,350,Cotton • Chest 24"-36",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ขาว,#edf1ee,3,TRUE
+nn-001,Pumpkins crop top,350,Cotton • Chest 24"-36",assets/images/products/nn-001-pumpkins-crop-top.jpeg,ส้มอิฐ,#bb4a33,2,TRUE
 ```
 
 ถ้าสินค้ามีหลายสี ให้ใช้ `code` เดิมซ้ำหลายแถว และเปลี่ยน `colorName`, `colorValue`, `stock`

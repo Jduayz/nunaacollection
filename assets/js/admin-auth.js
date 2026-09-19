@@ -45,7 +45,7 @@ async function showSignedInState(user) {
 
   if (!adminAppLoaded) {
     adminAppLoaded = true;
-    await import('./admin.js?v=20260816-pos-discount');
+    await import('./admin.js?v=20260919-stock-controls');
   }
 }
 

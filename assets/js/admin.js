@@ -19,9 +19,6 @@ const submitPosOrderButton = document.getElementById('submitPosOrderButton');
 const adminStockBody = document.getElementById('adminStockBody');
 const stockSearchInput = document.getElementById('stockSearchInput');
 const clearStockSearchButton = document.getElementById('clearStockSearchButton');
-const stockUpdateForm = document.getElementById('stockUpdateForm');
-const stockRows = document.getElementById('stockRows');
-const addStockRowButton = document.getElementById('addStockRowButton');
 const adminStatusMessage = document.getElementById('adminStatusMessage');
 
 let adminOrders = [];
@@ -208,30 +205,6 @@ function resetPosOrderForm() {
   updatePosOrderTotal();
 }
 
-function createStockRow(item = {}) {
-  const row = document.createElement('div');
-  row.className = 'admin-stock-row';
-  row.innerHTML = `
-    <label>
-      รหัสสินค้า
-      <input name="code" type="text" value="${escapeHtml(item.code || '')}" required />
-    </label>
-    <label>
-      สี
-      <input name="colorName" type="text" value="${escapeHtml(item.colorName || '')}" required />
-    </label>
-    <label>
-      สต็อกใหม่
-      <input name="stock" type="number" min="0" value="${escapeHtml(item.stock || 0)}" required />
-    </label>
-    <button type="button" class="button ghost remove-stock-row">ลบ</button>
-  `;
-
-  const removeButton = row.querySelector('.remove-stock-row');
-  removeButton.addEventListener('click', () => row.remove());
-  stockRows.appendChild(row);
-}
-
 function renderOrders() {
   const filterText = orderSearchInput.value.trim().toLowerCase();
   const statusFilter = orderStatusFilter.value;
@@ -278,79 +251,114 @@ function renderOrders() {
   });
 }
 
-function renderStockList() {
-  adminStockBody.innerHTML = '';
-  const searchText = stockSearchInput.value.trim().toLowerCase();
-  const list = adminProducts.flatMap(product => product.colors.map(color => ({
-    code: product.code,
-    name: product.name,
-    colorName: color.name,
-    stock: Number.isFinite(Number(color.stock)) ? Number(color.stock) : '-' 
-  }))).filter(item => !searchText || [item.code, item.name, item.colorName]
-    .some(value => String(value || '').toLowerCase().includes(searchText)));
+const stockDrafts = new Map();
+let savingStock = false;
+const saveStockChanges = document.getElementById('saveStockChanges');
+const discardStockChanges = document.getElementById('discardStockChanges');
+const stockKey = item => JSON.stringify([item.code, item.colorName]);
 
+function updateStockDraftSummary() {
+  document.getElementById('stockDraftStatus').textContent = savingStock
+    ? 'กำลังบันทึก...' : stockDrafts.size ? `แก้ไข ${stockDrafts.size} รายการ ยังไม่ได้บันทึก` : 'ยังไม่มีรายการแก้ไข';
+  saveStockChanges.disabled = savingStock || !stockDrafts.size;
+  discardStockChanges.disabled = savingStock || !stockDrafts.size;
+  document.getElementById('stockDraftReview').hidden = !stockDrafts.size;
+  document.getElementById('stockDraftList').innerHTML = Array.from(stockDrafts.values(), item =>
+    `<li>${escapeHtml(item.code)} · ${escapeHtml(item.colorName)}: ${item.original} → ${escapeHtml(item.stock === '' ? 'ยังไม่ระบุ' : item.stock)} ชิ้น</li>`
+  ).join('');
+}
+
+function renderStockList() {
+  const searchTerms = stockSearchInput.value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const list = adminProducts.flatMap(product => product.colors.map(color => ({
+    code: product.code, name: product.name, colorName: color.name,
+    stock: Number(color.stock || 0)
+  }))).filter(item => searchTerms.every(term =>
+    `${item.code} ${item.name} ${item.colorName}`.toLowerCase().includes(term)));
+  adminStockBody.innerHTML = '';
+  updateStockDraftSummary();
   if (!list.length) {
-    adminStockBody.innerHTML = `<tr><td colspan="5">${searchText ? 'ไม่พบสินค้าที่ตรงกับคำค้น' : 'ไม่พบข้อมูลสต็อก'}</td></tr>`;
+    adminStockBody.innerHTML = '<tr><td colspan="5">ไม่พบสินค้าที่ตรงกับคำค้น</td></tr>';
     return;
   }
-
   list.forEach(item => {
+    const key = stockKey(item);
     const row = document.createElement('tr');
+    row.classList.toggle('stock-edited', stockDrafts.has(key));
     row.innerHTML = `
-      <td>${escapeHtml(item.code)}</td>
-      <td>${escapeHtml(item.name)}</td>
-      <td>${escapeHtml(item.colorName)}</td>
-      <td>
-        <input
-          class="stock-inline-input"
-          type="number"
-          min="0"
-          max="1000000"
-          value="${escapeHtml(item.stock)}"
-          aria-label="จำนวนสต็อก ${escapeHtml(item.code)} สี ${escapeHtml(item.colorName)}"
-        />
+      <td data-label="รหัส">${escapeHtml(item.code)}</td>
+      <td data-label="สินค้า">${escapeHtml(item.name)}</td>
+      <td data-label="สี / ลาย / ไซซ์">${escapeHtml(item.colorName)}</td>
+      <td data-label="จำนวน">
+        <div class="stock-stepper">
+          <button type="button" data-step="-1" aria-label="ลดจำนวน ${escapeHtml(item.code)} ${escapeHtml(item.colorName)}">−</button>
+          <input class="stock-inline-input" type="number" min="0" max="1000000" step="1" inputmode="numeric"
+            value="${escapeHtml(stockDrafts.get(key)?.stock ?? item.stock)}" aria-label="จำนวน ${escapeHtml(item.code)} ${escapeHtml(item.colorName)}" />
+          <button type="button" data-step="1" aria-label="เพิ่มจำนวน ${escapeHtml(item.code)} ${escapeHtml(item.colorName)}">+</button>
+        </div>
+        <small>ยอดที่โหลดมา ${item.stock} ชิ้น</small>
       </td>
-      <td><button class="button primary stock-inline-save" type="button">บันทึก</button></td>
-    `;
+      <td><button type="button" class="button ghost stock-zero">หมด</button></td>`;
     adminStockBody.appendChild(row);
-
-    const stockInput = row.querySelector('.stock-inline-input');
-    const saveButton = row.querySelector('.stock-inline-save');
-
-    const saveStock = async () => {
-      const stock = Number(stockInput.value);
-      if (!Number.isInteger(stock) || stock < 0 || stock > 1000000) {
-        showAdminMessage('กรุณากรอกจำนวนสต็อกเป็นเลขจำนวนเต็มตั้งแต่ 0 ถึง 1,000,000', 'error');
-        stockInput.focus();
-        return;
-      }
-
-      saveButton.disabled = true;
-      saveButton.textContent = 'กำลังบันทึก...';
-      try {
-        await sendStockUpdate([{
-          code: item.code,
-          colorName: item.colorName,
-          stock
-        }]);
-        showAdminMessage(`อัปเดต ${item.code} สี ${item.colorName} เป็น ${stock} ชิ้นแล้ว`, 'success');
-        await fetchAdminData();
-      } catch (error) {
-        showAdminMessage(error.message || 'อัปเดตสต็อกไม่สำเร็จ', 'error');
-        saveButton.disabled = false;
-        saveButton.textContent = 'บันทึก';
-      }
+    const input = row.querySelector('input');
+    const sync = () => {
+      const value = input.value;
+      const original = stockDrafts.get(key)?.original ?? item.stock;
+      if (value !== '' && Number(value) === original) stockDrafts.delete(key);
+      else stockDrafts.set(key, { ...item, original, stock: value });
+      row.classList.toggle('stock-edited', stockDrafts.has(key));
+      row.querySelector('[data-step="-1"]').disabled = savingStock || Number(value) <= 0;
+      row.querySelector('[data-step="1"]').disabled = savingStock || Number(value) >= 1000000;
+      updateStockDraftSummary();
     };
-
-    saveButton.addEventListener('click', saveStock);
-    stockInput.addEventListener('keydown', event => {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        saveStock();
-      }
-    });
+    row.querySelectorAll('button, input').forEach(control => { control.disabled = savingStock; });
+    row.querySelector('[data-step="-1"]').disabled = savingStock || Number(input.value) <= 0;
+    row.querySelector('[data-step="1"]').disabled = savingStock || Number(input.value) >= 1000000;
+    input.addEventListener('input', sync);
+    row.querySelectorAll('[data-step]').forEach(button => button.addEventListener('click', () => {
+      input.value = String(Math.max(0, Math.min(1000000, Math.trunc(Number(input.value) || 0) + Number(button.dataset.step))));
+      sync();
+    }));
+    row.querySelector('.stock-zero').addEventListener('click', () => { input.value = '0'; sync(); });
   });
 }
+
+saveStockChanges.addEventListener('click', async () => {
+  if (savingStock || !stockDrafts.size) return;
+  const items = Array.from(stockDrafts.values());
+  if (items.some(item => item.stock === '' || !Number.isInteger(Number(item.stock)) || Number(item.stock) < 0 || Number(item.stock) > 1000000)) {
+    showAdminMessage('กรอกจำนวนเต็มตั้งแต่ 0 ถึง 1,000,000 ให้ครบทุกรายการก่อนบันทึก', 'error');
+    return;
+  }
+  if (items.length > 100) {
+    showAdminMessage('บันทึกได้ครั้งละไม่เกิน 100 รายการ กรุณาลดรายการที่แก้ไขก่อน', 'error');
+    return;
+  }
+  savingStock = true;
+  renderStockList();
+  try {
+    await sendStockUpdate(items.map(({ code, colorName, stock }) => ({ code, colorName, stock: Number(stock) })));
+    for (const item of items) {
+      const product = adminProducts.find(product => product.code === item.code);
+      const color = product?.colors.find(color => color.name === item.colorName);
+      if (color) color.stock = Number(item.stock);
+    }
+    stockDrafts.clear();
+    showAdminMessage(`บันทึกสต็อก ${items.length} รายการแล้ว`, 'success');
+    try { await fetchAdminData(); } catch (error) {
+      showAdminMessage('บันทึกสำเร็จแล้ว แต่โหลดข้อมูลล่าสุดไม่สำเร็จ กรุณากดรีเฟรช', 'error');
+    }
+  } catch (error) {
+    showAdminMessage(error.message || 'บันทึกไม่สำเร็จ รายการที่แก้ไขยังอยู่ กรุณาลองใหม่', 'error');
+  } finally {
+    savingStock = false;
+    renderStockList();
+  }
+});
+discardStockChanges.addEventListener('click', () => { stockDrafts.clear(); renderStockList(); });
+window.addEventListener('beforeunload', event => {
+  if (stockDrafts.size) { event.preventDefault(); event.returnValue = ''; }
+});
 
 async function fetchAdminData() {
   const data = await adminRequest('adminOrders');
@@ -414,7 +422,6 @@ clearStockSearchButton.addEventListener('click', () => {
 addPosOrderRowButton.addEventListener('click', createPosOrderRow);
 posAdjustedTotal.addEventListener('input', updatePosOrderDiscount);
 refreshAdminButton.addEventListener('click', () => fetchAdminData().catch(error => showAdminMessage(error.message, 'error')));
-addStockRowButton.addEventListener('click', () => createStockRow());
 
 posOrderForm.addEventListener('submit', async event => {
   event.preventDefault();
@@ -464,28 +471,7 @@ posOrderForm.addEventListener('submit', async event => {
   }
 });
 
-stockUpdateForm.addEventListener('submit', async event => {
-  event.preventDefault();
-  const rows = Array.from(stockRows.querySelectorAll('.admin-stock-row'));
-  const items = rows.map(row => ({
-    code: row.querySelector('[name="code"]').value.trim(),
-    colorName: row.querySelector('[name="colorName"]').value.trim(),
-    stock: Number(row.querySelector('[name="stock"]').value)
-  }));
-
-  try {
-    const result = await sendStockUpdate(items);
-    showAdminMessage(`อัปเดตสต็อก ${result.updated} รายการสำเร็จ`, 'success');
-    await fetchAdminData();
-    stockRows.innerHTML = '';
-    createStockRow();
-  } catch (error) {
-    showAdminMessage(error.message, 'error');
-  }
-});
-
 async function initAdmin() {
-  createStockRow();
   await fetchAdminData();
   createPosOrderRow();
 }

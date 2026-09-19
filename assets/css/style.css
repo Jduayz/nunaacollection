@@ -1018,3 +1018,24 @@ button.product-image:focus-visible::after {
   #productModalContent.swipe-next,
   #productModalContent.swipe-previous { animation: none; }
 }
+
+/* Stock editing */
+.admin-stock-grid { grid-template-columns: minmax(0, 1fr); }
+.stock-save-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; position: sticky; top: 0; z-index: 2; background: var(--paper); padding: 12px 0; }
+.stock-save-bar > span { flex: 1; }
+.stock-stepper { display: flex; align-items: center; gap: 6px; }
+.stock-stepper button { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 12px; background: #fffaf2; font-size: 24px; cursor: pointer; }
+.stock-stepper .stock-inline-input { width: 84px; text-align: center; padding: 10px 4px; }
+.stock-edited { background: #fff2cf; }
+.stock-stepper button:disabled { opacity: .4; cursor: default; }
+#stockDraftReview { margin: 12px 0; }
+#stockDraftReview summary { cursor: pointer; }
+@media (max-width: 640px) {
+  .admin-stock-table thead { display: none; }
+  .admin-stock-table, .admin-stock-table tbody { display: block; width: 100%; }
+  .admin-stock-table tr { display: block; border: 1px solid var(--line); border-radius: 16px; margin: 12px 0; padding: 12px; }
+  .admin-stock-table td { display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 0; padding: 6px 0; flex-wrap: wrap; }
+  .admin-stock-table td[data-label]::before { content: attr(data-label); font-weight: 700; }
+  .stock-save-bar > span { flex-basis: 100%; }
+  .stock-save-bar .button { flex: 1; }
+}

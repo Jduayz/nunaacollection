@@ -12,7 +12,7 @@
   <meta name="robots" content="noindex,nofollow" />
   <link rel="manifest" href="/manifest.webmanifest" />
   <link rel="apple-touch-icon" href="/assets/icons/nunaa-app-icon.png" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20260816-pos-discount" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20260919-stock-controls" />
 </head>
 <body>
   <header class="site-header admin-header" id="adminHeader" hidden>
@@ -153,23 +153,10 @@
         </div>
       </div>
       <div class="admin-stock-grid">
-        <div class="admin-stock-form-card">
-          <form id="stockUpdateForm" class="admin-stock-form">
-            <div class="form-heading">
-              <h3>อัปเดตสต็อก</h3>
-              <p>เลือกสินค้าและกรอกจำนวนสต็อกใหม่</p>
-            </div>
-            <div id="stockRows"></div>
-            <div class="stock-actions">
-              <button id="addStockRowButton" type="button" class="button ghost">เพิ่มรายการ</button>
-              <button type="submit" class="button primary">บันทึกสต็อก</button>
-            </div>
-          </form>
-        </div>
         <div class="admin-stock-list-card">
           <div class="form-heading">
             <h3>สต็อกปัจจุบัน</h3>
-            <p>รายการสินค้าที่อ่านจากระบบล่าสุด</p>
+            <p>กด − / + หรือพิมพ์ยอดใหม่ แล้วตรวจรายการก่อนบันทึก</p>
           </div>
           <div class="stock-search">
             <label for="stockSearchInput">ค้นหาสต็อก</label>
@@ -183,13 +170,19 @@
               <button id="clearStockSearchButton" class="button ghost" type="button">ล้าง</button>
             </div>
           </div>
+          <div class="stock-save-bar">
+            <span id="stockDraftStatus" role="status">ยังไม่มีรายการแก้ไข</span>
+            <button id="discardStockChanges" class="button ghost" type="button" disabled>ยกเลิกการแก้ไข</button>
+            <button id="saveStockChanges" class="button primary" type="button" disabled>บันทึกทั้งหมด</button>
+          </div>
+          <details id="stockDraftReview"><summary>รายการที่กำลังแก้ไข</summary><ul id="stockDraftList"></ul></details>
           <div class="admin-table-wrap admin-stock-list-wrap">
             <table class="admin-stock-table" id="adminStockTable">
               <thead>
                 <tr>
                   <th>รหัส</th>
                   <th>สินค้า</th>
-                  <th>สี</th>
+                  <th>สี / ลาย / ไซซ์</th>
                   <th>สต็อก</th>
                   <th>แก้ไข</th>
                 </tr>
@@ -207,6 +200,6 @@
   </main>
 
   <script src="assets/js/config.js"></script>
-  <script type="module" src="assets/js/admin-auth.js?v=20260816-pos-discount"></script>
+  <script type="module" src="assets/js/admin-auth.js?v=20260919-stock-controls"></script>
 </body>
 </html>

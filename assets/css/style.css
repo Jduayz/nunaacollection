@@ -181,6 +181,17 @@ a { color: inherit; text-decoration: none; }
   border-color: var(--accent);
   color: #fff;
 }
+.category-count {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, .08);
+  font-size: .8em;
+  text-align: center;
+}
+.category-button[aria-pressed="true"] .category-count { background: rgba(255, 255, 255, .2); }
+.product-results-count { color: var(--muted); font-size: .9rem; margin: 0 0 20px; }
 .category-button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 .product-empty { grid-column: 1 / -1; color: var(--muted); text-align: center; padding: 32px 0; }
 .shop-toolbar {

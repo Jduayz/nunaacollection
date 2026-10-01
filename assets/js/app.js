@@ -613,6 +613,7 @@ let countdownTimer = null;
 const productGrid = document.querySelector('#productGrid');
 const productSortSelect = document.querySelector('#productSort');
 const productCategories = document.querySelector('#productCategories');
+const productResultsCount = document.querySelector('#productResultsCount');
 let currentProductCategory = 'all';
 const cartItems = document.querySelector('#cartItems');
 const cartTotal = document.querySelector('#cartTotal');
@@ -712,6 +713,8 @@ const translations = {
     'shop.categoryDresses': 'เดรส',
     'shop.categoryOther': 'อื่น ๆ',
     'shop.categoryEmpty': 'ยังไม่มีสินค้าในหมวดนี้',
+    'shop.resultsCount': 'แสดง {count} จากทั้งหมด {total} แบบ',
+    'shop.stockCount': 'พร้อมขาย {stock} ชิ้น',
     'shop.sortLabel': 'เรียงสินค้า',
     'shop.sortCode': 'รหัสสินค้า',
     'shop.sortPriceAsc': 'ราคา: ถูกไปแพง',
@@ -859,6 +862,8 @@ const translations = {
     'shop.categoryDresses': 'Dresses',
     'shop.categoryOther': 'Other',
     'shop.categoryEmpty': 'No products in this category yet.',
+    'shop.resultsCount': 'Showing {count} of {total} styles',
+    'shop.stockCount': '{stock} items in stock',
     'shop.sortLabel': 'Sort products',
     'shop.sortCode': 'Product code',
     'shop.sortPriceAsc': 'Price: low to high',
@@ -1006,6 +1011,8 @@ const translations = {
     'shop.categoryDresses': '连衣裙',
     'shop.categoryOther': '其他',
     'shop.categoryEmpty': '此分类暂无商品。',
+    'shop.resultsCount': '显示 {count} 款，共 {total} 款',
+    'shop.stockCount': '库存 {stock} 件',
     'shop.sortLabel': '商品排序',
     'shop.sortCode': '商品编号',
     'shop.sortPriceAsc': '价格：从低到高',
@@ -1843,13 +1850,24 @@ async function loadProductsFromSheet() {
 }
 
 function renderProducts() {
+  const categoryCounts = { all: products.length, tops: 0, skirts: 0, pants: 0, dresses: 0, other: 0 };
+  products.forEach(product => { categoryCounts[getProductCategory(product)] += 1; });
   productCategories?.querySelectorAll('[data-category]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.category === currentProductCategory));
+    const count = button.querySelector('[data-category-count]');
+    if (count) count.textContent = categoryCounts[button.dataset.category];
     if (button.dataset.category === 'other') {
-      button.hidden = currentProductCategory !== 'other' && !products.some(product => getProductCategory(product) === 'other');
+      button.hidden = currentProductCategory !== 'other' && categoryCounts.other === 0;
     }
   });
   const visibleProducts = getSortedProducts();
+  if (productResultsCount) {
+    const colors = visibleProducts.flatMap(product => product.colors);
+    const hasStockData = colors.length > 0 && colors.every(color => Number.isFinite(Number(color.stock)));
+    const stock = colors.reduce((total, color) => total + Math.max(0, Number(color.stock) || 0), 0);
+    productResultsCount.textContent = t('shop.resultsCount', { count: visibleProducts.length, total: products.length })
+      + (hasStockData ? ` • ${t('shop.stockCount', { stock })}` : '');
+  }
   if (!visibleProducts.length) {
     productGrid.innerHTML = `<p class="product-empty" role="status">${t('shop.categoryEmpty')}</p>`;
     return;

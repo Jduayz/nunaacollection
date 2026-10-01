@@ -508,6 +508,7 @@ function getProducts() {
       productMap[row.code] = {
         code: row.code,
         name: row.name,
+        category: row.category || '',
         price: Number(row.price || 0),
         detail: row.detail || '',
         image: row.image || '',

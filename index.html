@@ -21,7 +21,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nunaacollection.com" />
   <link rel="canonical" href="https://nunaacollection.com" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20260803-product-swipe-2" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20261001-categories" />
 </head>
 <body>
   <header class="site-header">
@@ -71,6 +71,14 @@
     <section id="shop" class="section">
       <div class="section-heading">
         <h2 data-i18n="shop.title">สินค้าพร้อมสั่งซื้อ</h2>
+      </div>
+      <div class="product-categories" id="productCategories" role="group" aria-label="หมวดสินค้า" data-i18n-aria="shop.categories">
+        <button type="button" class="category-button" data-category="all" aria-pressed="true" data-i18n="shop.categoryAll">ทั้งหมด</button>
+        <button type="button" class="category-button" data-category="tops" aria-pressed="false" data-i18n="shop.categoryTops">เสื้อ</button>
+        <button type="button" class="category-button" data-category="skirts" aria-pressed="false" data-i18n="shop.categorySkirts">กระโปรง</button>
+        <button type="button" class="category-button" data-category="pants" aria-pressed="false" data-i18n="shop.categoryPants">กางเกง</button>
+        <button type="button" class="category-button" data-category="dresses" aria-pressed="false" data-i18n="shop.categoryDresses">เดรส</button>
+        <button type="button" class="category-button" data-category="other" aria-pressed="false" data-i18n="shop.categoryOther" hidden>อื่น ๆ</button>
       </div>
       <div class="shop-toolbar">
         <label for="productSort" data-i18n="shop.sortLabel">เรียงสินค้า</label>
@@ -251,6 +259,6 @@
   </footer>
 
   <script src="assets/js/config.js?v=20260711-new-sheets-url"></script>
-  <script src="assets/js/app.js?v=20260913-prices"></script>
+  <script src="assets/js/app.js?v=20261001-categories"></script>
 </body>
 </html>

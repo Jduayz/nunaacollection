@@ -612,6 +612,8 @@ let countdownTimer = null;
 
 const productGrid = document.querySelector('#productGrid');
 const productSortSelect = document.querySelector('#productSort');
+const productCategories = document.querySelector('#productCategories');
+let currentProductCategory = 'all';
 const cartItems = document.querySelector('#cartItems');
 const cartTotal = document.querySelector('#cartTotal');
 const cartShipping = document.querySelector('#cartShipping');
@@ -702,6 +704,14 @@ const translations = {
     'about.bodyThree': 'พวกเราอยากเป็นส่วนหนึ่งที่ช่วยให้คุณแสดงความเป็นตัวของตัวเองออกมาได้อย่างมั่นใจ ผ่านเสื้อผ้าที่รังสรรค์ด้วยความใส่ใจและความตั้งใจในทุกชิ้น',
     'about.bodyFour': 'เราแค่อยากเห็นคุณงดงามในแบบที่คุณเป็น',
     'shop.title': 'สินค้าพร้อมสั่งซื้อ',
+    'shop.categories': 'หมวดสินค้า',
+    'shop.categoryAll': 'ทั้งหมด',
+    'shop.categoryTops': 'เสื้อ',
+    'shop.categorySkirts': 'กระโปรง',
+    'shop.categoryPants': 'กางเกง',
+    'shop.categoryDresses': 'เดรส',
+    'shop.categoryOther': 'อื่น ๆ',
+    'shop.categoryEmpty': 'ยังไม่มีสินค้าในหมวดนี้',
     'shop.sortLabel': 'เรียงสินค้า',
     'shop.sortCode': 'รหัสสินค้า',
     'shop.sortPriceAsc': 'ราคา: ถูกไปแพง',
@@ -841,6 +851,14 @@ const translations = {
     'about.bodyThree': 'We hope to play a small part in helping you express who you are with confidence, through clothes created with care and intention in every piece.',
     'about.bodyFour': 'We simply want to see you bloom beautifully as yourself.',
     'shop.title': 'Ready-to-order pieces',
+    'shop.categories': 'Product categories',
+    'shop.categoryAll': 'All',
+    'shop.categoryTops': 'Tops',
+    'shop.categorySkirts': 'Skirts',
+    'shop.categoryPants': 'Pants & shorts',
+    'shop.categoryDresses': 'Dresses',
+    'shop.categoryOther': 'Other',
+    'shop.categoryEmpty': 'No products in this category yet.',
     'shop.sortLabel': 'Sort products',
     'shop.sortCode': 'Product code',
     'shop.sortPriceAsc': 'Price: low to high',
@@ -980,6 +998,14 @@ const translations = {
     'about.bodyThree': '我们希望通过每一件用心制作的衣服，陪伴你自信地展现真实的自己。',
     'about.bodyFour': '我们只是想看见你以自己的方式美丽绽放。',
     'shop.title': '可订购商品',
+    'shop.categories': '商品分类',
+    'shop.categoryAll': '全部',
+    'shop.categoryTops': '上衣',
+    'shop.categorySkirts': '半身裙',
+    'shop.categoryPants': '裤子',
+    'shop.categoryDresses': '连衣裙',
+    'shop.categoryOther': '其他',
+    'shop.categoryEmpty': '此分类暂无商品。',
     'shop.sortLabel': '商品排序',
     'shop.sortCode': '商品编号',
     'shop.sortPriceAsc': '价格：从低到高',
@@ -1255,8 +1281,30 @@ function compareProductCodes(productA, productB) {
   });
 }
 
+function getProductCategory(product) {
+  const category = String(product.category || '').trim().toLowerCase();
+  const aliases = {
+    tops: 'tops', top: 'tops', shirt: 'tops', shirts: 'tops', 'เสื้อ': 'tops',
+    skirts: 'skirts', skirt: 'skirts', 'กระโปรง': 'skirts',
+    pants: 'pants', trousers: 'pants', shorts: 'pants', 'กางเกง': 'pants',
+    dresses: 'dresses', dress: 'dresses', 'เดรส': 'dresses',
+    other: 'other', 'อื่น ๆ': 'other'
+  };
+  if (aliases[category]) return aliases[category];
+  if (category) return 'other';
+  // Older sheets have no category column; infer their existing product names.
+  const name = String(product.name || '').toLowerCase();
+  if (/\bdress(?:es)?\b|เดรส|ชุดกระโปรง/.test(name)) return 'dresses';
+  if (/\bskirt(?:s)?\b|กระโปรง/.test(name)) return 'skirts';
+  if (/\b(?:pants?|trousers?|shorts?|jeans?|leggings?)\b|กางเกง/.test(name)) return 'pants';
+  if (/\b(?:tops?|shirts?|blouses?|vests?|coats?|jackets?)\b|เสื้อ|puff sleeve|long sleeve/.test(name)) return 'tops';
+  return 'other';
+}
+
 function getSortedProducts() {
-  const sortedProducts = [...products];
+  const sortedProducts = products.filter(product => (
+    currentProductCategory === 'all' || getProductCategory(product) === currentProductCategory
+  ));
 
   if (currentProductSort === 'price-asc') {
     return sortedProducts.sort((productA, productB) => (
@@ -1752,6 +1800,7 @@ function normalizeProduct(row, index) {
     id: index + 1,
     code: row.code,
     name: override.name || row.name,
+    category: row.category || '',
     price: Number(row.price) || 0,
     detail: override.detail || row.detail || '',
     image: override.image || row.image || '',
@@ -1794,7 +1843,18 @@ async function loadProductsFromSheet() {
 }
 
 function renderProducts() {
-  productGrid.innerHTML = getSortedProducts().map(product => {
+  productCategories?.querySelectorAll('[data-category]').forEach(button => {
+    button.setAttribute('aria-pressed', String(button.dataset.category === currentProductCategory));
+    if (button.dataset.category === 'other') {
+      button.hidden = currentProductCategory !== 'other' && !products.some(product => getProductCategory(product) === 'other');
+    }
+  });
+  const visibleProducts = getSortedProducts();
+  if (!visibleProducts.length) {
+    productGrid.innerHTML = `<p class="product-empty" role="status">${t('shop.categoryEmpty')}</p>`;
+    return;
+  }
+  productGrid.innerHTML = visibleProducts.map(product => {
     const stockInfo = getStockStatus(product);
     return `
       <article class="product-card${getProductAvailability(product) ? '' : ' sold-out'}" data-product-id="${product.id}">
@@ -1900,6 +1960,7 @@ function openProductDetail(product) {
 function navigateProductDetail(direction) {
   if (!products.length || activeDetailProductId === null) return;
   const sortedProducts = getSortedProducts();
+  if (!sortedProducts.length) return;
   const currentIndex = sortedProducts.findIndex(product => product.id === activeDetailProductId);
   const nextIndex = (currentIndex + direction + sortedProducts.length) % sortedProducts.length;
   const nextProduct = sortedProducts[nextIndex];
@@ -2398,6 +2459,13 @@ languageButtons.forEach(button => {
     localStorage.setItem('nunaaLanguage', currentLanguage);
     applyTranslations();
   });
+});
+
+productCategories?.addEventListener('click', event => {
+  const button = event.target.closest('[data-category]');
+  if (!button || !productCategories.contains(button)) return;
+  currentProductCategory = button.dataset.category;
+  renderProducts();
 });
 
 productSortSelect?.addEventListener('change', () => {

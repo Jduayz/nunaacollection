@@ -21,7 +21,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://nunaacollection.com" />
   <link rel="canonical" href="https://nunaacollection.com" />
-  <link rel="stylesheet" href="assets/css/style.css?v=20261001-category-counts" />
+  <link rel="stylesheet" href="assets/css/style.css?v=20261001-shopping-ux" />
 </head>
 <body>
   <header class="site-header">
@@ -81,6 +81,10 @@
         <button type="button" class="category-button" data-category="other" aria-pressed="false" hidden><span data-i18n="shop.categoryOther">อื่น ๆ</span> <span class="category-count" data-category-count>0</span></button>
       </div>
       <p class="product-results-count" id="productResultsCount" role="status" aria-live="polite" aria-atomic="true"></p>
+      <label class="stock-filter" for="availableOnly">
+        <input type="checkbox" id="availableOnly" />
+        <span data-i18n="shop.onlyAvailable">ดูเฉพาะสินค้าที่มีสต๊อก</span>
+      </label>
       <div class="shop-toolbar">
         <label for="productSort" data-i18n="shop.sortLabel">เรียงสินค้า</label>
         <select id="productSort">
@@ -260,6 +264,6 @@
   </footer>
 
   <script src="assets/js/config.js?v=20260711-new-sheets-url"></script>
-  <script src="assets/js/app.js?v=20261001-category-counts"></script>
+  <script src="assets/js/app.js?v=20261001-shopping-ux"></script>
 </body>
 </html>

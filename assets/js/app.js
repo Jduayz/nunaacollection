@@ -258,7 +258,11 @@ function getNn027Colors(sourceColors = []) {
 }
 
 function getSelectedColor(product) {
-  return product.colors[selectedColors.get(product.id) || 0] || product.colors[0];
+  if (!selectedColors.has(product.id)) {
+    const availableIndex = product.colors.findIndex(color => isColorAvailable(product, color));
+    selectedColors.set(product.id, availableIndex >= 0 ? availableIndex : 0);
+  }
+  return product.colors[selectedColors.get(product.id)] || product.colors[0];
 }
 
 let products = [
@@ -612,6 +616,8 @@ let countdownTimer = null;
 
 const productGrid = document.querySelector('#productGrid');
 const productSortSelect = document.querySelector('#productSort');
+const availableOnlyCheckbox = document.querySelector('#availableOnly');
+let showAvailableOnly = false;
 const productCategories = document.querySelector('#productCategories');
 const productResultsCount = document.querySelector('#productResultsCount');
 let currentProductCategory = 'all';
@@ -660,7 +666,7 @@ let productTouchStart = null;
 let swipeHintShown = false;
 let swipeHintTimer = null;
 let captchaWidgetId = null;
-let currentProductSort = localStorage.getItem(PRODUCT_SORT_STORAGE_KEY) || 'code';
+let currentProductSort = localStorage.getItem(PRODUCT_SORT_STORAGE_KEY) || 'available';
 
 function getClientId() {
   try {
@@ -715,6 +721,9 @@ const translations = {
     'shop.categoryEmpty': 'ยังไม่มีสินค้าในหมวดนี้',
     'shop.resultsCount': 'แสดง {count} จากทั้งหมด {total} แบบ',
     'shop.stockCount': 'พร้อมขาย {stock} ชิ้น',
+    'shop.onlyAvailable': 'ดูเฉพาะสินค้าที่มีสต๊อก',
+    'product.colorSoldOut': 'สีนี้หมด',
+    'product.colorInCart': 'สีนี้อยู่ในตะกร้าครบจำนวนแล้ว',
     'shop.sortLabel': 'เรียงสินค้า',
     'shop.sortCode': 'รหัสสินค้า',
     'shop.sortPriceAsc': 'ราคา: ถูกไปแพง',
@@ -864,6 +873,9 @@ const translations = {
     'shop.categoryEmpty': 'No products in this category yet.',
     'shop.resultsCount': 'Showing {count} of {total} styles',
     'shop.stockCount': '{stock} items in stock',
+    'shop.onlyAvailable': 'In-stock products only',
+    'product.colorSoldOut': 'This color is sold out',
+    'product.colorInCart': 'All available units of this color are in your cart',
     'shop.sortLabel': 'Sort products',
     'shop.sortCode': 'Product code',
     'shop.sortPriceAsc': 'Price: low to high',
@@ -1013,6 +1025,9 @@ const translations = {
     'shop.categoryEmpty': '此分类暂无商品。',
     'shop.resultsCount': '显示 {count} 款，共 {total} 款',
     'shop.stockCount': '库存 {stock} 件',
+    'shop.onlyAvailable': '仅显示有货商品',
+    'product.colorSoldOut': '此颜色已售罄',
+    'product.colorInCart': '此颜色的可用库存已全部加入购物车',
     'shop.sortLabel': '商品排序',
     'shop.sortCode': '商品编号',
     'shop.sortPriceAsc': '价格：从低到高',
@@ -1310,7 +1325,8 @@ function getProductCategory(product) {
 
 function getSortedProducts() {
   const sortedProducts = products.filter(product => (
-    currentProductCategory === 'all' || getProductCategory(product) === currentProductCategory
+    (currentProductCategory === 'all' || getProductCategory(product) === currentProductCategory)
+    && (!showAvailableOnly || getProductStockAvailability(product))
   ));
 
   if (currentProductSort === 'price-asc') {
@@ -1343,7 +1359,9 @@ function getStockStatus(product) {
 
   const remaining = getRemainingStock(product, selectedColor);
   if (remaining <= 0) {
-    return { text: t('product.soldOut'), state: 'sold-out', remaining };
+    const key = Number(selectedColor.stock) > 0 ? 'product.colorInCart'
+      : getProductStockAvailability(product) ? 'product.colorSoldOut' : 'product.soldOut';
+    return { text: t(key), state: 'sold-out', remaining };
   }
 
   return {
@@ -1536,7 +1554,7 @@ function refreshProductStockDisplays() {
     }
 
     const addButton = card.querySelector('.add-cart');
-    if (addButton) addButton.disabled = !getProductAvailability(product);
+    if (addButton) addButton.disabled = !isColorAvailable(product, getSelectedColor(product));
     card.classList.toggle('sold-out', !getProductAvailability(product));
   });
 }
@@ -1732,7 +1750,7 @@ function addProductToCart(product, feedbackButton) {
 
   if (!selectedColor || !isColorAvailable(product, selectedColor)) {
     if (feedbackButton) {
-      feedbackButton.textContent = t('product.soldOut');
+      feedbackButton.textContent = getStockStatus(product).text;
       window.setTimeout(() => {
         feedbackButton.textContent = t('product.addCart');
       }, 1200);
@@ -1850,8 +1868,9 @@ async function loadProductsFromSheet() {
 }
 
 function renderProducts() {
-  const categoryCounts = { all: products.length, tops: 0, skirts: 0, pants: 0, dresses: 0, other: 0 };
-  products.forEach(product => { categoryCounts[getProductCategory(product)] += 1; });
+  const countedProducts = showAvailableOnly ? products.filter(getProductStockAvailability) : products;
+  const categoryCounts = { all: countedProducts.length, tops: 0, skirts: 0, pants: 0, dresses: 0, other: 0 };
+  countedProducts.forEach(product => { categoryCounts[getProductCategory(product)] += 1; });
   productCategories?.querySelectorAll('[data-category]').forEach(button => {
     button.setAttribute('aria-pressed', String(button.dataset.category === currentProductCategory));
     const count = button.querySelector('[data-category-count]');
@@ -1891,7 +1910,7 @@ function renderProducts() {
           <p class="stock-status ${stockInfo.state}" data-stock-id="${product.id}" data-stock-state="${stockInfo.state}">${stockInfo.text}</p>
         </div>
         ${renderProductSelector(product, 'card')}
-        <button class="button primary add-cart" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
+        <button class="button primary add-cart" data-id="${product.id}" ${isColorAvailable(product, getSelectedColor(product)) ? '' : 'disabled'}>${t('product.addCart')}</button>
       </article>
     `;
   }).join('');
@@ -1956,7 +1975,7 @@ function renderProductDetail(product) {
           </p>
         </div>
         ${renderProductSelector(product, 'modal')}
-        <button class="button primary modal-add-cart" type="button" data-id="${product.id}" ${getProductAvailability(product) ? '' : 'disabled'}>${t('product.addCart')}</button>
+        <button class="button primary modal-add-cart" type="button" data-id="${product.id}" ${isColorAvailable(product, getSelectedColor(product)) ? '' : 'disabled'}>${t('product.addCart')}</button>
       </div>
     </article>
   `;
@@ -2286,8 +2305,7 @@ productGrid.addEventListener('click', event => {
       swatch.setAttribute('aria-pressed', String(isSelected));
     });
 
-    const stockStatus = card.querySelector('[data-stock-id]');
-    if (stockStatus && product) stockStatus.textContent = formatStockText(product);
+    if (product) refreshProductStockDisplays();
     return;
   }
 
@@ -2486,6 +2504,11 @@ productCategories?.addEventListener('click', event => {
   renderProducts();
 });
 
+availableOnlyCheckbox?.addEventListener('change', () => {
+  showAvailableOnly = availableOnlyCheckbox.checked;
+  renderProducts();
+});
+
 productSortSelect?.addEventListener('change', () => {
   currentProductSort = productSortSelect.value;
   localStorage.setItem(PRODUCT_SORT_STORAGE_KEY, currentProductSort);
@@ -2616,7 +2639,7 @@ orderStatusForm?.addEventListener('submit', async event => {
 async function init() {
   if (!translations[currentLanguage]) currentLanguage = 'th';
   if (!['code', 'price-asc', 'price-desc', 'available'].includes(currentProductSort)) {
-    currentProductSort = 'code';
+    currentProductSort = 'available';
   }
   if (productSortSelect) productSortSelect.value = currentProductSort;
   setupCaptcha();
